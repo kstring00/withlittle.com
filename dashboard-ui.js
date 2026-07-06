@@ -374,10 +374,15 @@
     document.getElementById('dashSeedbed')?.addEventListener('keydown', e=>{
       if(e.target.id !== 'dashPlantSeed' || e.key !== 'Enter') return;
       const text = e.target.value.trim();
-      if(!text || typeof ensureIdeas !== 'function') return;
-      ensureIdeas();
-      globals.ideas.push(normalizeIdea({ text, status:'seedbed', category:'other' }));
-      e.target.value = ''; markDirty?.(); renderDashboard(); showDashToast('Seed planted.');
+      if(!text) return;
+      if(typeof IdeasStore !== 'undefined'){
+        IdeasStore.createIdea({ text, sourceType:'quick', lifeArea:'other' });
+        if(typeof globals !== 'undefined') globals.ideasHub = IdeasStore.getIdeas();
+      } else if(typeof ensureIdeas === 'function'){
+        ensureIdeas();
+        globals.ideas.push(normalizeIdea({ text, status:'seedbed', category:'other' }));
+      }
+      e.target.value = ''; markDirty?.(); renderDashboard(); showDashToast('Idea captured.');
     });
     document.getElementById('dashSeedbed')?.addEventListener('click', e=>{
       if(e.target.closest('[data-dash-seed]')) setMode('ideas');

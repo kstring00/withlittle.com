@@ -478,7 +478,148 @@ body.view-prayer .site-foot,body.view-journal .site-foot{display:none}
 @media(max-width:560px){.prayer-grid{grid-template-columns:1fr}}
 .prayer-empty{text-align:center;padding:24px;color:var(--mist);font-size:13px;font-style:italic}
 
-/* Ideas — Flow, Seedbed, Calendar */
+/* Ideas Hub */
+.ideas-hub{max-width:1440px;margin:0 auto;padding:0 20px 48px}
+.ih-hero-row{display:grid;grid-template-columns:1fr minmax(280px,420px);gap:20px;margin-bottom:24px;align-items:start}
+@media(max-width:900px){.ih-hero-row{grid-template-columns:1fr}}
+.ih-title-row{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.ih-icon{font-size:28px;color:var(--gold);line-height:1}
+.ih-hero h2{font-family:"Cormorant Garamond",serif;font-size:32px;font-weight:600;color:var(--text-primary);margin:0}
+.ih-sub{margin:0;font-size:14px;color:var(--text-secondary);line-height:1.5}
+.ih-scripture-card{border-radius:20px;padding:28px 32px;min-height:120px;display:flex;align-items:center;
+  background:linear-gradient(135deg,rgba(20,26,36,.92) 0%,rgba(35,45,58,.88) 50%,rgba(25,32,42,.95) 100%),
+  url('assets/mountain-banner.jpg') center/cover no-repeat;border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 8px 32px var(--shadow-elevated)}
+.ih-scripture-card p{margin:0;font-family:"Cormorant Garamond",serif;font-size:17px;line-height:1.55;color:var(--text-primary);font-style:italic}
+.ih-scripture-ref{display:block;margin-top:8px;font-size:13px;color:var(--gold);font-style:normal}
+.ih-pipeline{display:flex;align-items:stretch;gap:0;margin-bottom:24px;overflow-x:auto;padding-bottom:4px}
+.ih-pipe-stage{flex:1;min-width:120px;border:1px solid rgba(255,255,255,.08);background:rgba(20,26,36,.85);
+  border-radius:18px;padding:14px 12px;cursor:pointer;font-family:inherit;text-align:center;color:var(--text-primary);
+  transition:border-color .2s,box-shadow .2s}
+.ih-pipe-stage.on,.ih-pipe-stage:hover{border-color:var(--gold-border-soft);box-shadow:0 0 0 2px var(--gold-glow)}
+.ih-pipe-icon{display:block;font-size:16px;color:var(--gold);margin-bottom:4px}
+.ih-pipe-count{display:block;font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:600;color:var(--text-primary)}
+.ih-pipe-label{display:block;font-size:11px;font-weight:600;margin-top:2px}
+.ih-pipe-sub{display:block;font-size:10px;color:var(--text-muted);margin-top:2px}
+.ih-pipe-arrow{display:flex;align-items:center;color:var(--gold);font-size:18px;opacity:.55;padding:0 4px;flex:none}
+.ih-grid{display:grid;grid-template-columns:minmax(240px,280px) 1fr minmax(240px,280px);gap:18px;align-items:start}
+@media(max-width:1100px){.ih-grid{grid-template-columns:1fr 1fr}.ih-col-right{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}}
+@media(max-width:720px){.ih-grid{grid-template-columns:1fr}.ih-col-right{grid-template-columns:1fr}}
+.ih-col{display:flex;flex-direction:column;gap:16px}
+.ih-card{border:1px solid rgba(255,255,255,.08);background:rgba(20,26,36,.85);border-radius:20px;padding:16px 18px;
+  box-shadow:0 4px 24px var(--shadow-elevated)}
+.ih-card-label{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--text-muted);margin:0 0 10px}
+.ih-card-title{font-family:"Cormorant Garamond",serif;font-size:17px;font-weight:600;color:var(--text-primary);margin:0 0 10px}
+.ih-card-hint{margin:-6px 0 10px;font-size:11px;color:var(--text-muted)}
+.ih-inbox-text{width:100%;border:1px solid var(--border);background:var(--bg-card-2);border-radius:12px;padding:12px;
+  font-size:14px;line-height:1.5;resize:vertical;min-height:88px;font-family:inherit;color:var(--text-primary)}
+.ih-inbox-text:focus{outline:none;border-color:var(--gold)}
+.ih-inbox-tools{display:flex;gap:6px;margin-top:10px}
+.ih-icon-btn{border:1px solid var(--border);background:var(--bg-card-2);border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:16px}
+.ih-icon-btn:hover{border-color:var(--gold-border-soft)}
+.ih-inbox-foot{display:flex;justify-content:flex-end;margin-top:12px}
+.ih-btn-gold{border:none;background:var(--gold);color:var(--text-on-gold);border-radius:10px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.ih-btn-gold:hover{filter:brightness(1.06)}
+.ih-btn-ghost{border:1px solid var(--border);background:transparent;color:var(--text-secondary);border-radius:10px;padding:8px 14px;font-size:12px;cursor:pointer;font-family:inherit;width:100%;margin-top:10px}
+.ih-btn-ghost:hover{color:var(--gold);border-color:var(--gold-border-soft)}
+.ih-quick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ih-quick-btn{display:flex;flex-direction:column;align-items:center;gap:6px;border:1px solid var(--border);background:var(--bg-card-2);
+  border-radius:12px;padding:14px 8px;cursor:pointer;font-size:10px;font-weight:600;color:var(--text-secondary);font-family:inherit}
+.ih-quick-btn span{font-size:20px}
+.ih-quick-btn:hover{border-color:var(--gold-border-soft);color:var(--text-primary)}
+.ih-spark-board{position:relative;border-radius:12px;background:var(--bg-card-2);min-height:120px;margin-bottom:4px;overflow:hidden}
+.ih-sticky{position:absolute;width:76px;padding:8px 6px;border-radius:4px;font-size:10px;line-height:1.3;color:#fff;cursor:grab;
+  box-shadow:0 2px 8px rgba(0,0,0,.25);user-select:none;word-break:break-word}
+.ih-vault-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.ih-tabs{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+.ih-tab{border:none;background:transparent;padding:6px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;
+  font-family:inherit;color:var(--text-muted)}
+.ih-tab.on{background:var(--gold-dim);color:var(--gold)}
+.ih-search-toggle{border:1px solid var(--border);background:var(--bg-card-2);border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:14px}
+.ih-search-inp{width:100%;margin-bottom:12px;padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg-card-2);color:var(--text-primary);font-family:inherit;font-size:13px}
+.ih-vault-list{display:flex;flex-direction:column;gap:10px;max-height:min(60vh,520px);overflow-y:auto;margin-bottom:12px}
+.ih-idea-row{display:flex;gap:12px;padding:14px;border:1px solid var(--border);border-radius:14px;background:var(--bg-card-2);cursor:pointer;transition:border-color .15s}
+.ih-idea-row:hover{border-color:var(--gold-border-soft)}
+.ih-idea-main{flex:1;min-width:0}
+.ih-idea-title{margin:0 0 4px;font-size:14px;font-weight:600;color:var(--text-primary)}
+.ih-idea-desc{margin:0 0 6px;font-size:12px;color:var(--text-secondary);line-height:1.4}
+.ih-idea-meta{font-size:10px;color:var(--text-muted)}
+.ih-idea-actions{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
+.ih-badge{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:3px 8px;border-radius:999px}
+.ih-badge-captured{background:rgba(155,126,217,.2);color:#b89ee8}
+.ih-badge-clarified{background:rgba(91,159,212,.2);color:#7eb8e8}
+.ih-badge-planned{background:var(--gold-dim);color:var(--gold)}
+.ih-badge-in_progress{background:var(--green-bg);color:var(--green)}
+.ih-badge-completed{background:rgba(255,255,255,.08);color:var(--text-muted)}
+.ih-star{border:none;background:none;cursor:pointer;font-size:16px;color:var(--text-muted);padding:0;line-height:1}
+.ih-star.on{color:var(--gold)}
+.ih-more{position:relative;font-size:14px;color:var(--text-muted)}
+.ih-more summary{cursor:pointer;list-style:none}
+.ih-more summary::-webkit-details-marker{display:none}
+.ih-more button{display:block;width:100%;text-align:left;border:none;background:var(--bg-card);padding:8px 12px;font-size:11px;cursor:pointer;font-family:inherit;color:var(--text-primary)}
+.ih-more button:hover{background:var(--bg-hover)}
+.ih-more .ih-danger{color:var(--red)}
+.ih-new-idea{width:100%}
+.ih-empty{text-align:center;padding:24px 12px;font-size:12px;color:var(--text-muted);font-style:italic}
+.ih-focus-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.ih-crown{font-size:18px}
+.ih-focus-title{font-family:"Cormorant Garamond",serif;font-size:18px;color:var(--text-primary);margin:0 0 8px;line-height:1.35}
+.ih-focus-time{font-size:12px;color:var(--text-secondary);margin:0 0 14px}
+.ih-focus-empty{font-size:13px;color:var(--text-muted);font-style:italic;margin:0}
+.ih-open-ws{width:100%}
+.ih-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ih-stat{text-align:center;padding:8px 4px}
+.ih-stat-icon{font-size:14px;display:block;margin-bottom:4px}
+.ih-stat-val{display:block;font-family:"Cormorant Garamond",serif;font-size:24px;font-weight:600;color:var(--text-primary)}
+.ih-stat-lbl{display:block;font-size:10px;color:var(--text-secondary);margin-top:2px}
+.ih-streak-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ih-streak-day{width:28px;text-align:center;font-size:10px;color:var(--text-muted);position:relative;padding-top:18px}
+.ih-streak-lbl{display:block;font-weight:600}
+.ih-streak-check{position:absolute;top:0;left:50%;transform:translateX(-50%);width:18px;height:18px;border-radius:50%;
+  background:var(--gold);color:var(--text-on-gold);font-size:10px;line-height:18px;font-weight:700}
+.ih-streak-count{margin-left:auto;text-align:center}
+.ih-streak-num{display:block;font-family:"Cormorant Garamond",serif;font-size:28px;font-weight:700;color:var(--gold);line-height:1}
+.ih-streak-unit{font-size:10px;color:var(--text-muted)}
+.ih-workspace-backdrop{position:fixed;inset:0;background:var(--overlay-backdrop);z-index:80}
+.ih-workspace{position:fixed;top:0;right:0;width:min(560px,100vw);height:100vh;z-index:81;background:var(--bg-card);
+  border-left:1px solid var(--border);overflow-y:auto;box-shadow:-8px 0 40px var(--shadow-elevated)}
+body.ih-ws-open .app-sidebar{transform:translateX(-100%)}
+body.ih-ws-open.focus-mode .ih-workspace{width:min(720px,100vw)}
+.ih-ws-head{padding:16px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg-card);z-index:2}
+.ih-ws-close{float:right;border:none;background:none;font-size:24px;color:var(--text-muted);cursor:pointer;line-height:1;padding:0}
+.ih-ws-title{width:100%;border:none;background:transparent;font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:600;
+  color:var(--text-primary);margin-bottom:10px;padding:0}
+.ih-ws-title:focus{outline:none}
+.ih-ws-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ih-ws-select{padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg-card-2);color:var(--text-primary);font-family:inherit;font-size:12px}
+.ih-ws-body{padding:16px 18px 40px}
+.ih-ws-section{margin-bottom:24px}
+.ih-ws-section h4{font-family:"Cormorant Garamond",serif;font-size:16px;margin:0 0 12px;color:var(--text-primary)}
+.ih-cl-row,.ih-step-row{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.ih-cl-row span,.ih-step-row span{font-size:11px;font-weight:600;color:var(--text-secondary)}
+.ih-cl-row textarea,.ih-inp{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg-card-2);color:var(--text-primary);font-family:inherit;font-size:13px}
+.ih-growth{text-align:center;padding:16px;background:var(--bg-card-2);border-radius:14px}
+.ih-growth img{width:80px;height:80px;object-fit:contain}
+.ih-growth-fallback{font-size:48px;display:block}
+.ih-growth-label{display:block;margin-top:8px;font-size:12px;color:var(--gold);font-weight:600}
+.ih-sched-row{display:flex;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+.ih-sched-row label{font-size:11px;color:var(--text-secondary);display:flex;flex-direction:column;gap:4px}
+.ih-sched-row input{padding:6px 8px;border:1px solid var(--border);border-radius:8px;background:var(--bg-card-2);color:var(--text-primary);font-family:inherit}
+.ih-window-btns{display:flex;flex-wrap:wrap;gap:6px}
+.ih-window-btn{border:1px solid var(--border);background:var(--bg-card-2);border-radius:8px;padding:6px 10px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--text-secondary)}
+.ih-window-btn.on{background:var(--gold-dim);border-color:var(--gold);color:var(--gold)}
+.ih-first-label{display:block;font-size:11px;color:var(--text-secondary);margin-bottom:6px}
+.ih-check{display:flex;align-items:center;gap:8px;font-size:12px;margin:10px 0;color:var(--text-primary)}
+.ih-check input{accent-color:var(--gold)}
+.ih-btn-plant{width:100%;border:none;background:var(--green);color:var(--text-on-green);border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px}
+.ih-btn-plant:hover{filter:brightness(1.06)}
+.ih-danger{color:var(--red)!important}
+.ih-log{display:flex;flex-direction:column;gap:6px}
+.ih-log-item{font-size:11px;color:var(--text-secondary);padding:6px 8px;background:var(--bg-card-2);border-radius:6px}
+.ih-log-time{color:var(--text-muted);margin-right:6px}
+body.view-ideas .app-content{padding-top:8px}
+
+/* Ideas — Calendar (legacy helpers) */
 .ideas-panel{max-width:1100px;margin:0 auto;padding-bottom:48px}
 .ideas-section{margin-bottom:36px}
 .ideas-section-head{margin-bottom:16px}
@@ -1203,96 +1344,29 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
   <div class="prayer-list" id="prayerList"></div>
 </div>
 
-<div class="board ideas-panel" id="ideasPanel" hidden>
-  <div class="page-head">
-    <div>
-      <h2>Ideas</h2>
-      <p>Capture on the page. Plant on the calendar. One scroll, no popups.</p>
-    </div>
-  </div>
-
-  <section class="ideas-section" id="ideasFlowSection">
-    <div class="ideas-section-head">
-      <h2>The Flow</h2>
-      <p>Four steps, always visible — one thing at a time.</p>
-    </div>
-    <div class="pipeline-wrap">
-      <div class="pipeline-track" id="pipelineTrack">
-        <div class="pipe-card active" data-pipe="1" id="pipeCard1">
-          <div class="pipe-card-num">1 · Capture</div>
-          <h3 class="pipe-card-title">What's the idea?</h3>
-          <div class="pipe-card-body">
-            <textarea id="pipeIdeaText" class="pipe-inset" rows="3" placeholder="A seed worth saving…"></textarea>
-            <label class="q q-compact" for="pipeLifeArea" style="margin-top:10px">Life area</label>
-            <select id="pipeLifeArea" class="pipe-select">
-              <option value="ministry">Ministry</option><option value="career">Career</option>
-              <option value="content">Content</option><option value="health">Health</option>
-              <option value="income">Income</option><option value="other" selected>Other</option>
-            </select>
-            <div class="pipe-text-btns">
-              <button type="button" class="pipe-text-btn muted" id="pipeSaveLater">Save for later</button>
-              <button type="button" class="pipe-text-btn" id="pipeKeepGoing">Keep going →</button>
-            </div>
-          </div>
-        </div>
-        <div class="pipe-arrow" aria-hidden="true">›</div>
-        <div class="pipe-card future" data-pipe="2" id="pipeCard2">
-          <div class="pipe-card-num">2 · Plan</div>
-          <h3 class="pipe-card-title">Three faithful steps</h3>
-          <div class="pipe-card-body">
-            <div id="pipePlanLock" class="pipe-lock" hidden>Two ideas are already growing. Save this one to the Seedbed.</div>
-            <div class="pipe-step"><label for="pipeStep1">Step 1</label><input type="text" class="inp-sm" id="pipeStep1" placeholder="First move"></div>
-            <div class="pipe-step"><label for="pipeStep2">Step 2</label><input type="text" class="inp-sm" id="pipeStep2" placeholder="Next"></div>
-            <div class="pipe-step"><label for="pipeStep3">Step 3</label><input type="text" class="inp-sm" id="pipeStep3" placeholder="Finish"></div>
-            <p class="pipe-hint">Small is faithful. Three steps max.</p>
-            <label class="q q-compact" for="pipeDoneDef">Done looks like…</label>
-            <input type="text" class="inp-sm" id="pipeDoneDef" placeholder="Optional — what finished looks like">
-          </div>
-        </div>
-        <div class="pipe-arrow" aria-hidden="true">›</div>
-        <div class="pipe-card future" data-pipe="3" id="pipeCard3">
-          <div class="pipe-card-num">3 · Schedule</div>
-          <h3 class="pipe-card-title">When does Step 1 happen?</h3>
-          <div class="pipe-card-body">
-            <div class="pipe-week" id="pipeWeekStrip"></div>
-            <div class="pipe-slots" id="pipeSlots">
-              <button type="button" class="pipe-slot on" data-slot="beforeWork">Before Work</button>
-              <button type="button" class="pipe-slot" data-slot="duringWork">During Work</button>
-              <button type="button" class="pipe-slot" data-slot="afterWork">After Work</button>
-              <button type="button" class="pipe-slot" data-slot="eveningShutdown">Evening Shutdown</button>
-            </div>
-            <div class="pipe-confirm" id="pipeScheduleConfirm"></div>
-          </div>
-        </div>
-        <div class="pipe-arrow" aria-hidden="true">›</div>
-        <div class="pipe-card future" data-pipe="4" id="pipeCard4">
-          <div class="pipe-card-num">4 · First Step</div>
-          <h3 class="pipe-card-title">The 10-minute version</h3>
-          <div class="pipe-card-body">
-            <label class="q q-compact" for="pipeFirstAction">What's the very first physical action?</label>
-            <input type="text" class="inp-sm" id="pipeFirstAction" placeholder="Set up the tripod">
-            <label class="pipe-check"><input type="checkbox" id="pipeMustDo" checked>
-              <span id="pipeMustDoLabel">Make it a Must-Do that day</span></label>
-            <button type="button" class="pipe-plant-btn" id="pipePlantBtn">Plant it</button>
-          </div>
-        </div>
+<div class="board ideas-hub" id="ideasPanel" hidden>
+  <header class="ih-hero-row">
+    <div class="ih-hero">
+      <div class="ih-title-row">
+        <span class="ih-icon" aria-hidden="true">💡</span>
+        <h2 class="serif">Ideas Hub</h2>
       </div>
+      <p class="ih-sub">Capture inspiration. Clarify it. Build it. Bring it to life.</p>
     </div>
-  </section>
-
-  <section class="seedbed ideas-section" id="ideasSeedbedSection">
-    <div class="seedbed-head">
-      <h3>The Seedbed</h3>
-      <button type="button" class="seed-view-all" id="seedViewAllBtn" hidden>View all</button>
+    <div class="ih-scripture-card">
+      <p class="serif">"Commit to the Lord whatever you do, and He will establish your plans."
+        <span class="ih-scripture-ref">Proverbs 16:3</span></p>
     </div>
-    <div class="seedbed-shelf" id="seedbedShelf"><span class="seed-empty">No seeds waiting. Capture one above.</span></div>
-    <div class="seed-list-view" id="seedListView"></div>
-  </section>
-
-  <section class="ideas-section ideas-cal-link-section">
-    <button type="button" class="ideas-cal-link-btn" data-nav="calendar">View on Calendar →</button>
-  </section>
+  </header>
+  <div class="ih-pipeline" id="ihPipeline" aria-label="Idea journey"></div>
+  <div class="ih-grid">
+    <aside class="ih-col ih-col-left" id="ihColLeft"></aside>
+    <main class="ih-col ih-col-center" id="ihColCenter"></main>
+    <aside class="ih-col ih-col-right" id="ihColRight"></aside>
+  </div>
 </div>
+<div class="ih-workspace-backdrop" id="ihWorkspaceBackdrop" hidden></div>
+<aside class="ih-workspace" id="ihWorkspace" hidden aria-label="Idea Workspace"></aside>
 
 <button type="button" class="idea-fab" id="ideaFab" hidden aria-label="Go to Ideas"><span class="fab-icon">✦</span> Idea</button>
 <div class="idea-toast" id="ideaToast" role="status"></div>
@@ -1343,6 +1417,8 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
 <script src="tags-ui.js"></script>
 <script src="projects-ui.js"></script>
 <script src="journal-ui.js"></script>
+<script src="ideas-store.js"></script>
+<script src="ideas-ui.js"></script>
 <script src="dashboard-ui.js"></script>
 <script>
 
@@ -2009,10 +2085,20 @@ async function loadIdeaCalCache(monthStr){
 }
 function ideaEventsForDay(dateStr){
   const events=[];
+  const WINDOW_TO_SLOT = { before_work:'beforeWork', during_work:'duringWork', after_work:'afterWork', evening_shutdown:'eveningShutdown' };
+  if(typeof IdeasStore !== 'undefined'){
+    IdeasStore.getIdeas().forEach(i=>{
+      if(['planned','in_progress'].includes(i.status) && i.schedule?.date===dateStr && i.steps?.step1){
+        events.push({type:'idea',id:'idea-'+i.id,ideaId:i.id,text:i.steps.step1,
+          slot:WINDOW_TO_SLOT[i.schedule.window]||'beforeWork',done:false});
+      }
+    });
+  }
   ensureIdeas();
   globals.ideas.forEach(raw=>{
     const i=normalizeIdea(raw);
     if(i.status==='growing' && i.flow?.scheduleDate===dateStr && i.flow.steps?.[0]){
+      if(events.some(e=> e.ideaId===i.id)) return;
       events.push({type:'idea',id:'idea-'+i.id,ideaId:i.id,text:i.flow.steps[0],slot:i.flow.scheduleSlot,done:!!i.flow.stepsDone?.[0]});
     }
   });
@@ -2174,6 +2260,29 @@ async function calDeleteEvent(evId, dateStr){
   }
 }
 async function moveIdeaSchedule(ideaId,newDate){
+  const WINDOW_TO_SLOT = { before_work:'beforeWork', during_work:'duringWork', after_work:'afterWork', evening_shutdown:'eveningShutdown' };
+  if(typeof IdeasStore !== 'undefined'){
+    const idea=IdeasStore.getIdea(ideaId);
+    if(idea?.schedule?.date){
+      const oldDate=idea.schedule.date;
+      const slot=WINDOW_TO_SLOT[idea.schedule.window]||'beforeWork';
+      const field=PIPE_SLOT_FIELDS[slot];
+      const step=idea.steps?.step1;
+      if(oldDate!==newDate && step){
+        const oldDay=await getDayDataByDate(oldDate);
+        if(oldDay.execute[field]===step) oldDay.execute[field]='';
+        await saveDayDataByDate(oldDate,oldDay);
+        const newDay=await getDayDataByDate(newDate);
+        newDay.execute[field]=step;
+        await saveDayDataByDate(newDate,newDay);
+        IdeasStore.updateIdea(ideaId,{ schedule:{ ...idea.schedule, date:newDate } });
+        if(typeof globals !== 'undefined') globals.ideasHub=IdeasStore.getIdeas();
+        markDirty(); renderCalendar();
+        if(typeof loadIdeasHub==='function' && isIdeas()) loadIdeasHub();
+      }
+      return;
+    }
+  }
   const idea=globals.ideas.find(x=>x.id===ideaId);
   if(!idea?.flow?.scheduleDate) return;
   const oldDate=idea.flow.scheduleDate;
@@ -2208,7 +2317,7 @@ function syncIdeaFromMustDo(mustDoId,done){
     raw.updatedAt=new Date().toISOString();
     markDirty();
     if(isCalendar()) renderCalendar();
-    else if(isIdeas()) renderSeedbed();
+    else if(isIdeas()) loadIdeasHub?.();
   }
 }
 function checkIdeaHarvest(idea){
@@ -2235,6 +2344,7 @@ function renderMyWeekPanel(){
   }).join('');
 }
 function getUntouchedIdeas(limit){
+  if(typeof getUntouchedHubIdeas === 'function') return getUntouchedHubIdeas(limit);
   ensureIdeas();
   return globals.ideas.map(normalizeIdea).filter(i=> i.status==='seedbed' && (i.flow?.stage||1)===1)
     .sort((a,b)=>(a.createdAt||'').localeCompare(b.createdAt||'')).slice(0,limit||3);
@@ -2244,21 +2354,17 @@ function renderIdeaTriage(){
   if(!zone) return;
   const items=getUntouchedIdeas(3);
   if(!items.length){
-    zone.innerHTML='<section class="zone"><div class="zonehead compact"><div class="num">Idea Triage</div><h2>Seedbed is clear</h2><p>Well stewarded.</p></div></section>';
+    zone.innerHTML='<section class="zone"><div class="zonehead compact"><div class="num">Idea Triage</div><h2>Inbox is clear</h2><p>Well stewarded.</p></div></section>';
     return;
   }
-  zone.innerHTML='<section class="zone"><div class="zonehead compact"><div class="num">Idea Triage</div><h2>Oldest seeds</h2><p>Open the Ideas tab to continue the Flow.</p></div>'+
-    items.map(i=>'<div class="idea-triage-item"><div style="font-size:13px">'+esc(i.text)+'</div>'+
+  zone.innerHTML='<section class="zone"><div class="zonehead compact"><div class="num">Idea Triage</div><h2>Oldest captures</h2><p>Open Ideas Hub to clarify and plant.</p></div>'+
+    items.map(i=>'<div class="idea-triage-item"><div style="font-size:13px">'+esc(i.title||i.text||'')+'</div>'+
     '<button type="button" class="gobtn" style="margin-top:8px" data-goto-ideas>Go to Ideas</button></div>').join('')+'</section>';
 }
 function loadIdeas(){
   ensureIdeas(); ensureMyWeek();
-  globals.ideas=globals.ideas.map(raw=> normalizeIdea(raw));
-  if(pipeEditingId){
-    const idea=globals.ideas.find(x=>x.id===pipeEditingId);
-    if(idea) writePipeForm(idea); else resetPipeForm();
-  } else resetPipeForm();
-  renderSeedbed();
+  if(typeof loadIdeasHub === 'function') loadIdeasHub();
+  else { globals.ideas=globals.ideas.map(raw=> normalizeIdea(raw)); renderSeedbed?.(); }
 }
 function loadCalendar(){
   ensureIdeas(); ensureMyWeek();
@@ -2268,36 +2374,6 @@ function loadCalendar(){
 function bindIdeasPageEvents(){
   if(document.body.dataset.ideasPageBound) return;
   document.body.dataset.ideasPageBound='1';
-  document.getElementById('pipeSaveLater')?.addEventListener('click', pipeSaveLater);
-  document.getElementById('pipeKeepGoing')?.addEventListener('click', pipeKeepGoing);
-  document.getElementById('pipePlantBtn')?.addEventListener('click', pipePlant);
-  document.getElementById('pipeIdeaText')?.addEventListener('input', updatePipelineUI);
-  ['pipeStep1','pipeStep2','pipeStep3','pipeDoneDef'].forEach(id=> document.getElementById(id)?.addEventListener('input', onPipeStepInput));
-  document.getElementById('pipeWeekStrip')?.addEventListener('click', e=>{
-    const btn=e.target.closest('[data-pdate]');
-    if(!btn) return;
-    pipeScheduleDate=btn.dataset.pdate;
-    renderPipeWeekStrip();
-    onPipeSchedulePick();
-  });
-  document.getElementById('pipeSlots')?.addEventListener('click', e=>{
-    const btn=e.target.closest('[data-slot]');
-    if(!btn) return;
-    pipeScheduleSlot=btn.dataset.slot;
-    document.querySelectorAll('#pipeSlots .pipe-slot').forEach(b=> b.classList.toggle('on', b===btn));
-    onPipeSchedulePick();
-  });
-  document.getElementById('pipeFirstAction')?.addEventListener('input', updatePipelineUI);
-  document.getElementById('pipeFirstAction')?.addEventListener('focus', ()=> rotatePipePlaceholder(false));
-  document.getElementById('seedbedShelf')?.addEventListener('click', e=>{
-    const chip=e.target.closest('[data-seed]');
-    if(chip) loadSeedbedChip(chip.dataset.seed);
-  });
-  document.getElementById('seedListView')?.addEventListener('click', e=>{
-    const btn=e.target.closest('[data-seed]');
-    if(btn) loadSeedbedChip(btn.dataset.seed);
-  });
-  document.getElementById('seedViewAllBtn')?.addEventListener('click', ()=>{ seedbedListOpen=!seedbedListOpen; renderSeedbed(); });
   document.getElementById('ideaCalPrev')?.addEventListener('click', ()=>{ ideaCalMonthOffset--; renderCalendar(); });
   document.getElementById('ideaCalNext')?.addEventListener('click', ()=>{ ideaCalMonthOffset++; renderCalendar(); });
   document.querySelectorAll('[data-cal-view]').forEach(btn=> btn.addEventListener('click', ()=>{
@@ -2392,6 +2468,16 @@ function bindIdeasPageEvents(){
     }
     if(id.startsWith('idea-')){
       const ideaId=id.slice(5);
+      if(typeof IdeasStore !== 'undefined'){
+        const hubIdea=IdeasStore.getIdea(ideaId);
+        if(hubIdea){
+          IdeasStore.moveIdeaStatus(ideaId, e.target.checked ? 'completed' : 'in_progress');
+          markDirty();
+          renderCalendar();
+          if(typeof loadIdeasHub==='function' && isIdeas()) loadIdeasHub();
+          return;
+        }
+      }
       const idea=globals.ideas.find(x=>x.id===ideaId);
       if(idea?.flow){
         if(!Array.isArray(idea.flow.stepsDone)) idea.flow.stepsDone=[false,false,false];
@@ -2453,7 +2539,7 @@ function bindIdeasPageEvents(){
       saveAnchorSettingsFromDOM();
     }
   });
-  document.getElementById('ideaFab')?.addEventListener('click', ()=>{ setMode('ideas'); setTimeout(()=> document.getElementById('pipeIdeaText')?.focus(), 200); });
+  document.getElementById('ideaFab')?.addEventListener('click', ()=>{ setMode('ideas'); setTimeout(()=> document.getElementById('ihInboxText')?.focus(), 200); });
   document.addEventListener('click', e=>{
     if(e.target.closest('[data-goto-ideas]')) setMode('ideas');
   });
@@ -2889,6 +2975,11 @@ async function syncPlantToCore(idea, f, mustDoId){
   }
   await faithStore.save();
 }
+window.isIdeas = isIdeas;
+window.getDayDataByDate = getDayDataByDate;
+window.saveDayDataByDate = saveDayDataByDate;
+window.syncPlantToCore = syncPlantToCore;
+window.PIPE_SLOT_FIELDS = PIPE_SLOT_FIELDS;
 
 function scheduleSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>save(),800); }
 function markDirty(){
@@ -2903,6 +2994,7 @@ async function save(){
   const savedKeys = ['fs-globals'];
   try{
     const S = window.storage;
+    if(typeof IdeasStore !== 'undefined') globals.ideasHub = IdeasStore.getIdeas();
     const ops = [S.set('view-mode', viewMode), S.set('fs-globals', JSON.stringify(globals))];
     if(isJournal()){ ops.push(S.set(journalKeyFor(dayOffset), JSON.stringify(journal))); savedKeys.push(journalKeyFor(dayOffset)); }
     else if(isDaily()){ ops.push(S.set(dayKeyFor(dayOffset), JSON.stringify(dayData))); savedKeys.push(dayKeyFor(dayOffset)); }
@@ -4078,7 +4170,7 @@ function updateViewUI(){
   else if(isJournal()||isDaily()) document.getElementById('periodLabel').textContent = dayLabelFor(dayOffset);
   else if(isWeekly()) document.getElementById('periodLabel').textContent = weekLabelFor(weekOffset);
   else if(isMonthly()) document.getElementById('periodLabel').textContent = monthLabelFor(monthOffset);
-  else if(isIdeas()) document.getElementById('periodLabel').textContent = 'Ideas';
+  else if(isIdeas()) document.getElementById('periodLabel').textContent = dayLabelFor(dayOffset);
   else if(isPrayer()) document.getElementById('periodLabel').textContent = 'Prayer Log';
   else if(isProjects()) document.getElementById('periodLabel').textContent = 'Projects';
   else if(isSettings()) document.getElementById('periodLabel').textContent = 'Settings';
@@ -4199,6 +4291,7 @@ async function resetAll(){
   ensurePrayers();
   ensureIdeas();
   ensureMyWeek();
+  if(typeof IdeasStore !== 'undefined') IdeasStore.init(globals.ideasHub || globals.ideas);
   await initFaithStore();
   if(new URLSearchParams(location.search).get('test')==='store' && typeof runFaithfulnessStoreTests === 'function'){
     const out = await runFaithfulnessStoreTests(()=> new FaithfulnessStore(createMemoryStorage()));
