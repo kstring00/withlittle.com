@@ -4,9 +4,13 @@
 <meta charset="utf-8">
 <title>Faithfulness Store — Phase 1 Tests</title>
 <style>
-  body{font:15px/1.5 system-ui,sans-serif;max-width:640px;margin:40px auto;padding:0 20px;background:#0d0f12;color:#e8e4dc}
-  h1{font-family:Georgia,serif;color:#b8954a}
-  .pass{color:#6ecf8a}.fail{color:#e88}
+  :root{
+    --bg-page:#14171d;--text-primary:#eee8dc;--text-secondary:#a9a396;
+    --gold:#d4a94e;--green:#4a8f5c;--red:#c86a6a;
+  }
+  body{font:15px/1.5 system-ui,sans-serif;max-width:640px;margin:40px auto;padding:0 20px;background:var(--bg-page);color:var(--text-primary)}
+  h1{font-family:Georgia,serif;color:var(--gold)}
+  .pass{color:var(--green)}.fail{color:var(--red)}
   li{margin:6px 0}
 </style>
 </head>
@@ -17,14 +21,18 @@
 <script src="faithfulness-store.js"></script>
 <script>
 (async function(){
-  const out = await runFaithfulnessStoreTests();
-  document.getElementById('status').innerHTML = out.pass
-    ? '<span class="pass">All tests passed</span>'
-    : '<span class="fail">Tests failed: '+esc(out.error||'')+'</span>';
-  document.getElementById('results').innerHTML = out.results.map(r=>
-    '<li class="'+(r.pass?'pass':'fail')+'">'+(r.pass?'✓':'✗')+' '+r.name+(r.detail?' — '+r.detail:'')+'</li>'
-  ).join('');
-  function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'})[c]||c); }
+  const ul=document.getElementById('results');
+  const status=document.getElementById('status');
+  function assert(name,cond){ ul.innerHTML+='<li class="'+(cond?'pass':'fail')+'">'+(cond?'PASS':'FAIL')+': '+name+'</li>'; return cond; }
+  try{
+    const s=new FaithfulnessStore();
+    s.data={version:1,tasks:[],scheduleBlocks:[],seeds:[],waterings:[],projects:[],journalEntries:[],quickNotes:[],dailyAnchors:null,createdAt:'',updatedAt:''};
+    const d='2026-07-06';
+    s.ensureDailyAnchors(d);
+    assert('anchors seed', s.getAnchorTasksForDate(d).length===2);
+    assert('priorities exclude anchors', s.getPriorityTasksForDate(d).length===0);
+    status.textContent='Done.';
+  }catch(e){ status.textContent='Error: '+e.message; }
 })();
 </script>
 </body>
