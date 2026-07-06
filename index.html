@@ -3146,6 +3146,10 @@ async function initFaithStore(){
   await faithStore.load();
   await faithStore.migrateFromLegacy({ globals, getDayJSON: key => getJSON(key) });
   if(faithStore.ensureDefaultMentors()) await faithStore.save();
+  if(typeof MentorshipSeed !== 'undefined'){
+    const seeded = MentorshipSeed.seedInitialMentorshipNotes(faithStore);
+    if(seeded.created) await faithStore.save();
+  }
   faithStore.onChange(()=>{ dirty = true; updateSaveState('dirty'); scheduleSave(); });
 }
 
