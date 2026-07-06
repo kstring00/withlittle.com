@@ -1644,8 +1644,8 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
 </div><!-- /.app-shell -->
 
 <script src="faithfulness-store.js"></script>
-<script src="mentorship-seed.js?v=6"></script>
-<script src="mentorship-ui.js?v=6"></script>
+<script src="mentorship-seed.js?v=7"></script>
+<script src="mentorship-ui.js?v=7"></script>
 <script src="tags-ui.js"></script>
 <script src="projects-ui.js"></script>
 <script src="journal-ui.js"></script>
@@ -1881,6 +1881,7 @@ async function initAuth(){
     updateAuthUI();
     if(event === 'SIGNED_IN' && authUser){
       await migrateLocalToCloud();
+      await ensureFaithStore().catch(()=>{});
       await syncPullForView();
       await loadCurrent();
       if(!dirty) updateSaveState('synced');
@@ -3170,9 +3171,11 @@ const FLOW_SLOT_LABELS = {beforeWork:'Before Work',duringWork:'During Work',afte
 const FLOW_SLOT_FIELDS = {beforeWork:'beforeWork',duringWork:'duringWork',afterWork:'afterWork',eveningShutdown:'eveningShutdown'};
 let dirty=false, saveTimer=null, saving=false;
 let faithStore = null;
+let faithStoreInitPromise = null;
 
 async function initFaithStore(){
-  if(typeof FaithfulnessStore === 'undefined') return;
+  if(typeof FaithfulnessStore === 'undefined') return null;
+  if(window.faithStore) return window.faithStore;
   faithStore = new FaithfulnessStore(window.storage);
   window.faithStore = faithStore;
   await faithStore.load();
@@ -3183,7 +3186,21 @@ async function initFaithStore(){
     if(seeded.created) await faithStore.save();
   }
   faithStore.onChange(()=>{ dirty = true; updateSaveState('dirty'); scheduleSave(); });
+  return faithStore;
 }
+
+async function ensureFaithStore(){
+  if(window.faithStore) return window.faithStore;
+  if(!faithStoreInitPromise){
+    faithStoreInitPromise = initFaithStore().catch(err=>{
+      faithStoreInitPromise = null;
+      throw err;
+    });
+  }
+  await faithStoreInitPromise;
+  return window.faithStore;
+}
+window.ensureFaithStore = ensureFaithStore;
 
 async function syncPlantToCore(idea, f, mustDoId){
   if(!faithStore) return;
@@ -4572,7 +4589,6 @@ async function resetAll(){
 
 (async function init(){
   renderDaily(); renderWeekly(); renderMonthly(); bindEvents(); bindFFAccordion();
-  await initAuth();
   const vm = await window.storage.get('view-mode');
   if(vm?.value && (['dashboard','daily','weekly','monthly','journal','ideas','prayer','projects','settings','calendar','tag'].includes(vm.value) || vm.value.startsWith('mentorship-'))) viewMode = vm.value;
   syncViewModeBridge();
@@ -4583,7 +4599,9 @@ async function resetAll(){
   ensureIdeas();
   ensureMyWeek();
   if(typeof IdeasStore !== 'undefined') IdeasStore.init(globals.ideasHub || globals.ideas);
-  await initFaithStore();
+  faithStoreInitPromise = initFaithStore();
+  await faithStoreInitPromise;
+  await initAuth();
   if(new URLSearchParams(location.search).get('test')==='store' && typeof runFaithfulnessStoreTests === 'function'){
     const out = await runFaithfulnessStoreTests(()=> new FaithfulnessStore(createMemoryStorage()));
     console.log('[FaithfulnessStore tests]', out);

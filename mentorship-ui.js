@@ -281,6 +281,21 @@
     if(!panel) return;
     if(!window.faithStore){
       panel.innerHTML = '<p class="dash-empty">Loading mentorship data…</p>';
+      if(!renderMentorship._retry){
+        renderMentorship._retry = true;
+        const started = performance.now();
+        (function waitForStore(){
+          if(window.faithStore){
+            renderMentorship._retry = false;
+            renderMentorship();
+          }else if(performance.now() - started < 12000){
+            requestAnimationFrame(waitForStore);
+          }else{
+            renderMentorship._retry = false;
+            panel.innerHTML = '<p class="dash-empty">Mentorship data did not load — refresh the page or check that faithfulness-store.js loaded.</p>';
+          }
+        })();
+      }
       return;
     }
     try {
@@ -648,7 +663,12 @@
     }
   }
 
-  function loadMentorship(){ renderMentorship(); }
+  async function loadMentorship(){
+    if(typeof window.ensureFaithStore === 'function'){
+      try{ await window.ensureFaithStore(); }catch(e){ console.warn('[mentorship] store init failed', e); }
+    }
+    renderMentorship();
+  }
 
   root.renderMentorship = renderMentorship;
   root.loadMentorship = loadMentorship;
