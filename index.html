@@ -359,6 +359,7 @@ body.view-prayer .site-foot,body.view-journal .site-foot{display:none}
 .prayer-filter.on{background:var(--navy);color:var(--cream-raised);border-color:var(--navy)}
 .prayer-stats{font-size:12px;color:var(--mist);margin-bottom:14px;font-variant-numeric:tabular-nums}
 .prayer-add{margin-bottom:16px}
+.idea-add{margin-bottom:16px}
 .prayer-list{display:flex;flex-direction:column;gap:10px}
 .prayer-card{border:1px solid var(--line-soft);border-radius:10px;padding:12px 14px;background:var(--cream-raised);
   transition:border-color .15s}
@@ -596,6 +597,17 @@ body.view-ideas .site-foot{display:none}
     </div>
   </div>
   <p class="idea-stats" id="ideaStats"></p>
+  <div class="card-soft idea-add">
+    <h3>Capture an idea</h3>
+    <p class="modal-sub" style="margin-bottom:10px">Not a commitment — just a seed worth saving.</p>
+    <label class="q q-compact" for="ideaInlineText">What's the idea?</label>
+    <textarea id="ideaInlineText" class="ta-sm" rows="3" placeholder="A spark, a possibility, a next step…"></textarea>
+    <label class="q q-compact" style="margin-top:10px">Category <span class="hint" style="display:inline;margin:0">(optional)</span></label>
+    <div class="idea-cat-row" id="ideaInlineCats"></div>
+    <div style="margin-top:12px">
+      <button type="button" class="gobtn" id="ideaInlineSave">Save to vault</button>
+    </div>
+  </div>
   <div class="idea-filters" role="tablist" id="ideaStatusFilters">
     <button type="button" class="idea-filter on" data-idea-status="active">Active</button>
     <button type="button" class="idea-filter" data-idea-status="resting">Resting</button>
@@ -1068,19 +1080,32 @@ function closeIdeaModals(){
   document.querySelectorAll('.idea-modal').forEach(m=> m.classList.remove('open'));
   ideaModalTarget = null;
 }
-function openCaptureModal(){
-  document.getElementById('ideaCaptureText').value = '';
-  document.querySelectorAll('#ideaCaptureCats .idea-cat-pick').forEach((b,i)=> b.classList.toggle('on', i===IDEA_CATEGORIES.length-1));
-  openIdeaModal('ideaCaptureModal');
-  setTimeout(()=> document.getElementById('ideaCaptureText')?.focus(), 80);
-}
-function renderIdeaCaptureCats(){
-  const row = document.getElementById('ideaCaptureCats');
+function renderIdeaCatRow(containerId){
+  const row = document.getElementById(containerId);
   if(!row || row.dataset.ready) return;
   row.innerHTML = IDEA_CATEGORIES.map((c,i)=>
     '<button type="button" class="idea-cat-pick'+(i===IDEA_CATEGORIES.length-1?' on':'')+'" data-cat="'+c.id+'">'+esc(c.label)+'</button>'
   ).join('');
   row.dataset.ready = '1';
+}
+function renderIdeaCaptureCats(){ renderIdeaCatRow('ideaCaptureCats'); }
+function renderIdeaInlineCats(){ renderIdeaCatRow('ideaInlineCats'); }
+function selectedIdeaCategory(containerId){
+  return document.querySelector('#'+containerId+' .idea-cat-pick.on')?.dataset.cat || 'other';
+}
+function saveIdeaFromForm(textId, catContainerId, opts){
+  const text = document.getElementById(textId)?.value.trim();
+  if(!text) return false;
+  captureIdea(text, selectedIdeaCategory(catContainerId));
+  document.getElementById(textId).value = '';
+  if(opts?.closeModal) closeIdeaModals();
+  return true;
+}
+function openCaptureModal(){
+  document.getElementById('ideaCaptureText').value = '';
+  document.querySelectorAll('#ideaCaptureCats .idea-cat-pick').forEach((b,i)=> b.classList.toggle('on', i===IDEA_CATEGORIES.length-1));
+  openIdeaModal('ideaCaptureModal');
+  setTimeout(()=> document.getElementById('ideaCaptureText')?.focus(), 80);
 }
 function renderIdeaCatFilters(){
   const row = document.getElementById('ideaCatFilters');
@@ -2506,6 +2531,10 @@ function bindEvents(){
       e.preventDefault();
       document.getElementById('ideaCaptureSave')?.click();
     }
+    if(e.key==='Enter' && e.target.id==='ideaInlineText' && !e.shiftKey){
+      e.preventDefault();
+      document.getElementById('ideaInlineSave')?.click();
+    }
   });
   app.addEventListener('click', e=>{
     if(e.target.closest('#thoughtJournalToggle')){
@@ -2580,10 +2609,13 @@ function bindEvents(){
     if(ir){ ideaModalTarget = ir.dataset.ideaRest; openIdeaModal('ideaRestModal'); return; }
     const irel = e.target.closest('[data-idea-release]');
     if(irel){ ideaModalTarget = irel.dataset.ideaRelease; document.getElementById('ideaReleaseNote').value=''; openIdeaModal('ideaReleaseModal'); return; }
-    const icp = e.target.closest('#ideaCaptureCats .idea-cat-pick');
+    const icp = e.target.closest('.idea-cat-pick');
     if(icp){
-      document.querySelectorAll('#ideaCaptureCats .idea-cat-pick').forEach(b=> b.classList.toggle('on', b===icp));
-      return;
+      const row = icp.closest('.idea-cat-row');
+      if(row){
+        row.querySelectorAll('.idea-cat-pick').forEach(b=> b.classList.toggle('on', b===icp));
+        return;
+      }
     }
     const rt = e.target.closest('[data-rating]');
     if(rt && isDaily()){
@@ -2673,11 +2705,11 @@ function bindEvents(){
   document.getElementById('authSignOut')?.addEventListener('click', signOut);
   document.getElementById('ideaFab')?.addEventListener('click', openCaptureModal);
   document.getElementById('ideaCaptureSave')?.addEventListener('click', ()=>{
-    const text = document.getElementById('ideaCaptureText')?.value.trim();
-    if(!text) return;
-    const cat = document.querySelector('#ideaCaptureCats .idea-cat-pick.on')?.dataset.cat || 'other';
-    captureIdea(text, cat);
-    closeIdeaModals();
+    saveIdeaFromForm('ideaCaptureText', 'ideaCaptureCats', {closeModal:true});
+  });
+  document.getElementById('ideaInlineSave')?.addEventListener('click', ()=>{
+    saveIdeaFromForm('ideaInlineText', 'ideaInlineCats');
+    document.getElementById('ideaInlineText')?.focus();
   });
   document.getElementById('ideaPromoteConfirm')?.addEventListener('click', ()=> confirmPromoteIdea());
   document.getElementById('ideaReleaseConfirm')?.addEventListener('click', ()=>{
@@ -2886,6 +2918,7 @@ async function resetAll(){
   ensurePrayers();
   ensureIdeas();
   renderIdeaCaptureCats();
+  renderIdeaInlineCats();
   document.getElementById('researchNotes').value = globals.researchNotes||'';
   simpleMode = localStorage.getItem('wsr:simpleMode')==='1';
   await loadCurrent();
