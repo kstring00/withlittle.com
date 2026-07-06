@@ -95,19 +95,19 @@
     const open = expandedPrinciples.has(p.id);
     const appCount = faithStore.getApplicationCount(p.id);
     const form = activeForms[p.id];
-    return '<article class="ms-principle-card'+(open?' open':'')+'" id="ms-principle-'+p.id+'" data-principle-id="'+p.id+'">'+
-      '<div class="ms-principle-head">'+
+    return '<article class="ms-principle'+(open?' open':'')+'" id="ms-principle-'+p.id+'" data-principle-id="'+p.id+'">'+
       '<button type="button" class="ms-principle-toggle" data-ms-expand="'+p.id+'">'+
-      (appCount ? '<span class="ms-leaf-badge" title="'+appCount+' application(s)">🍃 '+appCount+'</span>' : '')+
+      (appCount ? '<span class="ms-leaf" title="'+appCount+' applied">🍃 '+appCount+'</span>' : '<span class="ms-leaf ms-leaf-empty"></span>')+
       '<span class="ms-principle-title">'+esc(p.title || '(Untitled principle)')+'</span>'+
-      '<span class="ms-chev">'+(open?'−':'+')+'</span></button></div>'+
+      '<span class="ms-chev" aria-hidden="true">'+(open?'▾':'▸')+'</span></button>'+
       (open ? '<div class="ms-principle-body">'+
         (p.detailBullets.length ? '<ul class="ms-bullets">'+p.detailBullets.map(b=>'<li>'+esc(b)+'</li>').join('')+'</ul>' : '')+
         (p.themeTags.length ? '<div class="ms-theme-tags">'+themeTagHtml(p.themeTags)+'</div>' : '')+
-        '<div class="ms-app-section"><h5>Applications</h5>'+renderApplicationTimeline(p.id)+'</div>'+
+        (faithStore.getApplicationsByPrinciple(p.id).length ? '<div class="ms-app-section"><span class="ms-label">Applications</span>'+renderApplicationTimeline(p.id)+'</div>' : '')+
         '<div class="ms-principle-actions">'+
-        '<button type="button" class="btn-ghost ms-action-btn" data-ms-work="'+p.id+'">Put it to work</button>'+
-        '<button type="button" class="btn-ghost ms-action-btn" data-ms-log="'+p.id+'">Log it</button>'+
+        '<button type="button" class="ms-text-btn" data-ms-work="'+p.id+'">Put to work</button>'+
+        '<span class="ms-dot">·</span>'+
+        '<button type="button" class="ms-text-btn" data-ms-log="'+p.id+'">Log it</button>'+
         '</div>'+
         (form === 'work' ? renderWorkForm(p) : '')+
         (form === 'log' ? renderLogForm(p) : '')+
@@ -156,59 +156,62 @@
   function renderQuestionVault(mentorId){
     const asked = faithStore.getAskedQuestions(mentorId);
     const queued = faithStore.getQueuedQuestions(mentorId);
-    return '<section class="ms-section"><h3 class="serif">Question Vault</h3>'+
-      '<div class="ms-vault-col"><h5>Asked</h5>'+
-      (asked.length ? asked.map(q=>{
+    return '<div class="ms-vault-inner">'+
+      '<div class="ms-vault-block"><span class="ms-label">Asked</span>'+
+      (asked.length ? '<ul class="ms-plain-list">'+asked.map(q=>{
         const gid = hashStr(q.text);
-        return '<button type="button" class="ms-vault-link" data-ms-scroll-q="'+gid+'">'+esc(q.text)+'</button>';
-      }).join('') : '<p class="ms-muted">Nothing asked yet.</p>')+
+        return '<li><button type="button" class="ms-link" data-ms-scroll-q="'+gid+'">'+esc(q.text)+'</button></li>';
+      }).join('')+'</ul>' : '<p class="ms-muted">Nothing asked yet.</p>')+
       '</div>'+
-      '<div class="ms-vault-col"><h5>Queued for next session</h5>'+
-      '<div class="ms-queue-list" data-ms-queue="'+mentorId+'">'+
+      '<div class="ms-vault-block"><span class="ms-label">Queued for next session</span>'+
+      '<ul class="ms-queue-list" data-ms-queue="'+mentorId+'">'+
       queued.map((q,i)=>
-        '<div class="ms-queue-row" draggable="true" data-ms-qid="'+q.id+'" data-ms-qidx="'+i+'">'+
-        '<span class="ms-drag">⋮⋮</span><span class="ms-q-text">'+esc(q.text)+'</span>'+
-        '<button type="button" class="ms-sched-btn" data-ms-q-up="'+q.id+'" title="Up">↑</button>'+
-        '<button type="button" class="ms-sched-btn" data-ms-q-down="'+q.id+'" title="Down">↓</button>'+
-        '<button type="button" class="btn-ghost ms-ask-btn" data-ms-mark-asked="'+q.id+'">Mark asked</button>'+
-        '<button type="button" class="ff-rm" data-ms-q-del="'+q.id+'">×</button></div>'
+        '<li class="ms-queue-item" draggable="true" data-ms-qid="'+q.id+'" data-ms-qidx="'+i+'">'+
+        '<span class="ms-drag" title="Drag to reorder">⋮⋮</span>'+
+        '<span class="ms-q-text">'+esc(q.text)+'</span>'+
+        '<span class="ms-queue-ctrls">'+
+        '<button type="button" class="ms-icon-btn" data-ms-q-up="'+q.id+'" title="Up">↑</button>'+
+        '<button type="button" class="ms-icon-btn" data-ms-q-down="'+q.id+'" title="Down">↓</button>'+
+        '<button type="button" class="ms-text-btn" data-ms-mark-asked="'+q.id+'">Asked</button>'+
+        '<button type="button" class="ms-icon-btn ms-del" data-ms-q-del="'+q.id+'" title="Remove">×</button>'+
+        '</span></li>'
       ).join('')+
-      '</div>'+
-      '<div class="ms-queue-add"><input type="text" data-ms-q-add="'+mentorId+'" placeholder="Add a question for next session…">'+
-      '<button type="button" class="btn-gold" data-ms-q-add-btn="'+mentorId+'">+</button></div>'+
-      '</div></section>';
+      '</ul>'+
+      '<div class="ms-queue-add"><input type="text" data-ms-q-add="'+mentorId+'" placeholder="Add a question…">'+
+      '<button type="button" class="ms-text-btn" data-ms-q-add-btn="'+mentorId+'">+ Add</button></div>'+
+      '</div></div>';
   }
 
   function renderSessionLog(mentorId){
     const mentor = faithStore.getMentor(mentorId);
     const sessions = faithStore.getSessionsByMentor(mentorId);
     const prep = prepView ? faithStore.buildSessionPrepText(mentorId) : '';
-    return '<section class="ms-section"><div class="ms-section-head">'+
-      '<h3 class="serif">Session Log</h3>'+
-      '<div class="ms-session-tools">'+
-      '<label class="ms-prep-toggle"><input type="checkbox" data-ms-prep-toggle'+(prepView?' checked':'')+'> Prep view</label>'+
-      '<button type="button" class="btn-gold" data-ms-new-session="'+mentorId+'">New session</button>'+
-      '</div></div>'+
-      (prepView ? '<div class="ms-prep-box"><pre class="ms-prep-text" id="msPrepText">'+esc(prep)+'</pre>'+
-      '<button type="button" class="btn-ghost" data-ms-copy-prep="'+mentorId+'">Copy prep</button></div>' : '')+
-      (mentor?.nextSessionDate ? '<p class="ms-next-session">Next session: <input type="date" data-ms-next-date="'+mentorId+'" value="'+esc(mentor.nextSessionDate)+'"></p>' : 
-        '<p class="ms-next-session">Next session: <input type="date" data-ms-next-date="'+mentorId+'" value=""></p>')+
-      (sessions.length ? sessions.map(renderSessionCard).join('') : '<p class="dash-empty">No sessions logged yet.</p>')+
-      '</section>';
+    return '<div class="ms-session-inner">'+
+      '<div class="ms-session-bar">'+
+      '<label class="ms-check-label"><input type="checkbox" data-ms-prep-toggle'+(prepView?' checked':'')+'> Prep view</label>'+
+      '<button type="button" class="ms-text-btn ms-text-btn-gold" data-ms-new-session="'+mentorId+'">+ New session</button>'+
+      '</div>'+
+      '<p class="ms-next-session">Next session <input type="date" data-ms-next-date="'+mentorId+'" value="'+esc(mentor?.nextSessionDate||'')+'"></p>'+
+      (prepView ? '<div class="ms-prep"><pre class="ms-prep-text" id="msPrepText">'+esc(prep)+'</pre>'+
+      '<button type="button" class="ms-text-btn" data-ms-copy-prep="'+mentorId+'">Copy prep</button></div>' : '')+
+      (sessions.length ? '<ul class="ms-session-list">'+sessions.map(s=>'<li>'+renderSessionCard(s)+'</li>').join('')+'</ul>' :
+        '<p class="ms-muted">No sessions logged yet.</p>')+
+      '</div>';
   }
 
   function renderSessionCard(s){
     const apps = (s.attachedApplicationIds||[]).map(id=> faithStore.data.applications.find(a=> a.id===id)).filter(Boolean);
     const qs = (s.attachedQuestionIds||[]).map(id=> faithStore.data.queuedQuestions.find(q=> q.id===id)).filter(Boolean);
-    return '<article class="ms-session-card">'+
-      '<div class="ms-session-head"><strong>'+esc(s.date)+'</strong></div>'+
-      (s.notes ? '<div class="ms-session-notes">'+esc(s.notes)+'</div>' : '')+
-      (apps.length ? '<div class="ms-session-att"><h5>Applications since last session</h5>'+
+    return '<article class="ms-session">'+
+      '<div class="ms-session-date">'+esc(s.date)+'</div>'+
+      (s.notes ? '<p class="ms-session-notes">'+esc(s.notes)+'</p>' : '')+
+      (apps.length ? '<div class="ms-session-att"><span class="ms-label">Since last session</span>'+
         apps.map(a=>{
           const p = faithStore.getPrinciple(a.principleId);
-          return '<div class="ms-app-row"><span class="ms-app-date">'+esc(a.date)+'</span> '+esc(p?.title||'')+' — '+esc(a.note||'')+'</div>';
+          return '<div class="ms-app-row"><span class="ms-app-date">'+esc(a.date)+'</span><span>'+esc(p?.title||'')+(a.note ? ' — '+esc(a.note) : '')+'</span></div>';
         }).join('')+'</div>' : '')+
-      (qs.length ? '<div class="ms-session-att"><h5>Questions marked asked</h5><ul>'+qs.map(q=>'<li>'+esc(q.text)+'</li>').join('')+'</ul></div>' : '')+
+      (qs.length ? '<div class="ms-session-att"><span class="ms-label">Questions asked</span><ul class="ms-plain-list compact">'+
+        qs.map(q=>'<li>'+esc(q.text)+'</li>').join('')+'</ul></div>' : '')+
       '</article>';
   }
 
@@ -220,12 +223,19 @@
       '<header class="ms-page-head">'+
       '<div><h2 class="serif">'+esc(m.label)+'</h2>'+
       '<p class="ms-role">'+esc(m.role)+(m.name ? ' · '+esc(m.name) : '')+'</p></div>'+
-      '<div class="ms-stats">'+stats.total+' principle'+(stats.total===1?'':'s')+' · '+stats.practiced+' put to work</div>'+
+      '<p class="ms-stats">'+stats.total+' principles · '+stats.practiced+' put to work</p>'+
       '</header>'+
-      '<section class="ms-section"><h3 class="serif">Principle Library</h3>'+renderPrincipleLibrary(mentorId)+'</section>'+
-      renderQuestionVault(mentorId)+
-      renderSessionLog(mentorId)+
-      '</div>';
+      '<div class="ms-columns">'+
+      '<div class="ms-col ms-col-library">'+
+      '<h3 class="ms-col-title serif">Principle Library</h3>'+
+      '<div class="ms-col-body">'+renderPrincipleLibrary(mentorId)+'</div></div>'+
+      '<div class="ms-col ms-col-vault">'+
+      '<h3 class="ms-col-title serif">Question Vault</h3>'+
+      '<div class="ms-col-body">'+renderQuestionVault(mentorId)+'</div></div>'+
+      '<div class="ms-col ms-col-sessions">'+
+      '<h3 class="ms-col-title serif">Session Log</h3>'+
+      '<div class="ms-col-body">'+renderSessionLog(mentorId)+'</div></div>'+
+      '</div></div>';
   }
 
   function renderThreadsView(){
@@ -236,17 +246,17 @@
     return '<div class="ms-threads">'+
       threads.map(g=>
         '<section class="ms-thread-group"><h3 class="serif ms-thread-title">'+esc(g.tag)+'</h3>'+
-        '<div class="ms-thread-grid">'+
+        '<ul class="ms-thread-list">'+
         g.principles.map(p=>{
           const m = faithStore.getMentor(p.mentorId);
           const apps = faithStore.getApplicationCount(p.id);
-          return '<button type="button" class="ms-thread-card" data-ms-goto-principle="'+p.id+'" data-ms-goto-mentor="'+p.mentorId+'">'+
+          return '<li><button type="button" class="ms-thread-item" data-ms-goto-principle="'+p.id+'" data-ms-goto-mentor="'+p.mentorId+'">'+
             '<span class="ms-thread-mentor">'+esc(m?.label||'?')+'</span>'+
             '<span class="ms-thread-principle">'+esc(p.title || p.sourceQuestion)+'</span>'+
-            (apps ? '<span class="ms-leaf-badge">🍃 '+apps+'</span>' : '')+
-            '</button>';
+            (apps ? '<span class="ms-leaf">🍃 '+apps+'</span>' : '')+
+            '</button></li>';
         }).join('')+
-        '</div></section>'
+        '</ul></section>'
       ).join('')+'</div>';
   }
 
