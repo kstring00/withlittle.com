@@ -3997,6 +3997,16 @@ function bindEvents(){
 }
 
 function nav(dir){
+  if(isJournal() && typeof flushJournalEntry === 'function'){
+    flushJournalEntry().then(()=>{
+      satBlockSessionOverride = null;
+      if(isDashboard()||isJournal()||isDaily()) dayOffset += dir;
+      else if(isWeekly()) weekOffset += dir;
+      else if(isMonthly()) monthOffset += dir;
+      loadCurrent();
+    });
+    return;
+  }
   if(dirty) save();
   satBlockSessionOverride = null;
   if(isDashboard()||isJournal()||isDaily()) dayOffset += dir;
@@ -4131,9 +4141,13 @@ async function loadJournal(){
     journal.body = body;
     markDirty();
   }
+  const dateStr = iso(dayOf(dayOffset));
   document.getElementById('journalBody').value = body;
+  if(typeof updateJournalEntryHead === 'function') updateJournalEntryHead(dateStr);
+  const period = document.getElementById('periodLabel');
+  if(period && isJournal()) period.textContent = dayLabelFor(dayOffset);
   updateJournalMeta();
-  renderJournalList();
+  if(typeof renderJournalList === 'function') await renderJournalList();
   if(typeof refreshJournalUI === 'function') await refreshJournalUI();
 }
 function updateJournalMeta(){
@@ -4142,21 +4156,6 @@ function updateJournalMeta(){
   document.getElementById('journalWords').textContent = words+' words';
   document.getElementById('journalUpdated').textContent = journal.updated
     ? 'Updated '+new Date(journal.updated).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : '';
-}
-async function renderJournalList(){
-  const ul = document.getElementById('journalList');
-  const r = await window.storage.list('journal:');
-  const keys = (r?.keys||[]).sort().reverse().slice(0,30);
-  const cur = journalKeyFor(dayOffset).slice(8);
-  ul.innerHTML = keys.map(k=>{
-    const d = k.slice(8);
-    return '<li><button type="button" class="'+(d===cur?'on':'')+'" data-jdate="'+d+'">'+d+'</button></li>';
-  }).join('') || '<li class="hint">No past entries</li>';
-  ul.querySelectorAll('[data-jdate]').forEach(b=> b.onclick = ()=>{
-    if(dirty) save();
-    dayOffset = Math.round((new Date(b.dataset.jdate+'T12:00:00')-dayOf(0))/86400000);
-    loadJournal();
-  });
 }
 function clearCurrent(){
   const labels = {daily:'this day',weekly:'this week',monthly:'this month'};
@@ -4172,7 +4171,9 @@ function clearJournalEntry(){
   journal={body:'',gratitude:['','',''],updated:null};
   document.getElementById('journalBody').value='';
   [1,2,3].forEach(n=>{ const el=document.getElementById('journalGratitude'+n); if(el) el.value=''; });
-  updateJournalMeta(); markDirty(); renderJournalList();
+  updateJournalMeta(); markDirty();
+  if(typeof renderJournalList === 'function') renderJournalList();
+  if(typeof scheduleSnapshotRefresh === 'function') scheduleSnapshotRefresh();
 }
 async function resetAll(){
   if(!confirm('Delete ALL saved data? This cannot be undone.')) return;

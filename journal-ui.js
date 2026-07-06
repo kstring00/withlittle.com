@@ -186,6 +186,78 @@
     snapshotTimer = setTimeout(refreshJournalSnapshot, 500);
   }
 
+  function dayOffsetFromDateStr(dateStr){
+    const target = new Date(dateStr + 'T12:00:00');
+    const base = dayOf(0);
+    base.setHours(12, 0, 0, 0);
+    return Math.round((target - base) / 86400000);
+  }
+
+  function formatJournalListDate(dateStr){
+    const today = iso(dayOf(0));
+    if(dateStr === today) return 'Today';
+    const d = new Date(dateStr + 'T12:00:00');
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function updateJournalEntryHead(dateStr){
+    const h = document.querySelector('.journal-entry-head h3');
+    if(!h) return;
+    const today = iso(dayOf(0));
+    if(dateStr === today){
+      h.textContent = "Today's entry";
+    } else {
+      h.textContent = formatJournalListDate(dateStr);
+    }
+  }
+
+  function syncJournalFromDom(){
+    if(typeof journal === 'undefined') return;
+    if(typeof normalizeJournal === 'function') journal = normalizeJournal(journal);
+    const ta = document.getElementById('journalBody');
+    if(ta) journal.body = ta.value;
+    if(!journal.gratitude) journal.gratitude = ['', '', ''];
+    [1, 2, 3].forEach(n=>{
+      const el = document.getElementById('journalGratitude' + n);
+      if(el) journal.gratitude[n - 1] = el.value;
+    });
+  }
+
+  async function flushJournalEntry(){
+    if(typeof dayOffset === 'undefined') return;
+    syncJournalFromDom();
+    const key = journalKeyFor(dayOffset);
+    const hasContent = (journal.body || '').trim() || (journal.gratitude || []).some(g=> String(g).trim());
+    if(hasContent){
+      journal.updated = journal.updated || Date.now();
+      await window.storage.set(key, JSON.stringify(journal));
+      if(typeof setLocalSyncAt === 'function') setLocalSyncAt(key, Date.now());
+      if(typeof scheduleCloudPush === 'function') scheduleCloudPush([key]);
+    }
+    if(typeof dirty !== 'undefined') dirty = false;
+    if(typeof updateSaveState === 'function') updateSaveState('saved');
+  }
+
+  async function navigateToJournalDate(dateStr){
+    if(!dateStr) return;
+    const curDate = iso(dayOf(dayOffset));
+    if(dateStr !== curDate) await flushJournalEntry();
+    dayOffset = dayOffsetFromDateStr(dateStr);
+    if(typeof loadJournal === 'function') await loadJournal();
+  }
+
+  async function renderJournalList(){
+    const ul = document.getElementById('journalList');
+    if(!ul) return;
+    const r = await window.storage.list('journal:');
+    const keys = (r?.keys || []).sort().reverse().slice(0, 30);
+    const cur = iso(dayOf(dayOffset));
+    ul.innerHTML = keys.map(k=>{
+      const d = k.slice(8);
+      return '<li><button type="button" class="'+(d === cur ? 'on' : '')+'" data-jdate="'+d+'">'+esc(formatJournalListDate(d))+'</button></li>';
+    }).join('') || '<li class="hint">No past entries</li>';
+  }
+
   function insertAtCursor(ta, before, after){
     if(!ta) return;
     const s = ta.selectionStart, e = ta.selectionEnd;
@@ -249,6 +321,13 @@
     document.getElementById('journalPastToggle')?.addEventListener('click', ()=>{
       document.getElementById('journalPastPanel')?.classList.toggle('open');
     });
+
+    document.getElementById('journalList')?.addEventListener('click', async e=>{
+      const btn = e.target.closest('[data-jdate]');
+      if(!btn) return;
+      e.preventDefault();
+      await navigateToJournalDate(btn.dataset.jdate);
+    });
   }
 
   function journalPromptForDay(){
@@ -265,5 +344,9 @@
   root.journalPromptForDay = journalPromptForDay;
   root.getAllJournalPrompts = getAllPrompts;
   root.verseForDate = verseForDate;
+  root.renderJournalList = renderJournalList;
+  root.navigateToJournalDate = navigateToJournalDate;
+  root.updateJournalEntryHead = updateJournalEntryHead;
+  root.flushJournalEntry = flushJournalEntry;
 
 })(typeof window !== 'undefined' ? window : globalThis);
