@@ -155,10 +155,96 @@ html,body{margin:0;background:var(--paper);color:var(--ink);
   font-size:12px;cursor:pointer;color:var(--mist);font-family:inherit}
 .why-btn:hover{border-color:var(--gold);color:var(--navy)}
 
-.daily-layout{display:grid;grid-template-columns:1fr 260px;gap:24px;align-items:start}
-@media(max-width:1100px){.daily-layout{grid-template-columns:1fr}.sidebar{display:none}}
+.daily-layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:32px;align-items:start;max-width:1400px;padding:0 24px;margin:0 auto}
+@media(max-width:1100px){.daily-layout{grid-template-columns:1fr;padding:0 16px}.dl-rail-col{display:none}}
+.dl-rail-col{position:relative}
+.sidebar{position:relative;top:0;display:flex;flex-direction:column;gap:20px}
 
-.sidebar{position:sticky;top:88px;display:flex;flex-direction:column;gap:12px}
+/* Daily Ledger — flat visual language */
+.dl-day-strip{margin-bottom:0;padding:0}
+.dl-strip-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.dl-strip-hint{margin:8px 0 0;font-size:11px;color:var(--text-secondary)}
+.dl-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:none;border-radius:999px;background:transparent;color:var(--text-secondary);font-size:12px;cursor:pointer;font-family:inherit;transition:background .15s}
+.dl-chip:hover,.dl-chip:focus-visible{background:var(--bg-card-2);outline:none}
+.dl-chip.done{color:var(--text-primary)}
+.dl-chip.done .dl-chip-check{color:var(--green)}
+.dl-chip.released{opacity:.55;text-decoration:line-through}
+.dl-chip-check{width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text-muted)}
+.dl-sub-tabs{display:flex;gap:4px;margin-left:auto;padding:0 24px;max-width:1400px;margin-right:auto;margin-bottom:8px}
+.dl-sub-tab{border:none;background:transparent;color:var(--text-secondary);font-size:11px;padding:6px 10px;border-radius:6px;cursor:pointer;font-family:inherit}
+.dl-sub-tab.on{background:var(--bg-card-2);color:var(--text-primary)}
+.dl-section{margin-bottom:36px;scroll-margin-top:120px}
+.dl-section-head{font-size:20px;font-weight:600;margin:0 0 14px;color:var(--text-primary);letter-spacing:.01em}
+.dl-list,.dl-acc-grid{display:flex;flex-direction:column;gap:4px}
+.dl-item{display:flex;flex-direction:column;gap:4px;padding:8px 10px;border-radius:8px;border:none;background:transparent;transition:background .15s}
+.dl-item:hover,.dl-item.expanded{background:var(--bg-card-2)}
+.dl-item.done .dl-item-main{opacity:.85}
+.dl-item.released .dl-item-main{text-decoration:line-through;color:var(--text-secondary)}
+.dl-check-wrap{display:flex;align-items:flex-start;gap:10px;cursor:pointer;width:100%}
+.dl-check{width:18px;height:18px;accent-color:var(--green);flex:none;margin-top:2px;cursor:pointer}
+.dl-item-main{flex:1;font-size:14px;font-weight:500;color:var(--text-primary);line-height:1.45}
+.dl-label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary);margin:8px 0 4px}
+.dl-hint{font-size:11px;color:var(--text-secondary);margin:0 0 10px;line-height:1.45}
+.dl-hairline{width:100%;border:none;border-bottom:1px solid var(--border-subtle);border-radius:0;padding:8px 2px;font:13px/1.4 inherit;color:var(--text-primary);background:transparent;transition:border-color .15s}
+.dl-hairline:focus{outline:none;border-bottom-color:var(--gold);box-shadow:none}
+.dl-hairline.dl-secondary{font-size:12px;color:var(--text-secondary)}
+.dl-hairline.dl-grow-text{border-bottom:none;padding:4px 2px}
+.dl-add-row{display:flex;gap:8px;align-items:center;margin-top:8px}
+.dl-add-btn{width:28px;height:28px;border:none;background:var(--bg-card-2);border-radius:6px;color:var(--green);font-size:18px;font-weight:600;cursor:pointer;flex:none}
+.dl-add-btn:hover{filter:brightness(1.08)}
+.dl-text-action{border:none;background:none;color:var(--text-secondary);font-size:11px;cursor:pointer;padding:0 10px 4px;text-align:left;font-family:inherit}
+.dl-text-action:hover{color:var(--gold)}
+.dl-empty,.dl-empty-li{font-size:12px;color:var(--text-secondary);list-style:none;padding:4px 0}
+.dl-carry-badge{font-size:10px;color:var(--gold);margin-right:6px;font-weight:600}
+.dl-carry-plan{font-size:11px;color:var(--text-secondary);padding-left:28px;margin-top:2px}
+.dl-session-panel{padding:8px 10px 10px 28px;display:flex;flex-direction:column;gap:4px}
+.dl-dur-picks{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.dl-dur-pick{border:none;background:transparent;color:var(--text-secondary);font-size:11px;padding:4px 10px;border-radius:999px;cursor:pointer;font-family:inherit}
+.dl-dur-pick.on,.dl-dur-pick:hover{background:var(--bg-card-2);color:var(--text-primary)}
+.dl-custom-min{width:64px!important;border-bottom:1px solid var(--border-subtle)!important;padding:4px!important;font-size:11px!important;background:transparent!important}
+.dl-accordion{border:none;background:transparent;margin-bottom:4px}
+.dl-accordion summary{display:flex;align-items:center;gap:8px;padding:10px 4px;cursor:pointer;list-style:none;font-size:13px;font-weight:600;color:var(--text-primary)}
+.dl-accordion summary::-webkit-details-marker{display:none}
+.dl-acc-icon{color:var(--gold);flex:none}
+.dl-acc-preview{margin-left:auto;font-size:11px;font-weight:400;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45%}
+.dl-acc-body{padding:0 4px 12px 24px}
+.dl-growth-items{list-style:none;margin:0 0 8px;padding:0;display:flex;flex-direction:column;gap:2px}
+.dl-rm{border:none;background:none;color:var(--text-secondary);cursor:pointer;font-size:16px;padding:4px}
+.dl-plan-row{display:grid;grid-template-columns:130px 1fr;gap:12px;align-items:center;margin-bottom:10px}
+@media(max-width:560px){.dl-plan-row{grid-template-columns:1fr}}
+.dl-plan-label{font-size:12px;color:var(--text-secondary)}
+.dl-borrow-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px}
+.dl-borrow-chip{border:none;background:var(--bg-card-2);color:var(--text-secondary);font-size:11px;padding:5px 10px;border-radius:999px;cursor:pointer;font-family:inherit}
+.dl-borrow-chip:hover{color:var(--text-primary)}
+.dl-review-row{padding:10px 4px;margin-bottom:8px}
+.dl-review-q{display:block;font-size:11px;color:var(--text-secondary);margin-bottom:4px}
+.dl-review-item{font-size:13px;color:var(--text-primary);display:block;margin-bottom:8px}
+.dl-review-actions{display:flex;gap:8px;flex-wrap:wrap}
+.dl-btn{border:1px solid var(--border-subtle);background:var(--bg-card-2);color:var(--text-primary);border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer;font-family:inherit}
+.dl-btn-primary{background:var(--green);border-color:var(--green);color:var(--text-on-green);font-weight:600}
+.dl-btn-ghost{background:transparent;border-color:transparent;color:var(--text-secondary)}
+.dl-carry-field{margin-top:8px;display:flex;flex-direction:column;gap:8px;max-width:420px}
+.dl-summary-line{font-size:13px;color:var(--text-secondary);margin:0}
+.dl-carried-panel{margin-bottom:32px}
+.dl-carried-row{display:flex;gap:10px;padding:10px 4px;align-items:flex-start}
+.dl-carried-text{font-size:13px;color:var(--text-primary)}
+.dl-carried-meta{font-size:10px;color:var(--text-secondary);margin-top:4px}
+.dl-rail-block{margin-bottom:8px}
+.dl-rail-head{font-size:15px;margin:0 0 10px;color:var(--text-primary)}
+.dl-flow-step{display:block;width:100%;text-align:left;border:none;background:transparent;color:var(--text-secondary);font-size:12px;padding:6px 4px;cursor:pointer;font-family:inherit;border-radius:6px}
+.dl-flow-step:hover{background:var(--bg-card-2);color:var(--text-primary)}
+.dl-scripture{font-size:12px;font-style:italic;color:var(--text-secondary);line-height:1.55;border-left:2px solid var(--gold);padding-left:10px;margin:0}
+.dl-scripture cite{display:block;font-size:10px;font-style:normal;color:var(--gold);margin-top:6px}
+#dailySidebar .side-card{border:none;background:transparent;box-shadow:none;border-radius:0}
+#dailySidebar .side-head{border:none;padding:0 0 8px;background:transparent}
+#dailySidebar .side-body{padding:0}
+#dailyBoard .page-head,#dailyBoard .daily-toolbar{padding-left:24px;padding-right:24px;max-width:1400px;margin-left:auto;margin-right:auto}
+.prayer-log-section{margin-top:28px}
+.prayer-log-date{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--gold);margin:16px 0 8px}
+.prayer-log-entry{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border:none;background:transparent}
+.prayer-log-entry+.prayer-log-entry{border-top:1px solid var(--border-subtle)}
+.prayer-fruit-toggle{font-size:11px;color:var(--text-secondary);display:flex;align-items:center;gap:6px;margin-top:4px;cursor:pointer}
+.prayer-fruit-toggle input{accent-color:var(--green)}
 .side-card{background:var(--card);border:1px solid var(--line-soft);border-radius:12px;overflow:hidden;box-shadow:0 1px 3px var(--shadow-elevated)}
 .side-head{padding:10px 14px;border-bottom:1px solid var(--line-soft)}
 .side-head h3{margin:0;font-family:"Cormorant Garamond",serif;font-size:15px;font-weight:600;color:var(--navy)}
@@ -179,6 +265,7 @@ html,body{margin:0;background:var(--paper);color:var(--ink);
 .scripture-card{font-size:12px;font-style:italic;color:var(--mist);line-height:1.55;border-left:2px solid var(--gold);padding-left:10px}
 .scripture-card cite{display:block;font-size:10px;font-style:normal;color:var(--gold);margin-top:6px}
 
+.daily-toolbar{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;padding:0 24px;max-width:1400px;margin-left:auto;margin-right:auto}
 .daily-section{display:none;margin-bottom:20px;scroll-margin-top:100px}
 #dailyBoard[data-phase="morning"] .daily-section[data-phases~="morning"],
 #dailyBoard[data-phase="day"] .daily-section[data-phases~="day"],
@@ -1518,6 +1605,12 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
     <button type="button" class="btn-ghost" id="anchorAddBtn" style="margin-top:10px">+ Add anchor</button>
   </div>
   <div class="settings-card">
+    <h4 class="serif" style="margin:0 0 8px">Daily Categories</h4>
+    <p style="margin:0 0 10px;font-size:12px;color:var(--text-secondary)">Growth category names, prompts, and icons on the Daily Ledger.</p>
+    <div class="anchor-settings" id="categorySettings"></div>
+    <button type="button" class="btn-ghost" id="categoryAddBtn" style="margin-top:10px">+ Add category</button>
+  </div>
+  <div class="settings-card">
     <h4 class="serif" style="margin:0 0 8px">Mentors</h4>
     <p style="margin:0 0 10px;font-size:12px;color:var(--text-secondary)">Labels appear in the Mentorship sidebar. Add a fourth mentor anytime.</p>
     <div class="mentor-settings" id="mentorSettings"></div>
@@ -1599,6 +1692,11 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
     </div>
   </div>
   <div class="daily-toolbar">
+    <div id="dlDayStripHost"></div>
+    <div class="dl-sub-tabs" role="tablist">
+      <button type="button" class="dl-sub-tab on" data-dl-sub="today">Today</button>
+      <button type="button" class="dl-sub-tab" data-dl-sub="carried">Carried</button>
+    </div>
     <div class="phase-tabs weekday-phase-tabs" role="tablist">
       <button type="button" class="phase-tab on" data-phase="morning" role="tab">Morning Setup</button>
       <button type="button" class="phase-tab" data-phase="day" role="tab">During the Day</button>
@@ -1608,7 +1706,7 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
   </div>
   <div class="daily-layout">
     <div class="main-col" id="dailyMain"></div>
-    <aside class="sidebar" id="dailySidebar"></aside>
+    <aside class="sidebar dl-rail-col" id="dailySidebar"></aside>
   </div>
 </div>
 
@@ -1754,10 +1852,10 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
     <h4>Foundations</h4>
     <ul>
       <li>Faithfulness in small details compounds over time</li>
-      <li>Work from the heart for the Lord, not for approval</li>
+      <li>First fruits anchor the day in Christ before everything else</li>
       <li>Steward talents for neighbor and kingdom</li>
       <li>Measure to improve — data, not shame</li>
-      <li>Implementation intentions beat vague goals</li>
+      <li>Non-negotiables with honest carry-over beat vague goals</li>
     </ul>
   </div>
   <div class="drawer-block">
@@ -1790,6 +1888,7 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
 <script src="journal-ui.js"></script>
 <script src="ideas-hub.js?v=5" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
 <script src="calendar-ui.js?v=1"></script>
+<script src="daily-ui.js?v=1"></script>
 <script src="dashboard-ui.js"></script>
 <script>
 
@@ -2522,7 +2621,7 @@ const DEFAULT_MOTIVES = [
   {id:'approval',label:'For approval'},{id:'pride',label:'Pride'},{id:'comfort',label:'Comfort / escape'}
 ];
 const FF_KEYS = [
-  {key:'mustDo',icon:'★',title:'Must-Do',hint:'The one non-negotiable task that makes today faithful.'},
+  {key:'mustDo',icon:'★',title:'Non-Negotiables',hint:'What must happen today — no exceptions.'},
   {key:'body',icon:'♥',title:'Body Habit',hint:'Care for my health so I can serve with energy.'},
   {key:'order',icon:'☰',title:'Order Habit',hint:'Bring order to my peace, schedule, and responsibilities.'},
   {key:'leadership',icon:'◎',title:'Leadership / Service',hint:'Serve, encourage, ask, listen, and make someone\'s day better.'},
@@ -2539,9 +2638,9 @@ const CAPTURE = [
   {k:'burdens',t:'Burdens in front of me',h:'What keeps coming up that needs action, prayer, or release?'}
 ];
 const FRUITS = ['Love','Joy','Peace','Patience','Kindness','Goodness','Faithfulness','Gentleness','Self-Control'];
-const FLOW = ['Posture','Faithful Few','Danger Plan','Execute','Track','Learn','Commit'];
-const FLOW_PHASE = ['morning','morning','morning','morning','evening','evening','evening'];
-const DAILY_SECTIONS = ['posture','faithfulFew','danger','execute','track','learn','commit'];
+const FLOW = ['First Fruits','Non-Negotiables','Growth','Plan of Action'];
+const FLOW_PHASE = ['morning','morning','morning','morning'];
+const DAILY_SECTIONS = ['first-fruits','non-neg','growth','plan'];
 let dailyPhase = 'morning';
 let simpleMode = false;
 let satBlockSessionOverride = null;
@@ -2677,7 +2776,7 @@ async function saveAnchorSettingsFromDOM(){
   if(typeof renderDashboard==='function') renderDashboard();
   markDirty?.();
 }
-function loadSettings(){ renderAnchorSettings(); renderMentorSettings?.(); }
+function loadSettings(){ renderAnchorSettings(); renderCategorySettings?.(); renderMentorSettings?.(); }
 function currentKey(){
   if(isDaily()) return dayKeyFor(dayOffset);
   if(isWeekly()) return weekKeyFor(weekOffset);
@@ -2814,7 +2913,14 @@ function blankMonth(){
 function normalizeFFCategory(raw){
   if(Array.isArray(raw?.items)){
     return {items: raw.items.map(it=>({
-      id: it.id||uid(), text: it.text||'', done: !!it.done
+      id: it.id||uid(), text: it.text||'', done: !!it.done,
+      anchorId: it.anchorId || null,
+      carryCount: it.carryCount || 0,
+      carryPlan: String(it.carryPlan||'').trim(),
+      carriedFrom: it.carriedFrom || null,
+      released: !!it.released,
+      eveningAction: it.eveningAction || null,
+      principleId: it.principleId || null
     }))};
   }
   if(raw?.text || raw?.done){
@@ -3157,11 +3263,14 @@ function normalizePrayer(p){
     askedDate: p.askedDate||iso(dayOf(0)),
     answer: p.answer||'',
     answeredDate: p.answeredDate||'',
-    updated: p.updated||null
+    updated: p.updated||null,
+    sessionId: p.sessionId||null,
+    bearingFruit: !!p.bearingFruit,
+    fruitLine: p.fruitLine||''
   };
 }
 function prayerAnswered(p){
-  return !!(p.answer?.trim() || p.answeredDate);
+  return !!(p.answer?.trim() || p.answeredDate || p.bearingFruit);
 }
 function formatPrayerDate(d){
   if(!d) return '—';
@@ -3181,31 +3290,57 @@ function renderPrayerList(){
   const total = globals.prayers.length;
   const ans = globals.prayers.filter(p=> prayerAnswered(normalizePrayer(p))).length;
   if(stats) stats.textContent = total ? ans+' answered · '+(total-ans)+' waiting · '+total+' total' : 'No prayers logged yet.';
-  if(!items.length){
+  const sessionItems = items.filter(p=> p.sessionId);
+  const manualItems = items.filter(p=> !p.sessionId);
+  let html = '';
+  if(sessionItems.length){
+    html += '<div class="prayer-log-section"><h3 class="serif" style="margin:0 0 8px;font-size:16px">Prayer Log</h3>';
+    const byDate = {};
+    sessionItems.forEach(p=>{
+      const d = p.askedDate || 'Unknown';
+      if(!byDate[d]) byDate[d] = [];
+      byDate[d].push(p);
+    });
+    Object.keys(byDate).sort((a,b)=> b.localeCompare(a)).forEach(d=>{
+      html += '<div class="prayer-log-date">'+formatPrayerDate(d)+'</div>';
+      byDate[d].forEach(p=>{
+        html += '<div class="prayer-log-entry" data-prayer-id="'+p.id+'">'+
+          '<div style="flex:1"><div style="font-size:13px;color:var(--text-primary)">'+esc(p.request)+'</div>'+
+          (p.fruitLine ? '<div style="font-size:11px;color:var(--text-secondary);margin-top:4px">'+esc(p.fruitLine)+'</div>' : '')+
+          '<label class="prayer-fruit-toggle"><input type="checkbox" data-prayer-fruit="'+p.id+'"'+(p.bearingFruit?' checked':'')+'> Answered / bearing fruit</label></div>'+
+          '<button type="button" class="ff-rm" data-prayer-rm data-id="'+p.id+'" aria-label="Remove">×</button></div>';
+      });
+    });
+    html += '</div>';
+  }
+  if(!manualItems.length && !sessionItems.length){
     list.innerHTML = '<div class="prayer-empty">'+(prayerFilter==='all'?'Start by adding a prayer above.':'Nothing in this view yet.')+'</div>';
     return;
   }
-  list.innerHTML = items.map(p=>{
-    const answered = prayerAnswered(p);
-    const badge = answered ? 'answered' : 'waiting';
-    const lbl = answered ? 'Answered' : 'Waiting';
-    return '<div class="prayer-card '+badge+'" data-prayer-id="'+p.id+'">'+
-      '<div class="prayer-card-head">'+
-      '<span class="prayer-badge '+badge+'">'+lbl+'</span>'+
-      '<span class="prayer-dates">Asked '+formatPrayerDate(p.askedDate)+
-      (p.answeredDate ? ' · Answered '+formatPrayerDate(p.answeredDate) : '')+'</span>'+
-      '<span class="spacer"></span>'+
-      '<button type="button" class="ff-rm" data-prayer-rm data-id="'+p.id+'" aria-label="Remove">×</button></div>'+
-      '<label class="q q-compact">Prayer</label>'+
-      '<textarea class="ta-sm" rows="2" data-prayer-field="request" data-id="'+p.id+'" placeholder="What you prayed…">'+esc(p.request)+'</textarea>'+
-      '<div class="prayer-grid">'+
-      '<div><label class="q q-compact">How God answered</label>'+
-      '<textarea class="ta-sm" rows="2" data-prayer-field="answer" data-id="'+p.id+'" placeholder="Write the answer when it comes…">'+esc(p.answer)+'</textarea></div>'+
-      '<div><label class="q q-compact">Date answered</label>'+
-      '<input type="date" data-prayer-field="answeredDate" data-id="'+p.id+'" value="'+(p.answeredDate||'')+'">'+
-      '<label class="q q-compact" style="margin-top:8px">Date prayed</label>'+
-      '<input type="date" data-prayer-field="askedDate" data-id="'+p.id+'" value="'+(p.askedDate||'')+'"></div></div></div>';
-  }).join('');
+  if(manualItems.length){
+    html += manualItems.map(p=>{
+      const answered = prayerAnswered(p);
+      const badge = answered ? 'answered' : 'waiting';
+      const lbl = answered ? 'Answered' : 'Waiting';
+      return '<div class="prayer-card '+badge+'" data-prayer-id="'+p.id+'">'+
+        '<div class="prayer-card-head">'+
+        '<span class="prayer-badge '+badge+'">'+lbl+'</span>'+
+        '<span class="prayer-dates">Asked '+formatPrayerDate(p.askedDate)+
+        (p.answeredDate ? ' · Answered '+formatPrayerDate(p.answeredDate) : '')+'</span>'+
+        '<span class="spacer"></span>'+
+        '<button type="button" class="ff-rm" data-prayer-rm data-id="'+p.id+'" aria-label="Remove">×</button></div>'+
+        '<label class="q q-compact">Prayer</label>'+
+        '<textarea class="ta-sm" rows="2" data-prayer-field="request" data-id="'+p.id+'" placeholder="What you prayed…">'+esc(p.request)+'</textarea>'+
+        '<div class="prayer-grid">'+
+        '<div><label class="q q-compact">How God answered</label>'+
+        '<textarea class="ta-sm" rows="2" data-prayer-field="answer" data-id="'+p.id+'" placeholder="Write the answer when it comes…">'+esc(p.answer)+'</textarea></div>'+
+        '<div><label class="q q-compact">Date answered</label>'+
+        '<input type="date" data-prayer-field="answeredDate" data-id="'+p.id+'" value="'+(p.answeredDate||'')+'">'+
+        '<label class="q q-compact" style="margin-top:8px">Date prayed</label>'+
+        '<input type="date" data-prayer-field="askedDate" data-id="'+p.id+'" value="'+(p.askedDate||'')+'"></div></div></div>';
+    }).join('');
+  }
+  list.innerHTML = html;
 }
 function loadPrayer(){
   ensurePrayers();
@@ -3220,6 +3355,16 @@ function addPrayer(request, askedDate){
   renderPrayerList();
   markDirty();
 }
+function addPrayerFromSession({ request, askedDate, sessionId, fruitLine }){
+  ensurePrayers();
+  globals.prayers.unshift(normalizePrayer({
+    id: uid(), request, askedDate: askedDate||iso(dayOf(0)), sessionId, fruitLine,
+    answer:'', answeredDate:'', bearingFruit: false, updated: Date.now()
+  }));
+  if(typeof viewMode !== 'undefined' && viewMode === 'prayer') renderPrayerList();
+  markDirty();
+}
+window.addPrayerFromSession = addPrayerFromSession;
 function ensureMotives(){
   if(!globals.motives?.length){
     globals.motives = DEFAULT_MOTIVES.map(m=>({id:m.id, label:m.label}));
@@ -3545,6 +3690,11 @@ function bindFFAccordion(){
   }, true);
 }
 function renderDaily(){
+  if(typeof renderDailyLedger === 'function' && renderDailyLedger()){
+    restoreWeekdayPageHead?.();
+    applyDailyPhase();
+    return;
+  }
   const main = document.getElementById('dailyMain');
   main.innerHTML =
     FaithfulFewHero() +
@@ -3832,6 +3982,15 @@ function bindEvents(){
       }
       return;
     }
+    if(el.dataset.prayerFruit !== undefined){
+      const p = globals.prayers?.find(x=>x.id===el.dataset.prayerFruit);
+      if(p){
+        p.bearingFruit = el.checked;
+        p.updated = Date.now();
+        markDirty();
+      }
+      return;
+    }
     if(el.dataset.satGratitude !== undefined && isDaily() && isSaturdayRecovery()){
       const i = +el.dataset.satGratitude;
       if(!dayData.satRecovery?.blocks?.evening?.closure) return;
@@ -3855,6 +4014,11 @@ function bindEvents(){
   });
   app.addEventListener('change', e=>{
     const el = e.target;
+    if(el.dataset.prayerFruit){
+      const p = globals.prayers?.find(x=>x.id===el.dataset.prayerFruit);
+      if(p){ p.bearingFruit = el.checked; p.updated = Date.now(); markDirty(); }
+      return;
+    }
     if(el.dataset.satCheck && isDaily() && isSaturdayRecovery()){
       setNested(dayData, 'satRecovery.blocks.'+el.dataset.satCheck, el.checked);
       el.closest('.ff-check-row')?.classList.toggle('done', el.checked);
@@ -4239,8 +4403,19 @@ async function loadDaily(){
   document.getElementById('dailyBoard').classList.toggle('saturday-recovery', isSat);
   dayData = normalizeDaily(await getJSON(dayKeyFor(dayOffset)));
   if(faithStore){
+    faithStore.getDailyCategoryConfig().forEach(c=>{
+      if(!dayData.faithfulFew[c.id]) dayData.faithfulFew[c.id] = { items: [] };
+    });
     faithStore.syncMustDosFromDay(iso(dayOf(dayOffset)), dayData);
     await faithStore.save();
+  }
+  if(!isSat && typeof loadDailyLedger === 'function'){
+    if(!document.getElementById('sec-first-fruits')) renderDailyLedger?.();
+    await loadDailyLedger();
+    applyDailyPhase();
+    if(typeof updateDailyScore === 'function') updateDailyScore();
+    else updateScore();
+    return;
   }
   if(!document.getElementById('sec-faithfulFew') || document.getElementById('sec-satRecovery')) renderDaily();
   populateFields(document.getElementById('dailyMain'), dayData);
@@ -4321,7 +4496,7 @@ async function resetAll(){
 
 
 (async function init(){
-  renderDaily(); renderWeekly(); renderMonthly(); bindEvents(); bindFFAccordion();
+  renderDaily(); renderWeekly(); renderMonthly(); bindEvents(); bindFFAccordion(); bindDailyEvents?.();
   const vm = await window.storage.get('view-mode');
   if(vm?.value && (['dashboard','daily','weekly','monthly','journal','ideas','prayer','projects','settings','calendar','tag'].includes(vm.value) || vm.value.startsWith('mentorship-'))) viewMode = vm.value;
   syncViewModeBridge();

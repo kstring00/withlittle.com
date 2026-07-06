@@ -39,24 +39,70 @@
       applications: [],
       mentorshipSessions: [],
       queuedQuestions: [],
+      practiceSessions: [],
+      dailyCategories: null,
       createdAt: nowIso(),
       updatedAt: nowIso()
     };
   }
 
   const DEFAULT_DAILY_ANCHORS = [
-    { id: 'bible', title: 'Bible Reading — 10 min', durationMin: 10, enabled: true },
-    { id: 'prayer', title: 'Prayer', durationMin: null, enabled: true }
+    { id: 'bible', title: 'Bible Reading', durationMin: 10, enabled: true, kind: 'bible' },
+    { id: 'prayer', title: 'Prayer', durationMin: null, enabled: true, kind: 'prayer' }
+  ];
+
+  const DEFAULT_DAILY_CATEGORIES = [
+    { id: 'body', icon: '♥', title: 'Body', hint: 'How am I stewarding my body today?', enabled: true, sortOrder: 0 },
+    { id: 'order', icon: '☰', title: 'Order', hint: 'Is my space and schedule in order?', enabled: true, sortOrder: 1 },
+    { id: 'leadership', icon: '◎', title: 'Leadership Development', hint: 'How am I growing as a leader, and what step is in place?', enabled: true, sortOrder: 2 },
+    { id: 'skill', icon: '✦', title: 'Skill / Talent', hint: 'How am I measuring today?', enabled: true, sortOrder: 3 }
   ];
 
   function normalizeDailyAnchor(raw){
     const a = raw || {};
+    const kind = a.kind === 'bible' ? 'bible' : (a.kind === 'prayer' ? 'prayer' : (a.id === 'bible' ? 'bible' : 'prayer'));
     return {
       id: a.id || uid(),
       title: String(a.title || '').trim(),
       durationMin: typeof a.durationMin === 'number' ? a.durationMin : (a.durationMin == null ? null : Number(a.durationMin) || null),
-      enabled: a.enabled !== false
+      enabled: a.enabled !== false,
+      kind
     };
+  }
+
+  function normalizeDailyCategory(raw){
+    const c = raw || {};
+    return {
+      id: c.id || uid(),
+      icon: String(c.icon || '•').trim(),
+      title: String(c.title || '').trim(),
+      hint: String(c.hint || '').trim(),
+      enabled: c.enabled !== false,
+      sortOrder: typeof c.sortOrder === 'number' ? c.sortOrder : 0
+    };
+  }
+
+  function normalizePracticeSession(raw){
+    const s = raw || {};
+    const kind = s.kind === 'bible' ? 'bible' : 'prayer';
+    return {
+      id: s.id || uid(),
+      kind,
+      anchorId: s.anchorId || null,
+      date: s.date || todayIso(),
+      minutes: typeof s.minutes === 'number' ? s.minutes : (Number(s.minutes) || 0),
+      entries: Array.isArray(s.entries) ? s.entries.map(e=> ({
+        request: String(e?.request || '').trim(),
+        fruit: String(e?.fruit || '').trim(),
+        passage: String(e?.passage || '').trim(),
+        takeaway: String(e?.takeaway || '').trim()
+      })) : [],
+      createdAt: s.createdAt || nowIso()
+    };
+  }
+
+  function getDefaultDailyCategories(){
+    return DEFAULT_DAILY_CATEGORIES.map(c=> normalizeDailyCategory({ ...c }));
   }
 
   function getDefaultDailyAnchors(){
@@ -272,6 +318,8 @@
       applications: (c.applications || []).map(normalizeApplication),
       mentorshipSessions: (c.mentorshipSessions || []).map(normalizeSessionEntry),
       queuedQuestions: (c.queuedQuestions || []).map(normalizeQueuedQuestion),
+      practiceSessions: (c.practiceSessions || []).map(normalizePracticeSession),
+      dailyCategories: (c.dailyCategories || getDefaultDailyCategories()).map(normalizeDailyCategory),
       updatedAt: c.updatedAt || base.updatedAt
     };
   }
@@ -381,6 +429,73 @@
     setDailyAnchorConfig(anchors){
       this.data.dailyAnchors = (anchors || []).map(normalizeDailyAnchor);
       return this.data.dailyAnchors;
+    }
+
+    getDailyCategoryConfig(){
+      if(!this.data.dailyCategories?.length) this.data.dailyCategories = getDefaultDailyCategories();
+      return this.data.dailyCategories.slice().sort((a,b)=> (a.sortOrder||0) - (b.sortOrder||0));
+    }
+
+    setDailyCategoryConfig(categories){
+      this.data.dailyCategories = (categories || []).map((c,i)=> normalizeDailyCategory({ ...c, sortOrder: i }));
+      return this.data.dailyCategories;
+    }
+
+    logPracticeSession(partial){
+      const s = normalizePracticeSession({ ...partial, id: uid(), createdAt: nowIso() });
+      this.data.practiceSessions.push(s);
+      const anchor = this.getDailyAnchorConfig().find(a=> a.id === s.anchorId);
+      if(s.kind === 'prayer' && s.entries?.length){
+        s.entries.forEach(e=>{
+          if(!e.request && !e.fruit) return;
+          if(typeof window !== 'undefined' && typeof window.addPrayerFromSession === 'function'){
+            window.addPrayerFromSession({ request: e.request, fruitLine: e.fruit, askedDate: s.date, sessionId: s.id });
+          }
+        });
+      }
+      if(s.kind === 'bible' && s.entries?.length){
+        s.entries.forEach(e=>{
+          if(!e.passage && !e.takeaway) return;
+          this.appendBibleReadingJournal(s.date, e.passage, e.takeaway);
+        });
+      }
+      const task = this.data.tasks.find(t=> t.date === s.date && t.anchorId === s.anchorId);
+      if(task && !task.completed){
+        task.completed = true;
+        task.completedAt = nowIso();
+      }
+      return s;
+    }
+
+    getPracticeSessionsForDate(dateStr, kind){
+      return (this.data.practiceSessions || [])
+        .filter(s=> s.date === dateStr && (!kind || s.kind === kind))
+        .sort((a,b)=> (a.createdAt||'').localeCompare(b.createdAt||''));
+    }
+
+    getPracticeSummaryForDate(dateStr){
+      const sessions = this.getPracticeSessionsForDate(dateStr);
+      const byAnchor = {};
+      sessions.forEach(s=>{
+        if(!byAnchor[s.anchorId]) byAnchor[s.anchorId] = { count: 0, minutes: 0, kind: s.kind };
+        byAnchor[s.anchorId].count++;
+        byAnchor[s.anchorId].minutes += s.minutes || 0;
+      });
+      const prayer = sessions.filter(s=> s.kind === 'prayer');
+      const bible = sessions.filter(s=> s.kind === 'bible');
+      return {
+        byAnchor,
+        prayerCount: prayer.length,
+        prayerMinutes: prayer.reduce((n,s)=> n + (s.minutes||0), 0),
+        bibleCount: bible.length,
+        bibleMinutes: bible.reduce((n,s)=> n + (s.minutes||0), 0),
+        totalSessions: sessions.length
+      };
+    }
+
+    getAnchorKind(anchorId){
+      const a = this.getDailyAnchorConfig().find(x=> x.id === anchorId);
+      return a?.kind || (anchorId === 'bible' ? 'bible' : 'prayer');
     }
 
     ensureDailyAnchors(dateStr){
@@ -1056,6 +1171,30 @@
 
     getJournalForDate(date){ return this.data.journalEntries.find(j=> j.date === date) || null; }
 
+    appendBibleReadingJournal(dateStr, passage, takeaway){
+      const block = (passage ? String(passage).trim() + '\n\n' : '') + String(takeaway || '').trim();
+      if(!block.trim()) return null;
+      const line = '【Bible reading】\n' + block;
+      const existing = this.getJournalForDate(dateStr);
+      if(existing){
+        existing.body = existing.body ? existing.body.trim() + '\n\n---\n\n' + line : line;
+        existing.tags = normalizeTags([...(existing.tags||[]), 'bible-reading']);
+        existing.updatedAt = nowIso();
+        return normalizeJournalEntry(existing);
+      }
+      const entry = normalizeJournalEntry({ id: uid(), date: dateStr, body: line, tags: ['bible-reading'], createdAt: nowIso(), updatedAt: nowIso() });
+      this.data.journalEntries.push(entry);
+      return entry;
+    }
+
+    getNonNegotiableSummary(dateStr, dayData){
+      const items = (dayData?.faithfulFew?.mustDo?.items || []).filter(it=> !it.anchorId);
+      const kept = items.filter(it=> it.done && !it.released).length;
+      const carried = items.filter(it=> it.eveningAction === 'carry').length;
+      const released = items.filter(it=> it.released).length;
+      return { kept, carried, released, total: items.length };
+    }
+
     // ——— Quick notes ———
     createQuickNote(text){
       const note = normalizeQuickNote({ id: uid(), text, createdAt: nowIso(), updatedAt: nowIso() });
@@ -1092,6 +1231,12 @@
       const growing = this.data.seeds.filter(s=> s.status === 'active').length;
       const nextBlock = this._nextScheduleBlock(dateStr, opts?.now);
       const anchorDone = anchors.filter(t=> t.completed).length;
+      const practice = this.getPracticeSummaryForDate(dateStr);
+      const practiceLine = [];
+      if(practice.prayerCount) practiceLine.push('Prayer ×'+practice.prayerCount);
+      if(practice.bibleMinutes) practiceLine.push('Word '+practice.bibleMinutes+'m');
+      else if(practice.bibleCount) practiceLine.push('Word ×'+practice.bibleCount);
+      const pl = practiceLine.length ? practiceLine.join(', ') + ' today' : '';
       return {
         prioritiesLeft: priOpen.length,
         tasksCompleted: all.filter(t=> t.completed).length,
@@ -1101,7 +1246,9 @@
         nextBlockTime: nextBlock?.startTime || null,
         firstFruitsDone: anchorDone,
         firstFruitsTotal: anchors.length,
-        firstFruitsComplete: anchors.length > 0 && anchorDone === anchors.length
+        firstFruitsComplete: anchors.length > 0 && anchorDone === anchors.length,
+        practiceSummary: practice,
+        practiceLine: pl
       };
     }
 

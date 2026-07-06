@@ -65,6 +65,7 @@
   }
 
   function buildSummaryLine(summary){
+    if(summary.practiceLine) return summary.practiceLine;
     if(summary.firstFruitsTotal > 0 && !summary.firstFruitsComplete)
       return "Start with what's first — Bible reading & prayer.";
     if(summary.firstFruitsComplete){
