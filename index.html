@@ -11,7 +11,8 @@
 <style>
 :root{
   --bg-deep:#0d0f12; --bg-card:#151922; --bg-card-hover:#1a1f2a;
-  --border-subtle:rgba(255,255,255,.06); --text-primary:#e8e4dc; --text-muted:#8b919a;
+  --sidebar-bg:#14171c; --sidebar-text:#a8a49c; --sidebar-active:#efe9dd;
+  --border-subtle:rgba(255,255,255,.06); --text-primary:#e8e4dc; --text-muted:#a8a49c;
   --gold:#c9a045; --gold-dim:rgba(201,160,69,.15); --green:#4ade80;
   --navy:var(--text-primary); --green-old:#2D5A3D;
   --cream:var(--bg-deep); --cream-raised:var(--bg-card); --ink:var(--text-primary);
@@ -20,16 +21,6 @@
   --green-bg:rgba(74,222,128,.12); --gold-bg:var(--gold-dim);
   --danger:#f87171; --danger-bg:rgba(248,113,113,.1);
   --scroll-track:var(--bg-deep); --scroll-thumb:#3a4050;
-}
-html.light{
-  --bg-deep:#F7F3EA; --bg-card:#FDFBF6; --bg-card-hover:#fff;
-  --border-subtle:#D4CFC0; --text-primary:#1B2A4A; --text-muted:#6B7280;
-  --gold:#B8954A; --gold-dim:rgba(184,149,74,.12); --green:#2D5A3D;
-  --navy:#1B2A4A; --cream:#F7F3EA; --cream-raised:#FDFBF6; --ink:var(--navy);
-  --mist:#6B7280; --line:#D4CFC0; --line-soft:#E8E3D8;
-  --card:var(--cream-raised); --paper:var(--cream);
-  --green-bg:rgba(45,90,61,.1); --danger:#8B3A3A; --danger-bg:rgba(139,58,58,.08);
-  --scroll-track:var(--cream); --scroll-thumb:#A39E93;
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--paper);color:var(--ink);
@@ -89,8 +80,6 @@ html,body{margin:0;background:var(--paper);color:var(--ink);
 .save-menu summary::-webkit-details-marker{display:none}
 .save-menu button{margin-top:6px;border:1px solid var(--navy);background:transparent;padding:5px 12px;font-size:12px;cursor:pointer;border-radius:4px;color:var(--ink);display:block;width:100%;text-align:left}
 .save-menu .danger-full{margin-top:8px;border-color:var(--danger);color:var(--danger)}
-#themeToggle{border:1px solid var(--line);background:transparent;border-radius:6px;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;color:var(--ink)}
-#themeToggle svg{width:18px;height:18px}
 
 .board{padding:16px 20px 32px;max-width:1400px;margin:0 auto}
 .board.loading{opacity:.45;pointer-events:none}
@@ -532,30 +521,33 @@ body.view-ideas .site-foot{display:none}
 /* ── Phase 2: App shell + dashboard ── */
 body.faithfulness-app{background:var(--bg-deep);color:var(--text-primary);min-height:100vh}
 .app-shell{display:flex;min-height:100vh}
-.app-sidebar{width:220px;flex:none;background:rgba(13,15,18,.98);border-right:1px solid var(--border-subtle);
+.app-sidebar{width:220px;flex:none;background:var(--sidebar-bg);border-right:1px solid rgba(255,255,255,.08);
   display:flex;flex-direction:column;padding:20px 12px;position:sticky;top:0;height:100vh;z-index:50;
   transition:transform .25s ease,width .25s ease}
 .sidebar-brand{display:flex;align-items:center;gap:10px;padding:4px 8px 20px;border-bottom:1px solid var(--border-subtle);margin-bottom:12px}
 .brand-icon{width:36px;height:36px;border-radius:10px;background:var(--gold-dim);border:1px solid rgba(201,160,69,.35);
   display:grid;place-items:center;color:var(--gold);font-size:16px}
-.brand-text{font-size:17px;font-weight:600;color:var(--text-primary);line-height:1.2}
+.brand-text{font-size:17px;font-weight:600;color:var(--sidebar-active);line-height:1.2}
 .sidebar-nav{flex:1;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
 .nav-item{display:flex;align-items:center;justify-content:space-between;width:100%;border:none;background:transparent;
-  color:var(--text-muted);padding:10px 12px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;
-  font-family:inherit;text-align:left;transition:background .15s,color .15s,border-color .15s;border:1px solid transparent}
-.nav-item:hover{background:var(--bg-card-hover);color:var(--text-primary)}
-.nav-item.on{background:var(--gold-dim);color:var(--gold);border-color:rgba(201,160,69,.25)}
+  color:var(--sidebar-text);padding:10px 12px 10px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;
+  font-family:inherit;text-align:left;transition:background .15s,color .15s,border-color .15s;border:1px solid transparent;
+  border-left:3px solid transparent}
+.nav-item:hover{background:var(--bg-card-hover);color:var(--sidebar-active)}
+.nav-item.on{background:rgba(201,160,69,.12);color:var(--sidebar-active);border-left-color:var(--gold);
+  border-color:rgba(201,160,69,.15)}
 .nav-sub{display:none;flex-direction:column;gap:2px;padding-left:8px;margin-bottom:4px}
 .nav-sub.open{display:flex}
-.nav-sub button{border:none;background:transparent;color:var(--text-muted);padding:7px 12px 7px 20px;
+.nav-sub button{border:none;background:transparent;color:var(--sidebar-text);padding:7px 12px 7px 20px;
   border-radius:6px;font-size:12px;cursor:pointer;text-align:left;font-family:inherit;transition:color .15s,background .15s}
-.nav-sub button:hover,.nav-sub button.on{color:var(--gold);background:var(--gold-dim)}
+.nav-sub button:hover,.nav-sub button.on{color:var(--sidebar-active);background:rgba(201,160,69,.1)}
 .nav-accordion .chev{transition:transform .2s;font-size:14px;opacity:.6}
 .nav-accordion[aria-expanded="true"] .chev{transform:rotate(90deg)}
 .sidebar-verse{margin-top:auto;border-radius:12px;overflow:hidden;border:1px solid var(--border-subtle);position:relative;min-height:88px}
 .verse-img{position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,15,18,.2),rgba(13,15,18,.92)),
   url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80"><path fill="%23151922" d="M0 50 Q50 20 100 45 T200 35 V80 H0Z"/></svg>') center/cover}
-.verse-text{position:relative;padding:12px;font-size:11px;line-height:1.45;color:var(--text-muted);font-style:italic}
+.verse-text{position:relative;padding:12px;font-size:11px;line-height:1.5;color:var(--sidebar-text);font-style:italic}
+.sidebar-verse .verse-text{color:#c4bfb5}
 .app-main{flex:1;min-width:0;display:flex;flex-direction:column}
 .app-topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 24px;
   border-bottom:1px solid var(--border-subtle);background:rgba(13,15,18,.85);backdrop-filter:blur(8px);
@@ -653,9 +645,52 @@ body.focus-mode .app-topbar .topbar-left .btn-ghost{display:none}
 #projectsPanel .proj-list{display:flex;flex-direction:column;gap:12px}
 #projectsPanel .proj-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:16px 18px}
 #projectsPanel .proj-card h4{margin:0 0 8px;font-family:"Cormorant Garamond",serif;font-size:18px}
+#settingsPanel .settings-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:20px;max-width:480px}
 body.view-dashboard #authCard{display:none}
 body.view-dashboard .idea-fab{display:none!important}
 .idea-fab[hidden]{display:none!important}
+#dailyBoard[hidden],#weeklyBoard[hidden],#monthlyBoard[hidden],#journalPanel[hidden],#ideasPanel[hidden],#prayerPanel[hidden],#calendarPanel[hidden],#tagLensPanel[hidden]{display:none!important}
+body.view-dashboard #dailyBoard,body.view-dashboard #weeklyBoard,body.view-dashboard #monthlyBoard,
+body.view-dashboard #journalPanel,body.view-dashboard #ideasPanel,body.view-dashboard #prayerPanel,
+body.view-dashboard #calendarPanel,body.view-dashboard #tagLensPanel,body.view-dashboard #projectsPanel,
+body.view-dashboard #settingsPanel{display:none!important}
+#calendarPanel .cal-page-layout{display:grid;grid-template-columns:2fr 1fr;gap:20px;align-items:start}
+@media(max-width:900px){#calendarPanel .cal-page-layout{grid-template-columns:1fr}}
+#calendarPanel .cal-agenda-panel{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:18px;position:sticky;top:100px}
+#calendarPanel .cal-agenda-panel h3{font-family:"Cormorant Garamond",serif;margin:0 0 12px;color:var(--text-primary)}
+.ideas-cal-link-section{padding:8px 0 16px}
+.ideas-cal-link-btn{border:none;background:none;color:var(--gold);font-size:14px;cursor:pointer;font-family:inherit;padding:0}
+.ideas-cal-link-btn:hover{text-decoration:underline}
+.tag-chips{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:4px}
+.tag-chip-wrap{display:inline-flex;align-items:center;gap:2px;margin-right:4px}
+.tag-chip-rm{border:none;background:transparent;color:var(--text-muted);cursor:pointer;font-size:12px;padding:0 2px}
+.tag-chip-rm:hover{color:var(--danger)}
+.tag-chip,.tag-add-btn{border:1px solid var(--border-subtle);background:rgba(255,255,255,.04);color:var(--text-muted);
+  padding:2px 8px;border-radius:99px;font-size:10px;cursor:pointer;font-family:inherit}
+.tag-chip:hover,.tag-add-btn:hover{color:var(--sidebar-active);border-color:rgba(201,160,69,.3)}
+.tag-add-btn{color:var(--gold);border-style:dashed}
+.tag-editor{margin-top:6px}
+.tag-input{font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid var(--border-subtle);width:100%;max-width:160px}
+.tag-lens-group{margin-bottom:16px}
+.tag-lens-group h4{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);margin:0 0 8px}
+.tag-lens-row{display:block;width:100%;text-align:left;border:none;background:var(--bg-card);border:1px solid var(--border-subtle);
+  padding:10px 12px;border-radius:8px;margin-bottom:6px;color:var(--text-primary);cursor:pointer;font-family:inherit;font-size:13px}
+.tag-lens-row:hover{border-color:rgba(201,160,69,.35);color:var(--gold)}
+.tag-lens-meta{font-size:11px;color:var(--text-muted);margin-left:8px}
+.dash-task-wrap{margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid var(--border-subtle)}
+.dash-task-wrap:last-child{border-bottom:none}
+body.faithfulness-app #dailyBoard .zone,body.faithfulness-app #dailyBoard .card,body.faithfulness-app #dailyBoard .card-soft,
+body.faithfulness-app #dailyBoard .side-card,body.faithfulness-app #dailyBoard .ff-card{background:var(--bg-card);border-color:var(--border-subtle);color:var(--text-primary)}
+body.faithfulness-app #dailyBoard .page-head h2,body.faithfulness-app #dailyBoard .zonehead h2,body.faithfulness-app #dailyBoard .side-head h3{color:var(--text-primary)}
+body.faithfulness-app #dailyBoard .hint,body.faithfulness-app #dailyBoard .page-head p{color:var(--text-muted)}
+body.faithfulness-app #dailyBoard .phase-tabs{background:var(--bg-card-hover)}
+body.faithfulness-app #dailyBoard .phase-tab.on{background:var(--bg-card);color:var(--sidebar-active);box-shadow:none;border:1px solid var(--border-subtle)}
+body.faithfulness-app #dailyBoard .phase-tab{color:var(--text-muted)}
+body.faithfulness-app #dailyBoard .why-btn,body.faithfulness-app #dailyBoard .gobtn{border-color:var(--border-subtle);background:var(--bg-card-hover);color:var(--text-muted)}
+body.faithfulness-app #dailyBoard .ff-item-text,body.faithfulness-app #dailyBoard textarea,body.faithfulness-app #dailyBoard input,
+body.faithfulness-app #dailyBoard select{background:var(--bg-card-hover);border-color:var(--border-subtle);color:var(--text-primary)}
+body.faithfulness-app #dailyBoard .scripture-card{color:var(--sidebar-text)}
+body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
 </style>
 </head>
 <body class="faithfulness-app">
@@ -709,10 +744,6 @@ body.view-dashboard .idea-fab{display:none!important}
       <summary>&#8943;</summary>
       <button type="button" class="danger-full" id="resetAll">Reset all data</button>
     </details>
-    <button type="button" id="themeToggle" aria-label="Toggle theme">
-      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-    </button>
     <button type="button" class="btn-focus" id="btnFocusMode">☀ Focus Mode</button>
     <button type="button" class="btn-gold" id="btnQuickAdd">+ Quick Add</button>
   </div>
@@ -824,12 +855,51 @@ body.view-dashboard .idea-fab{display:none!important}
 <section id="settingsPanel" hidden aria-label="Settings">
   <div class="page-head"><div><h2 class="serif">Settings</h2><p>Preferences and data.</p></div></div>
   <div class="settings-card">
-    <p style="margin:0 0 12px;font-size:13px;color:var(--text-muted)">Theme, sync, and reset live in the top bar. More settings coming soon.</p>
-    <button type="button" class="btn-ghost" id="settingsThemeBtn">Toggle light / dark theme</button>
+    <p style="margin:0;font-size:13px;color:var(--text-muted)">Sync and reset live in the top bar.</p>
   </div>
 </section>
 
-<div class="board" id="dailyBoard" data-phase="morning">
+<section id="calendarPanel" hidden aria-label="Calendar">
+  <div class="page-head">
+    <div><h2 class="serif">Calendar</h2><p>Month view and daily agenda — ideas, Must-Dos, and your weekly rhythm.</p></div>
+  </div>
+  <button type="button" class="idea-cal-edit" id="myWeekToggle">Edit my week</button>
+  <div class="my-week-panel" id="myWeekPanel"></div>
+  <div class="cal-page-layout">
+    <div class="cal-main-col">
+      <div class="idea-cal-head">
+        <div class="idea-cal-nav">
+          <button type="button" id="ideaCalPrev" aria-label="Previous month">‹</button>
+          <div class="idea-cal-month" id="ideaCalMonthLabel"></div>
+          <button type="button" id="ideaCalNext" aria-label="Next month">›</button>
+        </div>
+        <div class="idea-cal-toggles">
+          <button type="button" class="idea-cal-toggle on" data-cal-view="month">Month</button>
+          <button type="button" class="idea-cal-toggle" data-cal-view="week">Week</button>
+        </div>
+      </div>
+      <div class="cal-grid-wrap" id="ideaCalGridWrap"></div>
+    </div>
+    <aside class="cal-agenda-panel cal-day-panel open" id="ideaCalDayPanel">
+      <h3 id="ideaCalDayTitle">Agenda</h3>
+      <p class="cal-day-empty" id="ideaCalDayEmpty">Select a day on the calendar.</p>
+      <div id="ideaCalDayCapNote" hidden class="cal-cap-note"></div>
+      <div id="ideaCalDaySlots"></div>
+    </aside>
+  </div>
+</section>
+
+<section id="tagLensPanel" hidden aria-label="Tagged items">
+  <div class="page-head">
+    <div>
+      <button type="button" class="btn-ghost" id="tagLensBack">← Back</button>
+      <h2 class="serif" id="tagLensTitle" style="margin-top:10px">Tagged</h2>
+    </div>
+  </div>
+  <div id="tagLensBody"></div>
+</section>
+
+<div class="board" id="dailyBoard" data-phase="morning" hidden>
   <div class="page-head">
     <div>
       <h2>Daily Ledger</h2>
@@ -1002,33 +1072,8 @@ body.view-dashboard .idea-fab{display:none!important}
     <div class="seed-list-view" id="seedListView"></div>
   </section>
 
-  <section class="ideas-section" id="ideasCalendarSection">
-    <div class="ideas-section-head">
-      <h2>The Calendar</h2>
-      <p>Ideas, Must-Dos, and your weekly rhythm — one view.</p>
-    </div>
-    <button type="button" class="idea-cal-edit" id="myWeekToggle">Edit my week</button>
-    <div class="my-week-panel" id="myWeekPanel"></div>
-    <div class="idea-cal-head">
-      <div class="idea-cal-nav">
-        <button type="button" id="ideaCalPrev" aria-label="Previous month">‹</button>
-        <div class="idea-cal-month" id="ideaCalMonthLabel"></div>
-        <button type="button" id="ideaCalNext" aria-label="Next month">›</button>
-      </div>
-      <div class="idea-cal-toggles">
-        <button type="button" class="idea-cal-toggle on" data-cal-view="month">Month</button>
-        <button type="button" class="idea-cal-toggle" data-cal-view="week">Week</button>
-      </div>
-    </div>
-    <div class="cal-layout">
-      <div class="cal-grid-wrap" id="ideaCalGridWrap"></div>
-      <aside class="cal-day-panel" id="ideaCalDayPanel">
-        <h3 id="ideaCalDayTitle">Select a day</h3>
-        <p class="cal-day-empty" id="ideaCalDayEmpty">Open space is not wasted space.</p>
-        <div id="ideaCalDayCapNote" hidden class="cal-cap-note"></div>
-        <div id="ideaCalDaySlots"></div>
-      </aside>
-    </div>
+  <section class="ideas-section ideas-cal-link-section">
+    <button type="button" class="ideas-cal-link-btn" data-nav="calendar">View on Calendar →</button>
   </section>
 </div>
 
@@ -1078,6 +1123,7 @@ body.view-dashboard .idea-fab{display:none!important}
 </div><!-- /.app-shell -->
 
 <script src="faithfulness-store.js"></script>
+<script src="tags-ui.js"></script>
 <script src="dashboard-ui.js"></script>
 <script>
 
@@ -1616,7 +1662,7 @@ async function pipePlant(){
   showIdeaToast('Planted for '+dayLabel+'.');
   resetPipeForm();
   renderSeedbed();
-  renderIdeaCalendar();
+  renderCalendar();
   if(isDaily() && iso(dayOf(dayOffset))===f.scheduleDate){
     dayData=data; renderFFLists(); populateFields(document.getElementById('dailyMain'),dayData); updateScore();
   }
@@ -1678,7 +1724,14 @@ function ideaEventsForDay(dateStr){
   const day=ideaCalDayCache[dateStr];
   if(day?.faithfulFew?.mustDo?.items){
     day.faithfulFew.mustDo.items.forEach(it=>{
-      events.push({type:'mustdo',id:'md-'+it.id,mustDoId:it.id,text:it.text,done:!!it.done,slot:null});
+      events.push({type:'mustdo',id:'md-'+it.id,mustDoId:it.id,text:it.text,done:!!it.done,slot:'beforeWork'});
+    });
+  }
+  if(faithStore){
+    faithStore.getTasksForDate(dateStr).forEach(t=>{
+      if(t.legacyMustDoId && events.some(e=> e.type==='mustdo' && e.mustDoId===t.legacyMustDoId)) return;
+      if(!t.title) return;
+      events.push({type:'task',id:'t-'+t.id,taskId:t.id,text:t.title,done:!!t.completed,slot:t.timeSlot||'beforeWork'});
     });
   }
   return events;
@@ -1688,7 +1741,7 @@ function recurringBandsForDay(dateStr){
   const dow=new Date(dateStr+'T12:00:00').getDay();
   return (globals.myWeek[dow]||[]).map(b=> esc(b.label||'Block')+(b.start?' '+b.start:'')+(b.end?'–'+b.end:''));
 }
-async function renderIdeaCalendar(){
+async function renderCalendar(){
   const label=document.getElementById('ideaCalMonthLabel');
   const wrap=document.getElementById('ideaCalGridWrap');
   if(!wrap) return;
@@ -1752,7 +1805,20 @@ function renderCalDayPanel(dateStr){
   if(empty) empty.hidden = events.length > 0;
   if(!slots) return;
   const slotOrder=['beforeWork','duringWork','afterWork','eveningShutdown'];
-  slots.innerHTML=slotOrder.map(sk=>{
+  let timedHtml='';
+  if(faithStore){
+    const blocks=faithStore.getScheduleBlocksForDate(dateStr);
+    const timedTasks=faithStore.getTasksForDate(dateStr).filter(t=> t.timeSlot==='timed');
+    if(blocks.length||timedTasks.length){
+      timedHtml='<div class="cal-slot-block"><h4>Timed</h4>';
+      blocks.forEach(b=>{ timedHtml+='<div class="cal-slot-item">'+esc((b.startTime||'')+' '+(b.label||''))+'</div>'; });
+      timedTasks.forEach(t=>{
+        timedHtml+='<label class="cal-slot-item"><input type="checkbox" data-cal-task="'+t.id+'"'+(t.completed?' checked':'')+'><span>'+esc(t.title)+'</span></label>';
+      });
+      timedHtml+='</div>';
+    }
+  }
+  slots.innerHTML=timedHtml+slotOrder.map(sk=>{
     const exec=day.execute?.[PIPE_SLOT_FIELDS[sk]]||'';
     const slotEv=events.filter(e=> e.slot===sk || (e.type==='idea' && e.slot===sk));
     let inner='';
@@ -1781,12 +1847,12 @@ async function moveIdeaSchedule(ideaId,newDate){
     idea.flow.scheduleDate=newDate;
     idea.updatedAt=new Date().toISOString();
     markDirty();
-    renderIdeaCalendar();
+    renderCalendar();
     renderSeedbed();
   }
 }
 function syncIdeaFromMustDo(mustDoId,done){
-  if(faithStore && isDaily()){
+  if(faithStore){
     faithStore.syncLegacyMustDoToTask(mustDoId, iso(dayOf(dayOffset)), done, dayData);
     if(typeof renderDashboard === 'function') renderDashboard();
   }
@@ -1798,7 +1864,8 @@ function syncIdeaFromMustDo(mustDoId,done){
     if(done) checkIdeaHarvest(raw);
     raw.updatedAt=new Date().toISOString();
     markDirty();
-    if(isIdeas()){ renderSeedbed(); renderIdeaCalendar(); }
+    if(isCalendar()) renderCalendar();
+    else if(isIdeas()) renderSeedbed();
   }
 }
 function checkIdeaHarvest(idea){
@@ -1849,8 +1916,12 @@ function loadIdeas(){
     if(idea) writePipeForm(idea); else resetPipeForm();
   } else resetPipeForm();
   renderSeedbed();
+}
+function loadCalendar(){
+  ensureIdeas(); ensureMyWeek();
   renderMyWeekPanel();
-  renderIdeaCalendar();
+  if(!ideaCalSelectedDay) ideaCalSelectedDay = iso(dayOf(dayOffset));
+  renderCalendar();
 }
 function bindIdeasPageEvents(){
   if(document.body.dataset.ideasPageBound) return;
@@ -1884,12 +1955,12 @@ function bindIdeasPageEvents(){
     if(btn) loadSeedbedChip(btn.dataset.seed);
   });
   document.getElementById('seedViewAllBtn')?.addEventListener('click', ()=>{ seedbedListOpen=!seedbedListOpen; renderSeedbed(); });
-  document.getElementById('ideaCalPrev')?.addEventListener('click', ()=>{ ideaCalMonthOffset--; renderIdeaCalendar(); });
-  document.getElementById('ideaCalNext')?.addEventListener('click', ()=>{ ideaCalMonthOffset++; renderIdeaCalendar(); });
+  document.getElementById('ideaCalPrev')?.addEventListener('click', ()=>{ ideaCalMonthOffset--; renderCalendar(); });
+  document.getElementById('ideaCalNext')?.addEventListener('click', ()=>{ ideaCalMonthOffset++; renderCalendar(); });
   document.querySelectorAll('[data-cal-view]').forEach(btn=> btn.addEventListener('click', ()=>{
     ideaCalView=btn.dataset.calView;
     document.querySelectorAll('[data-cal-view]').forEach(b=> b.classList.toggle('on', b===btn));
-    renderIdeaCalendar();
+    renderCalendar();
   }));
   document.getElementById('myWeekToggle')?.addEventListener('click', ()=> document.getElementById('myWeekPanel')?.classList.toggle('open'));
   document.getElementById('myWeekPanel')?.addEventListener('input', e=>{
@@ -1901,18 +1972,18 @@ function bindIdeasPageEvents(){
     if(e.target.dataset.mwLabel!==undefined) b.label=e.target.value;
     if(e.target.dataset.mwStart!==undefined) b.start=e.target.value;
     if(e.target.dataset.mwEnd!==undefined) b.end=e.target.value;
-    markDirty(); renderIdeaCalendar();
+    markDirty(); renderCalendar();
   });
   document.getElementById('myWeekPanel')?.addEventListener('click', e=>{
     if(e.target.dataset.mwAdd!==undefined){
       ensureMyWeek(); globals.myWeek[+e.target.dataset.mwAdd].push({label:'',start:'',end:''}); markDirty(); renderMyWeekPanel(); return;
     }
     const rm=e.target.closest('[data-mw-rm]');
-    if(rm){ const row=rm.closest('[data-dow]'); globals.myWeek[+row.dataset.dow].splice(+row.dataset.bi,1); markDirty(); renderMyWeekPanel(); renderIdeaCalendar(); }
+    if(rm){ const row=rm.closest('[data-dow]'); globals.myWeek[+row.dataset.dow].splice(+row.dataset.bi,1); markDirty(); renderMyWeekPanel(); renderCalendar(); }
   });
   document.getElementById('ideaCalGridWrap')?.addEventListener('click', e=>{
     const cell=e.target.closest('[data-cdate]');
-    if(cell){ ideaCalSelectedDay=cell.dataset.cdate; renderIdeaCalendar(); renderCalDayPanel(ideaCalSelectedDay); }
+    if(cell){ ideaCalSelectedDay=cell.dataset.cdate; renderCalendar(); renderCalDayPanel(ideaCalSelectedDay); }
   });
   document.getElementById('ideaCalGridWrap')?.addEventListener('dragstart', e=>{
     const ev=e.target.closest('[data-idea-id]');
@@ -1924,6 +1995,14 @@ function bindIdeasPageEvents(){
     if(cell && dragIdeaId){ moveIdeaSchedule(dragIdeaId, cell.dataset.dropDay); dragIdeaId=null; }
   });
   document.getElementById('ideaCalDaySlots')?.addEventListener('change', async e=>{
+    const taskId=e.target.dataset.calTask;
+    if(taskId && faithStore){
+      if(e.target.checked) await faithStore.completeTask(taskId);
+      else await faithStore.uncompleteTask(taskId);
+      renderCalendar(); renderCalDayPanel(ideaCalSelectedDay);
+      if(typeof renderDashboard === 'function') renderDashboard();
+      return;
+    }
     if(!e.target.dataset.calDone) return;
     const id=e.target.dataset.calDone;
     if(id.startsWith('idea-')){
@@ -1940,13 +2019,13 @@ function bindIdeasPageEvents(){
           const md=day.faithfulFew?.mustDo?.items?.find(x=>x.id===idea.flow.mustDoId);
           if(md){ md.done=e.target.checked; await saveDayDataByDate(ideaCalSelectedDay,day); }
         }
-        renderIdeaCalendar(); renderSeedbed();
+        renderCalendar(); renderSeedbed();
       }
     } else if(id.startsWith('md-') && ideaCalSelectedDay){
       const mustDoId=id.slice(3);
       const day=await getDayDataByDate(ideaCalSelectedDay);
       const md=day.faithfulFew?.mustDo?.items?.find(x=>x.id===mustDoId);
-      if(md){ md.done=e.target.checked; await saveDayDataByDate(ideaCalSelectedDay,day); syncIdeaFromMustDo(mustDoId,e.target.checked); renderIdeaCalendar(); }
+      if(md){ md.done=e.target.checked; await saveDayDataByDate(ideaCalSelectedDay,day); syncIdeaFromMustDo(mustDoId,e.target.checked); renderCalendar(); }
     }
   });
   document.getElementById('ideaFab')?.addEventListener('click', ()=>{ setMode('ideas'); setTimeout(()=> document.getElementById('pipeIdeaText')?.focus(), 200); });
@@ -2072,6 +2151,8 @@ function isMonthly(){ return viewMode==='monthly'; }
 function isJournal(){ return viewMode==='journal'; }
 function isPrayer(){ return viewMode==='prayer'; }
 function isIdeas(){ return viewMode==='ideas'; }
+function isCalendar(){ return viewMode==='calendar'; }
+function isTag(){ return viewMode==='tag'; }
 function isProjects(){ return viewMode==='projects'; }
 function isSettings(){ return viewMode==='settings'; }
 function dashPeriodLabel(){
@@ -2085,7 +2166,9 @@ function renderProjects(){
   const projects = faithStore.data.projects || [];
   el.innerHTML = projects.length ? projects.map(p=>{
     const pc = faithStore.getProjectPercentComplete(p.id);
-    return '<div class="proj-card"><h4>'+esc(p.title)+'</h4><div class="dash-proj-bar"><div class="dash-proj-fill" style="width:'+pc+'%"></div></div>'+
+    const tags = typeof tagChipsHtml === 'function' ? tagChipsHtml(p.tags, { showAdd:true, entityType:'project', entityId:p.id }) : '';
+    return '<div class="proj-card"><h4>'+esc(p.title)+'</h4>'+tags+
+      '<div class="dash-proj-bar" style="margin-top:8px"><div class="dash-proj-fill" style="width:'+pc+'%"></div></div>'+
       '<div style="font-size:12px;color:var(--text-muted);margin-top:6px">'+pc+'% complete</div></div>';
   }).join('') : '<p class="dash-empty">No projects yet — link tasks to a project as you work.</p>';
 }
@@ -3342,7 +3425,13 @@ function bindEvents(){
       const text = inp?.value.trim();
       if(!text) return;
       if(!dayData.faithfulFew[key].items) dayData.faithfulFew[key].items = [];
-      dayData.faithfulFew[key].items.push({id:uid(), text, done:false});
+      const itemId = uid();
+      dayData.faithfulFew[key].items.push({id:itemId, text, done:false});
+      if(key==='mustDo' && faithStore){
+        faithStore.createTask({ title:text, date:iso(dayOf(dayOffset)), timeSlot:'beforeWork', tag:'stewardship', legacyMustDoId:itemId });
+        faithStore.save();
+        if(typeof renderDashboard === 'function') renderDashboard();
+      }
       inp.value = '';
       renderFFLists(); updateScore(); markDirty(); return;
     }
@@ -3450,16 +3539,20 @@ function nav(dir){
   loadCurrent();
 }
 async function setMode(mode){
-  if(mode==='calendar'){ viewMode='ideas'; await loadCurrent(); setTimeout(()=> document.getElementById('ideasCalendarSection')?.scrollIntoView({behavior:'smooth'}), 200); return; }
   if(viewMode===mode) return;
   if(dirty) await save();
   viewMode=mode;
   await loadCurrent();
 }
+function openTagView(tag){
+  if(typeof setActiveTag === 'function') setActiveTag(tag);
+  viewMode='tag';
+  loadCurrent();
+}
 function updateSidebarNav(){
   document.querySelectorAll('.sidebar-nav [data-nav]').forEach(btn=>{
     const nav = btn.dataset.nav;
-    let on = (nav==='calendar' && viewMode==='ideas') || viewMode===nav;
+    let on = viewMode===nav || (nav==='calendar' && isCalendar());
     btn.classList.toggle('on', on);
   });
 }
@@ -3471,6 +3564,8 @@ function updateViewUI(){
   document.getElementById('dashboardPanel').hidden = viewMode!=='dashboard';
   document.getElementById('projectsPanel').hidden = viewMode!=='projects';
   document.getElementById('settingsPanel').hidden = viewMode!=='settings';
+  document.getElementById('calendarPanel').hidden = viewMode!=='calendar';
+  document.getElementById('tagLensPanel').hidden = viewMode!=='tag';
   document.getElementById('dailyBoard').hidden = viewMode!=='daily';
   document.body.classList.toggle('view-dashboard', viewMode==='dashboard');
   document.body.classList.toggle('view-daily', viewMode==='daily');
@@ -3487,7 +3582,7 @@ function updateViewUI(){
   const score = document.getElementById('score');
   score.style.display = viewMode==='daily' ? '' : 'none';
   const nav = document.querySelector('.app-topbar .navrow');
-  const hideNav = isPrayer() || isIdeas() || isProjects() || isSettings();
+  const hideNav = isPrayer() || isIdeas() || isProjects() || isSettings() || isCalendar() || isTag();
   if(nav) nav.style.visibility = hideNav ? 'hidden' : 'visible';
   const calJump = document.getElementById('btnCalJump');
   if(calJump) calJump.hidden = !(isDashboard() || isDaily() || isJournal());
@@ -3511,13 +3606,17 @@ function updateViewUI(){
   else if(isPrayer()) document.getElementById('periodLabel').textContent = 'Prayer Log';
   else if(isProjects()) document.getElementById('periodLabel').textContent = 'Projects';
   else if(isSettings()) document.getElementById('periodLabel').textContent = 'Settings';
+  else if(isCalendar()) document.getElementById('periodLabel').textContent = 'Calendar';
+  else if(isTag()) document.getElementById('periodLabel').textContent = 'Tags';
   const foot = document.querySelector('.site-foot');
-  if(foot) foot.style.display = (isIdeas()||isPrayer()||isDashboard()) ? 'none' : '';
+  if(foot) foot.style.display = (isIdeas()||isPrayer()||isDashboard()||isCalendar()||isTag()) ? 'none' : '';
 }
 async function loadCurrent(){
   updateViewUI();
   if(authUser) await syncPullForView();
   if(isDashboard()) loadDashboard();
+  else if(isTag()) loadTagLens?.();
+  else if(isCalendar()) loadCalendar();
   else if(isProjects()) renderProjects();
   else if(isJournal()) await loadJournal();
   else if(isPrayer()) loadPrayer();
@@ -3530,6 +3629,10 @@ async function loadDaily(){
   const isSat = isSaturdayRecovery();
   document.getElementById('dailyBoard').classList.toggle('saturday-recovery', isSat);
   dayData = normalizeDaily(await getJSON(dayKeyFor(dayOffset)));
+  if(faithStore){
+    faithStore.syncMustDosFromDay(iso(dayOf(dayOffset)), dayData);
+    await faithStore.save();
+  }
   if(!document.getElementById('sec-faithfulFew') || document.getElementById('sec-satRecovery')) renderDaily();
   populateFields(document.getElementById('dailyMain'), dayData);
   populateFields(document.getElementById('drawerGrowthTree'), dayData);
@@ -3588,7 +3691,7 @@ async function renderJournalList(){
 }
 function clearCurrent(){
   const labels = {daily:'this day',weekly:'this week',monthly:'this month'};
-  if(isJournal() || isPrayer() || isIdeas() || isDashboard() || isProjects() || isSettings()) return;
+  if(isJournal() || isPrayer() || isIdeas() || isDashboard() || isProjects() || isSettings() || isCalendar() || isTag()) return;
   if(!confirm('Clear everything for '+labels[viewMode]+'?')) return;
   if(isDaily()) dayData = blankDaily();
   else if(isWeekly()) weekData = blankWeekly();
@@ -3613,28 +3716,12 @@ async function resetAll(){
   loadThoughtJournal();
 }
 
-(function initTheme(){
-  const btn = document.getElementById('themeToggle');
-  const sun = btn?.querySelector('.icon-sun');
-  const moon = btn?.querySelector('.icon-moon');
-  function applyTheme(light){
-    document.documentElement.classList.toggle('light', light);
-    document.documentElement.classList.toggle('dark', !light);
-    if(sun) sun.style.display = light?'block':'none';
-    if(moon) moon.style.display = light?'none':'block';
-    try{ localStorage.setItem('wsr:theme', light?'light':'dark'); }catch(e){}
-  }
-  const stored = localStorage.getItem('wsr:theme');
-  applyTheme(stored==='light');
-  btn?.addEventListener('click', ()=>applyTheme(!document.documentElement.classList.contains('light')));
-  document.getElementById('settingsThemeBtn')?.addEventListener('click', ()=> btn?.click());
-})();
 
 (async function init(){
   renderDaily(); renderWeekly(); renderMonthly(); bindEvents(); bindFFAccordion();
   await initAuth();
   const vm = await window.storage.get('view-mode');
-  if(vm?.value && ['dashboard','daily','weekly','monthly','journal','ideas','prayer','projects','settings'].includes(vm.value)) viewMode = vm.value;
+  if(vm?.value && ['dashboard','daily','weekly','monthly','journal','ideas','prayer','projects','settings','calendar','tag'].includes(vm.value)) viewMode = vm.value;
   const g = await getJSON('fs-globals');
   if(g) globals = {...globals,...g};
   ensureMotives();
@@ -3650,6 +3737,11 @@ async function resetAll(){
   document.getElementById('researchNotes').value = globals.researchNotes||'';
   simpleMode = localStorage.getItem('wsr:simpleMode')==='1';
   bindDashboardEvents?.();
+  bindTagEvents?.();
+  document.querySelectorAll('[data-nav]').forEach(btn=>{
+    if(btn.closest('.sidebar-nav')) return;
+    btn.addEventListener('click', ()=> setMode(btn.dataset.nav));
+  });
   await loadCurrent();
   loadThoughtJournal();
   if(authUser && !dirty) updateSaveState('synced');

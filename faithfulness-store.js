@@ -38,6 +38,11 @@
     };
   }
 
+  function normalizeTags(arr){
+    if(!Array.isArray(arr)) return [];
+    return [...new Set(arr.map(t=> String(t||'').trim()).filter(Boolean))];
+  }
+
   function normalizeTask(raw){
     const t = raw || {};
     return {
@@ -47,6 +52,7 @@
       timeSlot: TIME_SLOTS.includes(t.timeSlot) ? t.timeSlot : 'beforeWork',
       durationMin: typeof t.durationMin === 'number' ? t.durationMin : null,
       tag: TASK_TAGS.includes(t.tag) ? t.tag : 'none',
+      tags: normalizeTags(t.tags),
       seedId: t.seedId || null,
       stepNumber: typeof t.stepNumber === 'number' ? t.stepNumber : null,
       projectId: t.projectId || null,
@@ -87,7 +93,8 @@
       createdAt: s.createdAt || nowIso(),
       updatedAt: s.updatedAt || s.createdAt || nowIso(),
       legacyIdeaId: s.legacyIdeaId || null,
-      flow: s.flow || null
+      flow: s.flow || null,
+      tags: normalizeTags(s.tags)
     };
   }
 
@@ -109,6 +116,7 @@
       id: p.id || uid(),
       title: String(p.title || '').trim(),
       linkedSeedId: p.linkedSeedId || null,
+      tags: normalizeTags(p.tags),
       createdAt: p.createdAt || nowIso(),
       updatedAt: p.updatedAt || p.createdAt || nowIso()
     };
@@ -121,6 +129,7 @@
       date: j.date || todayIso(),
       promptText: String(j.promptText || '').trim(),
       body: String(j.body || ''),
+      tags: normalizeTags(j.tags),
       createdAt: j.createdAt || nowIso(),
       updatedAt: j.updatedAt || j.createdAt || nowIso()
     };
@@ -131,6 +140,7 @@
     return {
       id: n.id || uid(),
       text: String(n.text || '').trim(),
+      tags: normalizeTags(n.tags),
       createdAt: n.createdAt || nowIso(),
       updatedAt: n.updatedAt || nowIso(),
       promotedTo: n.promotedTo || null
@@ -206,6 +216,81 @@
 
     getTasksForDate(date){
       return this.data.tasks.filter(t=> t.date === date);
+    }
+
+    /** Must-Do / Faithful Few priorities — one entity with Daily Ledger */
+    getPriorityTasksForDate(date){
+      return this.data.tasks.filter(t=> t.date === date && t.legacyMustDoId);
+    }
+
+    syncMustDosFromDay(dateStr, dayData){
+      if(!dayData?.faithfulFew?.mustDo?.items) return;
+      dayData.faithfulFew.mustDo.items.forEach(it=>{
+        if(!it?.id) return;
+        let task = this.findTaskByLegacyMustDo(it.id, dateStr);
+        if(!task){
+          this.createTask({
+            title: it.text || '',
+            date: dateStr,
+            timeSlot: 'beforeWork',
+            tag: 'stewardship',
+            legacyMustDoId: it.id,
+            completed: !!it.done
+          });
+        } else {
+          if(task.title !== (it.text||'')) this.updateTask(task.id, { title: it.text||'' });
+          if(!!task.completed !== !!it.done){
+            if(it.done) task.completed = true;
+            else { task.completed = false; task.completedAt = null; }
+            task.updatedAt = nowIso();
+          }
+        }
+      });
+    }
+
+    getAllTags(){
+      const set = new Set();
+      const add = e=> (e.tags||[]).forEach(t=> set.add(t));
+      this.data.tasks.forEach(add);
+      this.data.seeds.forEach(add);
+      this.data.projects.forEach(add);
+      this.data.journalEntries.forEach(add);
+      this.data.quickNotes.forEach(add);
+      return [...set].sort((a,b)=> a.localeCompare(b));
+    }
+
+    findByTag(tag){
+      const t = String(tag||'').trim();
+      if(!t) return { tasks:[], seeds:[], projects:[], journalEntries:[], quickNotes:[] };
+      const has = e=> (e.tags||[]).includes(t);
+      return {
+        tasks: this.data.tasks.filter(has),
+        seeds: this.data.seeds.filter(has),
+        projects: this.data.projects.filter(has),
+        journalEntries: this.data.journalEntries.filter(has),
+        quickNotes: this.data.quickNotes.filter(has)
+      };
+    }
+
+    setEntityTags(type, id, tags){
+      const list = normalizeTags(tags);
+      const map = {
+        task: 'tasks', seed: 'seeds', project: 'projects',
+        journal: 'journalEntries', note: 'quickNotes'
+      };
+      const key = map[type];
+      if(!key) return null;
+      const ent = this.data[key].find(x=> x.id === id);
+      if(!ent) return null;
+      ent.tags = list;
+      ent.updatedAt = nowIso();
+      return ent;
+    }
+
+    async updateEntityTags(type, id, tags){
+      const ent = this.setEntityTags(type, id, tags);
+      if(ent) await this.save();
+      return ent;
     }
 
     getTasksBySeed(seedId){
@@ -405,7 +490,7 @@
 
     // ——— Dashboard summary helpers ———
     getDashboardSummary(dateStr, opts){
-      const tasks = this.getTasksForDate(dateStr);
+      const tasks = this.getPriorityTasksForDate(dateStr);
       const open = tasks.filter(t=> !t.completed);
       const growing = this.data.seeds.filter(s=> s.status === 'active').length;
       const nextBlock = this._nextScheduleBlock(dateStr, opts?.now);

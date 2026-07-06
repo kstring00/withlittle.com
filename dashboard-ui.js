@@ -70,12 +70,45 @@
     return items.sort((a,b)=> String(a.time).localeCompare(String(b.time)));
   }
 
+  function syncDayForDash(){
+    const dateStr = dashDateStr();
+    if(!faithStore || typeof getDayDataByDate !== 'function') return Promise.resolve();
+    const useCached = typeof iso === 'function' && typeof dayOffset === 'number' && typeof dayData !== 'undefined'
+      && iso(dayOf(dayOffset)) === dateStr && dayData;
+    return (useCached ? Promise.resolve(dayData) : getDayDataByDate(dateStr)).then(day=>{
+      if(typeof normalizeDaily === 'function') day = normalizeDaily(day);
+      faithStore.syncMustDosFromDay(dateStr, day);
+      return faithStore.save();
+    });
+  }
+
+  async function dashAddMustDo(text){
+    const dateStr = dashDateStr();
+    let day = (typeof iso === 'function' && iso(dayOf(dayOffset)) === dateStr && typeof dayData !== 'undefined' && dayData)
+      ? dayData : await getDayDataByDate(dateStr);
+    if(typeof normalizeDaily === 'function') day = normalizeDaily(day);
+    if(!day.faithfulFew.mustDo.items) day.faithfulFew.mustDo.items = [];
+    const mustDoId = uid();
+    day.faithfulFew.mustDo.items.push({ id: mustDoId, text, done: false });
+    faithStore.createTask({ title: text, date: dateStr, tag: 'stewardship', timeSlot: 'beforeWork', legacyMustDoId: mustDoId });
+    await faithStore.save();
+    if(typeof iso === 'function' && iso(dayOf(dayOffset)) === dateStr){
+      dayData = day;
+      if(typeof renderFFLists === 'function') renderFFLists();
+      if(typeof updateScore === 'function') updateScore();
+    } else if(typeof saveDayDataByDate === 'function'){
+      await saveDayDataByDate(dateStr, day);
+    }
+    if(typeof markDirty === 'function') markDirty();
+  }
+
   function renderDashboard(){
     const panel = document.getElementById('dashboardPanel');
     if(!panel || !faithStore) return;
+    syncDayForDash();
     const dateStr = dashDateStr();
     const summary = faithStore.getDashboardSummary(dateStr, { now: new Date() });
-    const tasks = faithStore.getTasksForDate(dateStr).slice().sort((a,b)=>{
+    const tasks = faithStore.getPriorityTasksForDate(dateStr).slice().sort((a,b)=>{
       if(a.completed !== b.completed) return a.completed ? 1 : -1;
       return (a.createdAt||'').localeCompare(b.createdAt||'');
     });
@@ -92,12 +125,15 @@
 
     const pri = document.getElementById('dashPriorities');
     if(pri){
-      pri.innerHTML = tasks.length ? tasks.map(t=>'<label class="dash-task'+(t.completed?' done':'')+'">'+
+      pri.innerHTML = tasks.length ? tasks.map(t=>'<div class="dash-task-wrap'+(t.completed?' done':'')+'">'+
+        '<label class="dash-task'+(t.completed?' done':'')+'">'+
         '<input type="checkbox" data-dash-task="'+t.id+'"'+(t.completed?' checked':'')+'>'+
         '<span class="dash-task-text">'+esc(t.title)+'</span>'+
         (t.durationMin ? '<span class="dash-dur">'+t.durationMin+'m</span>' : '')+
         (TAG_LABELS[t.tag] ? '<span class="dash-tag '+t.tag+'">'+TAG_LABELS[t.tag]+'</span>' : '')+
-        '</label>').join('') : '<p class="dash-empty">No priorities yet — add one below.</p>';
+        '</label>'+
+        (typeof tagChipsHtml === 'function' ? tagChipsHtml(t.tags, { showAdd:true, entityType:'task', entityId:t.id }) : '')+
+        '</div>').join('') : '<p class="dash-empty">No priorities yet — add one below.</p>';
     }
 
     const sched = document.getElementById('dashScheduleList');
@@ -149,23 +185,34 @@
       if(!task) return;
       if(e.target.checked){
         const r = await faithStore.completeTask(id);
-        e.target.closest('.dash-task')?.classList.add('done','bloom');
+        e.target.closest('.dash-task-wrap')?.classList.add('done','bloom');
+        if(task.legacyMustDoId){
+          if(typeof dayData !== 'undefined' && dayData){
+            faithStore.syncTaskToLegacyDay({ ...task, completed: true }, dayData);
+            if(typeof syncIdeaFromMustDo === 'function') syncIdeaFromMustDo(task.legacyMustDoId, true);
+            if(typeof renderFFLists === 'function') renderFFLists();
+          }
+        }
         if(r.seedHarvested) showDashToast('Harvested — faithful work completed.');
         else if(r.watering) showDashToast('Watered.');
       } else {
         await faithStore.uncompleteTask(id);
-        e.target.closest('.dash-task')?.classList.remove('done');
+        e.target.closest('.dash-task-wrap')?.classList.remove('done');
+        if(task.legacyMustDoId && typeof dayData !== 'undefined' && dayData){
+          faithStore.syncTaskToLegacyDay({ ...task, completed: false }, dayData);
+          if(typeof syncIdeaFromMustDo === 'function') syncIdeaFromMustDo(task.legacyMustDoId, false);
+          if(typeof renderFFLists === 'function') renderFFLists();
+        }
       }
       renderDashboard();
-      if(typeof renderIdeaCalendar === 'function') renderIdeaCalendar();
+      if(typeof renderCalendar === 'function') renderCalendar();
     });
 
     document.getElementById('dashAddTask')?.addEventListener('click', async ()=>{
       const inp = document.getElementById('dashNewTask');
       const text = inp?.value.trim();
       if(!text || !faithStore) return;
-      faithStore.createTask({ title:text, date:dashDateStr(), tag:'stewardship', timeSlot:'beforeWork' });
-      await faithStore.save();
+      await dashAddMustDo(text);
       inp.value = '';
       renderDashboard();
       markDirty();
@@ -199,7 +246,7 @@
     document.querySelectorAll('[data-dash-link]').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         const mode = btn.dataset.dashLink;
-        if(mode === 'calendar'){ setMode('ideas'); setTimeout(()=> document.getElementById('ideasCalendarSection')?.scrollIntoView({behavior:'smooth'}), 200); }
+        if(mode === 'calendar'){ setMode('calendar'); }
         else if(mode === 'journal-prefill'){
           window._journalPromptPrefill = document.getElementById('dashJournalPrompt')?.textContent || '';
           setMode('journal');
