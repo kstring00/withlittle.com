@@ -374,6 +374,66 @@ body.view-prayer .site-foot,body.view-journal .site-foot{display:none}
 @media(max-width:560px){.prayer-grid{grid-template-columns:1fr}}
 .prayer-empty{text-align:center;padding:24px;color:var(--mist);font-size:13px;font-style:italic}
 
+/* Idea Vault */
+.idea-fab{position:fixed;bottom:22px;right:22px;z-index:45;border:1.5px solid var(--gold);background:var(--gold-bg);
+  color:var(--navy);border-radius:999px;padding:10px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;
+  box-shadow:0 2px 12px rgba(27,42,74,.12);display:flex;align-items:center;gap:6px}
+.idea-fab:hover{filter:brightness(1.03);background:rgba(184,149,74,.2)}
+.idea-fab .fab-icon{font-size:15px;color:var(--gold);line-height:1}
+.ideas-panel{max-width:900px;margin:0 auto}
+.idea-stats{font-size:12px;color:var(--mist);margin-bottom:14px;line-height:1.5;font-variant-numeric:tabular-nums}
+.idea-filters,.idea-cat-filters{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.idea-cat-filters{margin-bottom:14px}
+.idea-filter,.idea-cat-filter{border:1px solid var(--line-soft);background:var(--cream-raised);border-radius:999px;
+  padding:5px 11px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--mist)}
+.idea-filter.on,.idea-cat-filter.on{background:var(--navy);color:var(--cream-raised);border-color:var(--navy)}
+.idea-list{display:flex;flex-direction:column;gap:10px}
+.idea-card{border:1px solid var(--line-soft);border-radius:10px;padding:12px 14px;background:var(--cream-raised)}
+.idea-card.promoted{border-left:3px solid var(--green)}
+.idea-card.resting{border-left:3px solid var(--mist)}
+.idea-card.released{opacity:.72;border-left:3px solid var(--line)}
+.idea-card-head{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px;align-items:flex-start}
+.idea-cat-badge{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:3px 8px;border-radius:999px;
+  background:var(--gold-bg);color:var(--gold)}
+.idea-card-text{font-size:13px;line-height:1.5;color:var(--ink);width:100%}
+.idea-card-meta{font-size:10px;color:var(--mist)}
+.idea-card-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.idea-act{border:1px solid var(--line-soft);background:var(--paper);border-radius:6px;padding:5px 10px;font-size:11px;
+  font-weight:600;cursor:pointer;font-family:inherit;color:var(--navy)}
+.idea-act:hover{border-color:var(--gold);background:var(--gold-bg)}
+.idea-act.gold{border-color:var(--gold);color:var(--gold)}
+.idea-act.muted{color:var(--mist)}
+.idea-triage-item{border:1px dashed var(--gold);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:var(--gold-bg)}
+.idea-triage-item .idea-card-text{margin-bottom:8px}
+.modal-backdrop{position:fixed;inset:0;background:rgba(27,42,74,.28);z-index:90;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-backdrop.open{opacity:1;pointer-events:auto}
+.idea-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.96);width:min(400px,calc(100vw - 32px));
+  max-height:min(90vh,560px);overflow-y:auto;background:var(--cream-raised);border:1px solid var(--line-soft);border-radius:12px;
+  padding:18px 18px 16px;z-index:95;box-shadow:0 8px 32px rgba(27,42,74,.15);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+  box-sizing:border-box}
+.idea-modal.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.idea-modal h3{margin:0 0 4px;font-family:"Cormorant Garamond",serif;font-size:20px;color:var(--navy)}
+.idea-modal .modal-sub{margin:0 0 14px;font-size:12px;color:var(--mist);line-height:1.45}
+.idea-modal-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+.idea-modal-close{position:absolute;top:10px;right:10px;border:none;background:var(--line-soft);width:28px;height:28px;
+  border-radius:6px;cursor:pointer;font-size:16px;color:var(--mist)}
+.idea-cat-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.idea-cat-pick{border:1px solid var(--line-soft);background:var(--paper);border-radius:999px;padding:4px 9px;font-size:10px;
+  cursor:pointer;font-family:inherit;color:var(--mist)}
+.idea-cat-pick.on{background:var(--gold-bg);border-color:var(--gold);color:var(--navy);font-weight:600}
+.promote-type{display:flex;gap:8px;margin-bottom:10px}
+.promote-type label{flex:1;border:1px solid var(--line-soft);border-radius:8px;padding:8px 10px;font-size:11px;cursor:pointer;text-align:center;display:block}
+.promote-type input{display:none}
+.promote-type label:has(input:checked){border-color:var(--gold);background:var(--gold-bg);font-weight:600}
+.rest-picks{display:flex;gap:8px;margin-bottom:8px}
+.rest-pick{flex:1;border:1px solid var(--line-soft);background:var(--paper);border-radius:8px;padding:10px;cursor:pointer;
+  font-size:12px;font-weight:600;font-family:inherit;color:var(--navy);text-align:center}
+.rest-pick:hover{border-color:var(--gold);background:var(--gold-bg)}
+.guard-msg{padding:12px;border-left:2px solid var(--gold);background:var(--gold-bg);font-size:12px;line-height:1.55;color:var(--navy);
+  border-radius:0 8px 8px 0;margin-top:10px}
+body.view-ideas .daily-layout,body.view-ideas .weekly-board,body.view-ideas .monthly-board,body.view-ideas .journal-panel,body.view-ideas .prayer-panel{display:none}
+body.view-ideas .site-foot{display:none}
+
 /* Thought journal — sidebar card above Today's Flow */
 .thought-journal .thought-journal-head{padding:0}
 .thought-journal:not(.collapsed) .thought-journal-head{border-bottom:1px solid var(--line-soft)}
@@ -405,6 +465,7 @@ body.view-prayer .site-foot,body.view-journal .site-foot{display:none}
     <button type="button" id="modeWeekly" role="tab">Weekly</button>
     <button type="button" id="modeMonthly" role="tab">Monthly</button>
     <button type="button" id="modeJournal" role="tab">Journal</button>
+    <button type="button" id="modeIdeas" role="tab">Ideas</button>
     <button type="button" id="modePrayer" role="tab">Prayer</button>
   </div>
   <div class="navrow">
@@ -471,6 +532,7 @@ body.view-prayer .site-foot,body.view-journal .site-foot{display:none}
     <h2>Weekly Stewardship Review</h2>
     <p>Review. Adjust. Experiment.</p>
   </div>
+  <div id="ideaTriageZone"></div>
   <div id="weeklyMain"></div>
 </div>
 
@@ -524,6 +586,86 @@ body.view-prayer .site-foot,body.view-journal .site-foot{display:none}
     </div>
   </div>
   <div class="prayer-list" id="prayerList"></div>
+</div>
+
+<div class="board ideas-panel" id="ideasPanel" hidden>
+  <div class="page-head">
+    <div>
+      <h2>Idea Vault</h2>
+      <p>Capture freely. Act deliberately. Steward ideas — don't hoard them.</p>
+    </div>
+  </div>
+  <p class="idea-stats" id="ideaStats"></p>
+  <div class="idea-filters" role="tablist" id="ideaStatusFilters">
+    <button type="button" class="idea-filter on" data-idea-status="active">Active</button>
+    <button type="button" class="idea-filter" data-idea-status="resting">Resting</button>
+    <button type="button" class="idea-filter" data-idea-status="promoted">In motion</button>
+    <button type="button" class="idea-filter" data-idea-status="released">Released</button>
+    <button type="button" class="idea-filter" data-idea-status="all">All</button>
+  </div>
+  <div class="idea-cat-filters" id="ideaCatFilters"></div>
+  <div class="idea-list" id="ideaList"></div>
+</div>
+
+<button type="button" class="idea-fab" id="ideaFab" hidden aria-label="Capture an idea"><span class="fab-icon">✦</span> Idea</button>
+
+<div class="modal-backdrop" id="ideaModalBackdrop"></div>
+<div class="idea-modal" id="ideaCaptureModal" role="dialog" aria-labelledby="ideaCaptureTitle">
+  <button type="button" class="idea-modal-close" data-close-modal aria-label="Close">×</button>
+  <h3 id="ideaCaptureTitle">Capture an idea</h3>
+  <p class="modal-sub">Two seconds. Not a commitment — just stewardship of a thought.</p>
+  <label class="q q-compact" for="ideaCaptureText">What's the idea?</label>
+  <textarea id="ideaCaptureText" class="ta-sm" rows="3" placeholder="A seed worth saving…"></textarea>
+  <label class="q q-compact" style="margin-top:10px">Category <span class="hint" style="display:inline;margin:0">(optional)</span></label>
+  <div class="idea-cat-row" id="ideaCaptureCats"></div>
+  <div class="idea-modal-foot">
+    <button type="button" class="idea-act muted" data-close-modal>Cancel</button>
+    <button type="button" class="gobtn" id="ideaCaptureSave">Save to vault</button>
+  </div>
+</div>
+<div class="idea-modal" id="ideaPromoteModal" role="dialog">
+  <button type="button" class="idea-modal-close" data-close-modal aria-label="Close">×</button>
+  <h3>Promote to Plan</h3>
+  <p class="modal-sub">Move from possibility to a chosen day's ledger.</p>
+  <div id="ideaPromoteGuard" class="guard-msg" hidden></div>
+  <label class="q q-compact" for="ideaPromoteDate">Target day</label>
+  <input type="date" id="ideaPromoteDate">
+  <label class="q q-compact" style="margin-top:10px">How should this land?</label>
+  <div class="promote-type">
+    <label><input type="radio" name="promoteType" value="mustDo" checked> Must-Do item</label>
+    <label><input type="radio" name="promoteType" value="plan"> Plan of Action</label>
+  </div>
+  <div id="ideaPromotePlanFields" hidden>
+    <label class="q q-compact">Before Work</label><input type="text" class="inp-sm" id="ideaPromoteBefore">
+    <label class="q q-compact">During Work</label><input type="text" class="inp-sm" id="ideaPromoteDuring">
+    <label class="q q-compact">After Work</label><input type="text" class="inp-sm" id="ideaPromoteAfter">
+    <label class="q q-compact">Evening Shutdown</label><input type="text" class="inp-sm" id="ideaPromoteShutdown">
+  </div>
+  <div class="idea-modal-foot">
+    <button type="button" class="idea-act muted" data-close-modal>Cancel</button>
+    <button type="button" class="gobtn" id="ideaPromoteConfirm">Promote</button>
+  </div>
+</div>
+<div class="idea-modal" id="ideaRestModal" role="dialog">
+  <button type="button" class="idea-modal-close" data-close-modal aria-label="Close">×</button>
+  <h3>Let it rest</h3>
+  <p class="modal-sub">Not now — and that's faithful too. Hide until you're ready.</p>
+  <div class="rest-picks">
+    <button type="button" class="rest-pick" data-rest-days="7">7 days</button>
+    <button type="button" class="rest-pick" data-rest-days="30">30 days</button>
+    <button type="button" class="rest-pick" data-rest-days="90">90 days</button>
+  </div>
+</div>
+<div class="idea-modal" id="ideaReleaseModal" role="dialog">
+  <button type="button" class="idea-modal-close" data-close-modal aria-label="Close">×</button>
+  <h3>Release this idea</h3>
+  <p class="modal-sub">Letting go is also stewardship.</p>
+  <label class="q q-compact" for="ideaReleaseNote">Why? <span class="hint" style="display:inline;margin:0">(optional)</span></label>
+  <input type="text" class="inp-sm" id="ideaReleaseNote" placeholder="Not the season · merged elsewhere · no longer aligned…">
+  <div class="idea-modal-foot">
+    <button type="button" class="idea-act muted" data-close-modal>Cancel</button>
+    <button type="button" class="gobtn" id="ideaReleaseConfirm">Release</button>
+  </div>
 </div>
 
 <footer class="site-foot">
@@ -837,6 +979,290 @@ async function signOut(){
   updateSaveState(dirty ? 'dirty' : 'saved');
 }
 
+const IDEA_CATEGORIES = [
+  {id:'ministry', label:'Ministry'},{id:'career', label:'Career'},{id:'content', label:'Content / YouTube'},
+  {id:'health', label:'Health'},{id:'income', label:'Income'},{id:'other', label:'Other'}
+];
+const IDEA_STATUS_LABELS = {active:'Active', resting:'Resting', promoted:'In motion', released:'Released'};
+function ensureIdeas(){
+  if(!Array.isArray(globals.ideas)) globals.ideas = [];
+}
+function normalizeIdea(raw){
+  const today = iso(dayOf(0));
+  const o = {
+    id: raw.id||uid(),
+    text: raw.text||'',
+    category: raw.category||'other',
+    status: raw.status||'active',
+    createdAt: raw.createdAt||new Date().toISOString(),
+    updatedAt: raw.updatedAt||null,
+    snoozedUntil: raw.snoozedUntil||null,
+    releaseNote: raw.releaseNote||'',
+    promotedTo: raw.promotedTo||null
+  };
+  if(o.status==='resting' && o.snoozedUntil && o.snoozedUntil <= today){
+    o.status = 'active';
+    o.snoozedUntil = null;
+  }
+  return o;
+}
+function ideaCategoryLabel(id){
+  return IDEA_CATEGORIES.find(c=>c.id===id)?.label || 'Other';
+}
+function addDaysStr(dateStr, days){
+  const d = new Date(dateStr+'T12:00:00');
+  d.setDate(d.getDate()+days);
+  return iso(d);
+}
+function countPromotedIdeas(excludeId){
+  ensureIdeas();
+  return globals.ideas.filter(i=>{
+    const n = normalizeIdea(i);
+    return n.status==='promoted' && n.id !== excludeId;
+  }).length;
+}
+function ideaMonthStats(){
+  ensureIdeas();
+  const prefix = monthKey(0);
+  const monthStart = prefix+'-01';
+  const next = new Date(monthOf(0)); next.setMonth(next.getMonth()+1);
+  const monthEnd = iso(new Date(next.getTime()-86400000));
+  let captured=0, promoted=0, released=0;
+  globals.ideas.forEach(raw=>{
+    const i = normalizeIdea(raw);
+    const created = i.createdAt.slice(0,10);
+    if(created >= monthStart && created <= monthEnd) captured++;
+    const upd = (i.updatedAt||i.createdAt).slice(0,10);
+    if(i.status==='promoted' && upd >= monthStart && upd <= monthEnd) promoted++;
+    if(i.status==='released' && upd >= monthStart && upd <= monthEnd) released++;
+  });
+  return {captured, promoted, released};
+}
+function ideaMatchesFilters(idea){
+  const i = normalizeIdea(idea);
+  if(ideaCatFilter !== 'all' && i.category !== ideaCatFilter) return false;
+  if(ideaStatusFilter === 'all') return true;
+  if(ideaStatusFilter === 'active') return i.status === 'active';
+  if(ideaStatusFilter === 'resting') return i.status === 'resting' && i.snoozedUntil && i.snoozedUntil > iso(dayOf(0));
+  return i.status === ideaStatusFilter;
+}
+function getUntouchedIdeas(limit){
+  ensureIdeas();
+  return globals.ideas.map(normalizeIdea)
+    .filter(i=> i.status==='active')
+    .sort((a,b)=> (a.createdAt||'').localeCompare(b.createdAt||''))
+    .slice(0, limit||3);
+}
+function formatIdeaWhen(isoStr){
+  if(!isoStr) return '';
+  try{
+    return new Date(isoStr).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+  }catch{ return isoStr; }
+}
+function openIdeaModal(id){
+  document.getElementById('ideaModalBackdrop')?.classList.add('open');
+  document.getElementById(id)?.classList.add('open');
+}
+function closeIdeaModals(){
+  document.getElementById('ideaModalBackdrop')?.classList.remove('open');
+  document.querySelectorAll('.idea-modal').forEach(m=> m.classList.remove('open'));
+  ideaModalTarget = null;
+}
+function openCaptureModal(){
+  document.getElementById('ideaCaptureText').value = '';
+  document.querySelectorAll('#ideaCaptureCats .idea-cat-pick').forEach((b,i)=> b.classList.toggle('on', i===IDEA_CATEGORIES.length-1));
+  openIdeaModal('ideaCaptureModal');
+  setTimeout(()=> document.getElementById('ideaCaptureText')?.focus(), 80);
+}
+function renderIdeaCaptureCats(){
+  const row = document.getElementById('ideaCaptureCats');
+  if(!row || row.dataset.ready) return;
+  row.innerHTML = IDEA_CATEGORIES.map((c,i)=>
+    '<button type="button" class="idea-cat-pick'+(i===IDEA_CATEGORIES.length-1?' on':'')+'" data-cat="'+c.id+'">'+esc(c.label)+'</button>'
+  ).join('');
+  row.dataset.ready = '1';
+}
+function renderIdeaCatFilters(){
+  const row = document.getElementById('ideaCatFilters');
+  if(!row) return;
+  let h = '<button type="button" class="idea-cat-filter'+(ideaCatFilter==='all'?' on':'')+'" data-idea-cat="all">All categories</button>';
+  IDEA_CATEGORIES.forEach(c=>{
+    h += '<button type="button" class="idea-cat-filter'+(ideaCatFilter===c.id?' on':'')+'" data-idea-cat="'+c.id+'">'+esc(c.label)+'</button>';
+  });
+  row.innerHTML = h;
+}
+function renderIdeaList(){
+  ensureIdeas();
+  renderIdeaCatFilters();
+  const list = document.getElementById('ideaList');
+  const stats = document.getElementById('ideaStats');
+  if(!list) return;
+  const ms = ideaMonthStats();
+  if(stats){
+    stats.textContent = 'This month: '+ms.captured+' captured · '+ms.promoted+' promoted · '+ms.released+' released. Ideas are seeds — not obligations.';
+  }
+  let items = globals.ideas.map(normalizeIdea).filter(ideaMatchesFilters);
+  items.sort((a,b)=> (b.createdAt||'').localeCompare(a.createdAt||''));
+  if(!items.length){
+    list.innerHTML = '<div class="prayer-empty">'+(ideaStatusFilter==='active'?'The vault is quiet. Capture a spark when it comes — no pressure.':'Nothing in this view yet.')+'</div>';
+    return;
+  }
+  list.innerHTML = items.map(i=>{
+    let meta = 'Captured '+formatIdeaWhen(i.createdAt);
+    if(i.status==='resting' && i.snoozedUntil) meta += ' · Resting until '+formatIdeaWhen(i.snoozedUntil+'T12:00:00');
+    if(i.status==='promoted' && i.promotedTo?.date) meta += ' · Promoted to '+i.promotedTo.date;
+    if(i.status==='released' && i.releaseNote) meta += ' · '+esc(i.releaseNote);
+    let actions = '';
+    if(i.status==='active'){
+      actions = '<button type="button" class="idea-act gold" data-idea-promote="'+i.id+'">Promote to Plan</button>'+
+        '<button type="button" class="idea-act" data-idea-rest="'+i.id+'">Let it Rest</button>'+
+        '<button type="button" class="idea-act muted" data-idea-release="'+i.id+'">Release</button>';
+    } else if(i.status==='resting'){
+      actions = '<button type="button" class="idea-act gold" data-idea-promote="'+i.id+'">Promote to Plan</button>'+
+        '<button type="button" class="idea-act muted" data-idea-release="'+i.id+'">Release</button>';
+    } else if(i.status==='promoted'){
+      actions = '<button type="button" class="idea-act muted" data-idea-release="'+i.id+'">Mark released</button>';
+    }
+    return '<div class="idea-card '+i.status+'" data-idea-id="'+i.id+'">'+
+      '<div class="idea-card-head"><span class="idea-cat-badge">'+esc(ideaCategoryLabel(i.category))+'</span>'+
+      '<div class="idea-card-text">'+esc(i.text)+'</div>'+
+      '<div class="idea-card-meta">'+meta+'</div></div>'+
+      (actions ? '<div class="idea-card-actions">'+actions+'</div>' : '')+'</div>';
+  }).join('');
+}
+function loadIdeas(){
+  ensureIdeas();
+  let changed = false;
+  globals.ideas = globals.ideas.map(raw=>{
+    const n = normalizeIdea(raw);
+    if(n.status !== raw.status || n.snoozedUntil !== raw.snoozedUntil) changed = true;
+    return n;
+  });
+  if(changed) markDirty();
+  renderIdeaList();
+}
+function captureIdea(text, category){
+  ensureIdeas();
+  globals.ideas.unshift(normalizeIdea({
+    id: uid(), text, category: category||'other', status:'active', createdAt: new Date().toISOString()
+  }));
+  markDirty();
+  renderIdeaList();
+  renderIdeaTriage();
+}
+async function getDayDataByDate(dateStr){
+  return normalizeDaily(await getJSON('fs-day:'+dateStr));
+}
+async function saveDayDataByDate(dateStr, data){
+  await window.storage.set('fs-day:'+dateStr, JSON.stringify(data));
+  setLocalSyncAt('fs-day:'+dateStr, Date.now());
+  scheduleCloudPush(['fs-day:'+dateStr]);
+}
+function openPromoteModal(ideaId){
+  const idea = globals.ideas.find(x=>x.id===ideaId);
+  if(!idea) return;
+  ideaModalTarget = ideaId;
+  const guard = document.getElementById('ideaPromoteGuard');
+  const btn = document.getElementById('ideaPromoteConfirm');
+  const n = countPromotedIdeas(ideaId);
+  if(n >= 2){
+    if(guard){
+      guard.hidden = false;
+      guard.textContent = 'Two ideas are already in motion. Finish or release one first — faithfulness in a few things before many things. (Matthew 25:21)';
+    }
+    if(btn) btn.disabled = true;
+  } else {
+    if(guard) guard.hidden = true;
+    if(btn) btn.disabled = false;
+  }
+  document.getElementById('ideaPromoteDate').value = iso(dayOf(0));
+  document.querySelector('input[name="promoteType"][value="mustDo"]').checked = true;
+  document.getElementById('ideaPromotePlanFields').hidden = true;
+  document.getElementById('ideaPromoteBefore').value = idea.text||'';
+  document.getElementById('ideaPromoteDuring').value = '';
+  document.getElementById('ideaPromoteAfter').value = '';
+  document.getElementById('ideaPromoteShutdown').value = '';
+  openIdeaModal('ideaPromoteModal');
+}
+async function confirmPromoteIdea(){
+  if(!ideaModalTarget) return;
+  if(countPromotedIdeas(ideaModalTarget) >= 2) return;
+  const idea = globals.ideas.find(x=>x.id===ideaModalTarget);
+  if(!idea) return;
+  const dateStr = document.getElementById('ideaPromoteDate')?.value || iso(dayOf(0));
+  const type = document.querySelector('input[name="promoteType"]:checked')?.value || 'mustDo';
+  const data = await getDayDataByDate(dateStr);
+  if(type==='mustDo'){
+    if(!data.faithfulFew.mustDo.items) data.faithfulFew.mustDo.items = [];
+    data.faithfulFew.mustDo.items.push({id:uid(), text: idea.text, done:false});
+  } else {
+    data.execute.beforeWork = document.getElementById('ideaPromoteBefore')?.value || idea.text;
+    data.execute.duringWork = document.getElementById('ideaPromoteDuring')?.value || '';
+    data.execute.afterWork = document.getElementById('ideaPromoteAfter')?.value || '';
+    data.execute.eveningShutdown = document.getElementById('ideaPromoteShutdown')?.value || '';
+  }
+  await saveDayDataByDate(dateStr, data);
+  idea.status = 'promoted';
+  idea.promotedTo = {type, date: dateStr};
+  idea.updatedAt = new Date().toISOString();
+  idea.snoozedUntil = null;
+  markDirty();
+  closeIdeaModals();
+  renderIdeaList();
+  renderIdeaTriage();
+  if(isDaily() && iso(dayOf(dayOffset))===dateStr){
+    dayData = data;
+    renderFFLists();
+    populateFields(document.getElementById('dailyMain'), dayData);
+    updateScore();
+  }
+}
+function restIdea(ideaId, days){
+  const idea = globals.ideas.find(x=>x.id===ideaId);
+  if(!idea) return;
+  idea.status = 'resting';
+  idea.snoozedUntil = addDaysStr(iso(dayOf(0)), days);
+  idea.updatedAt = new Date().toISOString();
+  markDirty();
+  closeIdeaModals();
+  renderIdeaList();
+  renderIdeaTriage();
+}
+function releaseIdea(ideaId, note){
+  const idea = globals.ideas.find(x=>x.id===ideaId);
+  if(!idea) return;
+  idea.status = 'released';
+  idea.releaseNote = note||'';
+  idea.updatedAt = new Date().toISOString();
+  idea.snoozedUntil = null;
+  markDirty();
+  closeIdeaModals();
+  renderIdeaList();
+  renderIdeaTriage();
+}
+function renderIdeaTriage(){
+  const zone = document.getElementById('ideaTriageZone');
+  if(!zone) return;
+  const items = getUntouchedIdeas(3);
+  if(!items.length){
+    zone.innerHTML = '<section class="zone idea-triage-zone"><div class="zonehead compact"><div class="num">Idea Triage</div>'+
+      '<h2>Vault is clear</h2><p>No untouched ideas waiting — well stewarded.</p></div></section>';
+    return;
+  }
+  let cards = items.map(i=>
+    '<div class="idea-triage-item"><span class="idea-cat-badge">'+esc(ideaCategoryLabel(i.category))+'</span>'+
+    '<div class="idea-card-text">'+esc(i.text)+'</div>'+
+    '<div class="idea-card-meta">Captured '+formatIdeaWhen(i.createdAt)+'</div>'+
+    '<div class="idea-card-actions">'+
+    '<button type="button" class="idea-act gold" data-idea-promote="'+i.id+'">Promote</button>'+
+    '<button type="button" class="idea-act" data-idea-rest="'+i.id+'">Rest</button>'+
+    '<button type="button" class="idea-act muted" data-idea-release="'+i.id+'">Release</button></div></div>'
+  ).join('');
+  zone.innerHTML = '<section class="zone idea-triage-zone"><div class="zonehead compact"><div class="num">Idea Triage</div>'+
+    '<h2>Oldest untouched ideas</h2><p>Promote, rest, or release — so the vault stays alive, not a graveyard.</p></div>'+
+    '<div class="zonebody compact">'+cards+'</div></section>';
+}
+
 const VIRTUES = ['Diligence','Faithfulness','Service','Courage','Order','Excellence','Self-Control','Love for Neighbor'];
 const DEFAULT_MOTIVES = [
   {id:'lord',label:'For the Lord'},{id:'neighbor',label:'For love of neighbor'},{id:'stewardship',label:'For stewardship'},
@@ -952,6 +1378,7 @@ function isWeekly(){ return viewMode==='weekly'; }
 function isMonthly(){ return viewMode==='monthly'; }
 function isJournal(){ return viewMode==='journal'; }
 function isPrayer(){ return viewMode==='prayer'; }
+function isIdeas(){ return viewMode==='ideas'; }
 function currentKey(){
   if(isDaily()) return dayKeyFor(dayOffset);
   if(isWeekly()) return weekKeyFor(weekOffset);
@@ -1168,8 +1595,11 @@ function setNested(obj, path, val){
 
 let viewMode='daily', dayOffset=0, weekOffset=0, monthOffset=0;
 let dayData=null, weekData=null, monthData=null, journal={body:'',updated:null};
-let globals={researchNotes:'',motives:null,prayers:[],thoughtJournal:''};
+let globals={researchNotes:'',motives:null,prayers:[],thoughtJournal:'',ideas:[]};
 let prayerFilter = 'all';
+let ideaStatusFilter = 'active';
+let ideaCatFilter = 'all';
+let ideaModalTarget = null;
 let dirty=false, saveTimer=null, saving=false;
 
 function scheduleSave(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>save(),800); }
@@ -2072,6 +2502,10 @@ function bindEvents(){
       e.preventDefault();
       document.getElementById('qcAdd')?.click();
     }
+    if(e.key==='Enter' && e.target.id==='ideaCaptureText' && !e.shiftKey){
+      e.preventDefault();
+      document.getElementById('ideaCaptureSave')?.click();
+    }
   });
   app.addEventListener('click', e=>{
     if(e.target.closest('#thoughtJournalToggle')){
@@ -2128,6 +2562,28 @@ function bindEvents(){
       prayerFilter = pf.dataset.pfilter;
       document.querySelectorAll('.prayer-filter').forEach(b=> b.classList.toggle('on', b.dataset.pfilter===prayerFilter));
       renderPrayerList(); return;
+    }
+    const isf = e.target.closest('[data-idea-status]');
+    if(isf){
+      ideaStatusFilter = isf.dataset.ideaStatus;
+      document.querySelectorAll('.idea-filter').forEach(b=> b.classList.toggle('on', b.dataset.ideaStatus===ideaStatusFilter));
+      renderIdeaList(); return;
+    }
+    const icf = e.target.closest('[data-idea-cat]');
+    if(icf){
+      ideaCatFilter = icf.dataset.ideaCat;
+      renderIdeaList(); return;
+    }
+    const ip = e.target.closest('[data-idea-promote]');
+    if(ip){ openPromoteModal(ip.dataset.ideaPromote); return; }
+    const ir = e.target.closest('[data-idea-rest]');
+    if(ir){ ideaModalTarget = ir.dataset.ideaRest; openIdeaModal('ideaRestModal'); return; }
+    const irel = e.target.closest('[data-idea-release]');
+    if(irel){ ideaModalTarget = irel.dataset.ideaRelease; document.getElementById('ideaReleaseNote').value=''; openIdeaModal('ideaReleaseModal'); return; }
+    const icp = e.target.closest('#ideaCaptureCats .idea-cat-pick');
+    if(icp){
+      document.querySelectorAll('#ideaCaptureCats .idea-cat-pick').forEach(b=> b.classList.toggle('on', b===icp));
+      return;
     }
     const rt = e.target.closest('[data-rating]');
     if(rt && isDaily()){
@@ -2215,12 +2671,40 @@ function bindEvents(){
     if(e.key==='Enter'){ e.preventDefault(); sendMagicLink(); }
   });
   document.getElementById('authSignOut')?.addEventListener('click', signOut);
+  document.getElementById('ideaFab')?.addEventListener('click', openCaptureModal);
+  document.getElementById('ideaCaptureSave')?.addEventListener('click', ()=>{
+    const text = document.getElementById('ideaCaptureText')?.value.trim();
+    if(!text) return;
+    const cat = document.querySelector('#ideaCaptureCats .idea-cat-pick.on')?.dataset.cat || 'other';
+    captureIdea(text, cat);
+    closeIdeaModals();
+  });
+  document.getElementById('ideaPromoteConfirm')?.addEventListener('click', ()=> confirmPromoteIdea());
+  document.getElementById('ideaReleaseConfirm')?.addEventListener('click', ()=>{
+    if(!ideaModalTarget) return;
+    releaseIdea(ideaModalTarget, document.getElementById('ideaReleaseNote')?.value.trim());
+  });
+  document.querySelectorAll('.rest-pick').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(!ideaModalTarget) return;
+      restIdea(ideaModalTarget, +btn.dataset.restDays);
+    });
+  });
+  document.querySelectorAll('input[name="promoteType"]').forEach(r=>{
+    r.addEventListener('change', ()=>{
+      const plan = document.querySelector('input[name="promoteType"]:checked')?.value === 'plan';
+      document.getElementById('ideaPromotePlanFields').hidden = !plan;
+    });
+  });
+  document.getElementById('ideaModalBackdrop')?.addEventListener('click', closeIdeaModals);
+  document.querySelectorAll('[data-close-modal]').forEach(btn=> btn.addEventListener('click', closeIdeaModals));
   document.getElementById('prevP').onclick = ()=>nav(-1);
   document.getElementById('nextP').onclick = ()=>nav(1);
   document.getElementById('modeDaily').onclick = ()=>setMode('daily');
   document.getElementById('modeWeekly').onclick = ()=>setMode('weekly');
   document.getElementById('modeMonthly').onclick = ()=>setMode('monthly');
   document.getElementById('modeJournal').onclick = ()=>setMode('journal');
+  document.getElementById('modeIdeas').onclick = ()=>setMode('ideas');
   document.getElementById('modePrayer').onclick = ()=>setMode('prayer');
   document.getElementById('clearPeriod').onclick = clearCurrent;
   document.getElementById('clearJournal').onclick = clearJournalEntry;
@@ -2249,7 +2733,7 @@ async function setMode(mode){
   await loadCurrent();
 }
 function updateViewUI(){
-  ['daily','weekly','monthly','journal','prayer'].forEach(m=>{
+  ['daily','weekly','monthly','journal','ideas','prayer'].forEach(m=>{
     document.getElementById('mode'+m.charAt(0).toUpperCase()+m.slice(1))?.classList.toggle('on', viewMode===m);
   });
   document.getElementById('dailyBoard').hidden = viewMode!=='daily';
@@ -2257,9 +2741,13 @@ function updateViewUI(){
   document.getElementById('weeklyBoard').hidden = viewMode!=='weekly';
   document.getElementById('monthlyBoard').hidden = viewMode!=='monthly';
   document.getElementById('journalPanel').hidden = viewMode!=='journal';
+  document.getElementById('ideasPanel').hidden = viewMode!=='ideas';
   document.getElementById('prayerPanel').hidden = viewMode!=='prayer';
   document.body.classList.toggle('view-journal', viewMode==='journal');
+  document.body.classList.toggle('view-ideas', viewMode==='ideas');
   document.body.classList.toggle('view-prayer', viewMode==='prayer');
+  const fab = document.getElementById('ideaFab');
+  if(fab) fab.hidden = !(isDaily() || isWeekly() || isMonthly());
   const score = document.getElementById('score');
   score.style.display = viewMode==='daily' ? '' : 'none';
   const nav = document.querySelector('.navrow');
@@ -2279,6 +2767,7 @@ function updateViewUI(){
   if(isJournal()||isDaily()) document.getElementById('periodLabel').textContent = dayLabelFor(dayOffset);
   else if(isWeekly()) document.getElementById('periodLabel').textContent = weekLabelFor(weekOffset);
   else if(isMonthly()) document.getElementById('periodLabel').textContent = monthLabelFor(monthOffset);
+  else if(isIdeas()) document.getElementById('periodLabel').textContent = 'Idea Vault';
   else if(isPrayer()) document.getElementById('periodLabel').textContent = 'Prayer Log';
 }
 async function loadCurrent(){
@@ -2286,6 +2775,7 @@ async function loadCurrent(){
   if(authUser) await syncPullForView();
   if(isJournal()) await loadJournal();
   else if(isPrayer()) loadPrayer();
+  else if(isIdeas()) loadIdeas();
   else if(isDaily()) await loadDaily();
   else if(isWeekly()) await loadWeekly();
   else if(isMonthly()) await loadMonthly();
@@ -2307,6 +2797,7 @@ async function loadDaily(){
 async function loadWeekly(){
   weekData = normalizeWeekly(await getJSON(weekKeyFor(weekOffset)));
   populateFields(document.getElementById('weeklyMain'), weekData);
+  renderIdeaTriage();
   await computeWeekScorecard();
 }
 async function loadMonthly(){
@@ -2344,7 +2835,7 @@ async function renderJournalList(){
 }
 function clearCurrent(){
   const labels = {daily:'this day',weekly:'this week',monthly:'this month'};
-  if(isJournal()) return;
+  if(isJournal() || isPrayer() || isIdeas()) return;
   if(!confirm('Clear everything for '+labels[viewMode]+'?')) return;
   if(isDaily()) dayData = blankDaily();
   else if(isWeekly()) weekData = blankWeekly();
@@ -2363,7 +2854,7 @@ async function resetAll(){
   clearTimeout(saveTimer);
   await window.storage.clearAll();
   dayData=null; weekData=null; monthData=null; journal={body:'',updated:null};
-  globals={researchNotes:'',motives:null,prayers:[],thoughtJournal:''}; dayOffset=0; weekOffset=0; monthOffset=0; viewMode='daily'; dirty=false;
+  globals={researchNotes:'',motives:null,prayers:[],thoughtJournal:'',ideas:[]}; dayOffset=0; weekOffset=0; monthOffset=0; viewMode='daily'; dirty=false;
   localStorage.removeItem('wsr:thoughtJournalCollapsed');
   await loadCurrent();
   loadThoughtJournal();
@@ -2388,11 +2879,13 @@ async function resetAll(){
   renderDaily(); renderWeekly(); renderMonthly(); bindEvents(); bindFFAccordion();
   await initAuth();
   const vm = await window.storage.get('view-mode');
-  if(vm?.value && ['daily','weekly','monthly','journal','prayer'].includes(vm.value)) viewMode = vm.value;
+  if(vm?.value && ['daily','weekly','monthly','journal','ideas','prayer'].includes(vm.value)) viewMode = vm.value;
   const g = await getJSON('fs-globals');
   if(g) globals = {...globals,...g};
   ensureMotives();
   ensurePrayers();
+  ensureIdeas();
+  renderIdeaCaptureCats();
   document.getElementById('researchNotes').value = globals.researchNotes||'';
   simpleMode = localStorage.getItem('wsr:simpleMode')==='1';
   await loadCurrent();
