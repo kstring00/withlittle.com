@@ -584,7 +584,8 @@ body.focus-mode .app-topbar .topbar-left .btn-ghost{display:none}
 .dash-greeting{margin-bottom:20px}
 .dash-greeting h2{font-family:"Cormorant Garamond",serif;font-size:28px;font-weight:600;margin:0 0 6px;color:var(--text-primary)}
 .dash-greeting p{margin:0;font-size:13px;color:var(--text-muted)}
-.dash-stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:16px}
+.dash-stat-row{display:grid;grid-template-columns:1fr 2fr;gap:16px;margin-bottom:16px}
+@media(max-width:900px){.dash-stat-row{grid-template-columns:1fr}}
 .dash-stat-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:18px 20px}
 .dash-stat-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px}
 .dash-stat-val{font-family:"Cormorant Garamond",serif;font-size:32px;font-weight:600;color:var(--text-primary)}
@@ -592,8 +593,36 @@ body.focus-mode .app-topbar .topbar-left .btn-ghost{display:none}
 .dash-stat-bar-wrap{height:4px;background:rgba(255,255,255,.06);border-radius:99px;margin-top:12px;overflow:hidden}
 .dash-stat-bar-fill{height:100%;background:var(--gold);border-radius:99px;transition:width .3s ease}
 .dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-@media(max-width:1100px){.dash-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:720px){.dash-grid{grid-template-columns:1fr}.app-sidebar{position:fixed;left:0;transform:translateX(-100%)}}
+.dash-grid .dash-row2-pri{grid-column:span 2}
+.dash-grid .dash-row2-sched{grid-column:span 1}
+@media(max-width:1100px){
+  .dash-grid{grid-template-columns:1fr 1fr}
+  .dash-grid .dash-row2-pri,.dash-grid .dash-row2-sched{grid-column:span 1}
+}
+@media(max-width:720px){.dash-grid{grid-template-columns:1fr}.dash-grid .dash-row2-pri,.dash-grid .dash-row2-sched{grid-column:span 1}.app-sidebar{position:fixed;left:0;transform:translateX(-100%)}}
+.dash-first-fruits{background:rgba(201,160,69,.06);border:1px solid rgba(201,160,69,.2);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.dash-first-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.dash-first-icon{font-size:12px}
+.dash-pri-divider{height:1px;background:var(--border-subtle);margin:12px 0}
+.dash-tag.first-fruits{background:var(--gold-dim);color:var(--gold)}
+.dash-suggestions{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.dash-suggest-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:8px 10px;background:var(--bg-card-hover);border-radius:8px;font-size:12px}
+.dash-suggest-text{flex:1;color:var(--text-muted);line-height:1.4}
+.dash-suggest-actions{display:flex;gap:4px;flex:none}
+.dash-suggest-add,.dash-suggest-dismiss{border:1px solid var(--border-subtle);background:transparent;color:var(--gold);width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:14px}
+.dash-suggest-dismiss{color:var(--text-muted)}
+.dash-suggest-edit{margin-top:6px;display:flex;gap:6px}
+.dash-suggest-inp{flex:1;font-size:12px;padding:6px 8px;border-radius:6px;border:1px solid var(--border-subtle)}
+.dash-suggest-save{border:1px solid rgba(201,160,69,.4);background:var(--gold-dim);color:var(--gold);padding:6px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit}
+.dash-inline-add{margin-top:10px}
+.dash-inline-add input{width:100%;font-size:12px;padding:8px 10px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-card-hover);color:var(--text-primary)}
+.dash-proj-link{width:100%;text-align:left;border:none;background:transparent;padding:0;cursor:pointer;font-family:inherit;color:inherit}
+.dash-journal-widget{cursor:pointer;transition:border-color .15s}
+.dash-journal-widget:hover{border-color:rgba(201,160,69,.35)}
+.ff-first-fruits-wrap{list-style:none;padding:10px 12px;margin:0 0 10px;background:rgba(201,160,69,.06);border:1px solid rgba(201,160,69,.2);border-radius:10px}
+.ff-first-label-row{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ff-pri-divider{list-style:none;height:1px;background:var(--border-subtle);margin:8px 0;padding:0}
+.idea-toast .toast-undo{margin-left:8px;border:none;background:var(--gold-dim);color:var(--gold);padding:2px 8px;border-radius:4px;cursor:pointer;font-size:11px;font-family:inherit}
 .dash-widget{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;min-height:220px}
 .dash-widget.span2{grid-column:span 2}
 @media(max-width:1100px){.dash-widget.span2{grid-column:span 1}}
@@ -645,6 +674,13 @@ body.focus-mode .app-topbar .topbar-left .btn-ghost{display:none}
 #projectsPanel .proj-list{display:flex;flex-direction:column;gap:12px}
 #projectsPanel .proj-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:16px 18px}
 #projectsPanel .proj-card h4{margin:0 0 8px;font-family:"Cormorant Garamond",serif;font-size:18px}
+#projectsPanel .proj-card.selected{border-color:var(--gold)}
+#projectsPanel .proj-card-head{display:flex;justify-content:space-between;align-items:baseline}
+#projectsPanel .proj-meta{font-size:12px;color:var(--text-muted);margin-top:6px}
+#projectsPanel .proj-detail-head{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+#projectsPanel .proj-rename-inp{flex:1;font-size:16px;font-family:"Cormorant Garamond",serif;padding:8px 10px;border-radius:8px;border:1px solid var(--border-subtle)}
+#projectsPanel .proj-task-group{margin:12px 0}
+#projectsPanel .proj-task-group h5{margin:0 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted)}
 #settingsPanel .settings-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:20px;max-width:480px}
 body.view-dashboard #authCard{display:none}
 body.view-dashboard .idea-fab{display:none!important}
@@ -654,10 +690,37 @@ body.view-dashboard #dailyBoard,body.view-dashboard #weeklyBoard,body.view-dashb
 body.view-dashboard #journalPanel,body.view-dashboard #ideasPanel,body.view-dashboard #prayerPanel,
 body.view-dashboard #calendarPanel,body.view-dashboard #tagLensPanel,body.view-dashboard #projectsPanel,
 body.view-dashboard #settingsPanel{display:none!important}
-#calendarPanel .cal-page-layout{display:grid;grid-template-columns:2fr 1fr;gap:20px;align-items:start}
-@media(max-width:900px){#calendarPanel .cal-page-layout{grid-template-columns:1fr}}
-#calendarPanel .cal-agenda-panel{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:18px;position:sticky;top:100px}
-#calendarPanel .cal-agenda-panel h3{font-family:"Cormorant Garamond",serif;margin:0 0 12px;color:var(--text-primary)}
+#calendarPanel .cal-page-layout{display:block}
+#calendarPanel .cal-agenda-panel{display:none!important}
+.cal-grid-wrap.full-width{border:1px solid var(--border-subtle);border-radius:14px;padding:12px;background:var(--bg-card)}
+.cal-grid{transition:grid-template-rows .25s ease}
+.cal-cell.expanded{grid-column:span 2;grid-row:span 2;min-height:280px;z-index:2;border-color:var(--gold);background:var(--bg-card-hover);transition:all .25s ease}
+.cal-cell.expanded .cal-events{display:none}
+.cal-cell.expanded .cal-recur{display:none}
+.cal-expanded-inner{padding:8px 4px;animation:calExpandIn .25s ease}
+@keyframes calExpandIn{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:scale(1)}}
+.cal-expanded-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;cursor:pointer}
+.cal-expanded-head h4{margin:0;font-family:"Cormorant Garamond",serif;font-size:16px;color:var(--text-primary)}
+.cal-expanded-close{border:none;background:none;color:var(--text-muted);cursor:pointer;font-size:18px}
+.cal-item-row{display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:6px;background:var(--bg-card);margin-bottom:4px;font-size:11px}
+.cal-item-row input{accent-color:var(--gold);flex:none}
+.cal-item-origin{font-size:9px;padding:1px 6px;border-radius:99px;background:var(--gold-dim);color:var(--gold);flex:none}
+.cal-item-actions{margin-left:auto;display:flex;gap:2px;flex:none}
+.cal-item-actions button{border:none;background:none;color:var(--text-muted);cursor:pointer;font-size:12px;padding:2px 4px}
+.cal-item-actions button:hover{color:var(--gold)}
+.cal-add-day{margin-top:10px;padding-top:10px;border-top:1px solid var(--border-subtle)}
+.cal-add-day input{width:100%;font-size:11px;padding:6px 8px;border-radius:6px;border:1px solid var(--border-subtle);margin-bottom:6px}
+.cal-slot-chips{display:flex;flex-wrap:wrap;gap:4px}
+.cal-slot-chips button{font-size:10px;padding:3px 8px;border-radius:99px;border:1px solid var(--border-subtle);background:transparent;color:var(--text-muted);cursor:pointer;font-family:inherit}
+.cal-slot-chips button.on{background:var(--gold-dim);color:var(--gold);border-color:rgba(201,160,69,.35)}
+.anchor-settings{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.anchor-row{display:grid;grid-template-columns:1fr 72px auto auto;gap:8px;align-items:center;padding:10px;background:var(--bg-card-hover);border-radius:8px}
+.cal-reschedule-row{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px 24px;font-size:11px}
+.cal-reschedule-row input,.cal-reschedule-row select{font-size:11px;padding:4px 6px;border-radius:6px;border:1px solid var(--border-subtle)}
+.cal-reschedule-row button{border:1px solid rgba(201,160,69,.4);background:var(--gold-dim);color:var(--gold);padding:4px 8px;border-radius:6px;font-size:10px;cursor:pointer;font-family:inherit}
+.anchor-row input{font-size:12px;padding:6px 8px;border-radius:6px;border:1px solid var(--border-subtle)}
+#projDetailPanel{margin-top:16px}
+@media(max-width:720px){.app-sidebar{position:fixed;left:0;transform:translateX(-100%)}}
 .ideas-cal-link-section{padding:8px 0 16px}
 .ideas-cal-link-btn{border:none;background:none;color:var(--gold);font-size:14px;cursor:pointer;font-family:inherit;padding:0}
 .ideas-cal-link-btn:hover{text-decoration:underline}
@@ -784,15 +847,25 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
     <p id="dashSummary">Loading your day…</p>
   </div>
   <div class="dash-stat-row">
-    <div class="dash-stat-card">
+    <div class="dash-stat-card dash-row1-stat">
       <div class="dash-stat-label">Tasks Completed</div>
       <div class="dash-stat-val"><span id="dashStatFraction">0 / 0</span></div>
       <div class="dash-stat-sub"><span id="dashStatPct">0%</span> of today's priorities</div>
       <div class="dash-stat-bar-wrap"><div class="dash-stat-bar-fill" id="dashStatBar" style="width:0%"></div></div>
     </div>
+    <div class="dash-widget dash-row1-capture">
+      <div class="dash-widget-head"><h3>Quick Capture</h3></div>
+      <div class="dash-capture">
+        <textarea id="dashQuickNote" placeholder="Write a thought, idea, or note…" aria-label="Quick note"></textarea>
+        <div class="dash-capture-actions">
+          <button type="button" class="btn-gold" id="dashSaveNote">Save Note</button>
+        </div>
+      </div>
+      <div id="dashNotesInbox"></div>
+    </div>
   </div>
   <div class="dash-grid">
-    <div class="dash-widget span2">
+    <div class="dash-widget dash-row2-pri span2">
       <div class="dash-widget-head">
         <h3>Today's Priorities</h3>
         <button type="button" class="dash-widget-link" data-dash-link="daily">Open Daily →</button>
@@ -803,7 +876,7 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
         <button type="button" id="dashAddTask">+ Add Task</button>
       </div>
     </div>
-    <div class="dash-widget">
+    <div class="dash-widget dash-row2-sched">
       <div class="dash-widget-head">
         <h3>Schedule</h3>
         <button type="button" class="dash-widget-link" data-dash-link="calendar">View Calendar →</button>
@@ -817,25 +890,12 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
       </div>
       <div id="dashProjects"></div>
     </div>
-    <div class="dash-widget">
+    <div class="dash-widget dash-journal-widget" id="dashJournalWidget" role="button" tabindex="0" aria-label="Open journal with today's prompt">
       <div class="dash-widget-head">
         <h3>Journal Prompt</h3>
-        <button type="button" class="dash-widget-link" data-dash-link="journal-prefill">Write in Journal →</button>
+        <span class="dash-widget-link">Write in Journal →</span>
       </div>
       <p class="dash-journal-text" id="dashJournalPrompt"></p>
-      <button type="button" class="dash-journal-btn" data-dash-link="journal-prefill">Write in Journal →</button>
-    </div>
-    <div class="dash-widget">
-      <div class="dash-widget-head">
-        <h3>Quick Capture</h3>
-      </div>
-      <div class="dash-capture">
-        <textarea id="dashQuickNote" placeholder="Write a thought, idea, or note…" aria-label="Quick note"></textarea>
-        <div class="dash-capture-actions">
-          <button type="button" class="btn-gold" id="dashSaveNote">Save Note</button>
-        </div>
-      </div>
-      <div id="dashNotesInbox"></div>
     </div>
     <div class="dash-widget">
       <div class="dash-widget-head">
@@ -849,43 +909,48 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
 
 <section id="projectsPanel" hidden aria-label="Projects">
   <div class="page-head"><div><h2 class="serif">Projects</h2><p>Faithful work over time — progress from linked tasks.</p></div></div>
+  <div class="settings-card" id="projNewForm">
+    <h4 class="serif" style="margin:0 0 10px">New Project</h4>
+    <div class="dash-add-row">
+      <input type="text" id="projNewTitle" placeholder="Project title…">
+      <select id="projNewSeed" aria-label="Linked seed"><option value="">No linked seed</option></select>
+      <button type="button" class="btn-gold" id="projCreateBtn">Create</button>
+    </div>
+  </div>
   <div class="proj-list" id="projectsList"></div>
+  <div id="projDetailPanel"></div>
 </section>
 
 <section id="settingsPanel" hidden aria-label="Settings">
-  <div class="page-head"><div><h2 class="serif">Settings</h2><p>Preferences and data.</p></div></div>
+  <div class="page-head"><div><h2 class="serif">Settings</h2><p>Preferences and daily anchors.</p></div></div>
   <div class="settings-card">
-    <p style="margin:0;font-size:13px;color:var(--text-muted)">Sync and reset live in the top bar.</p>
+    <p style="margin:0 0 8px;font-size:13px;color:var(--text-muted)">Sync and reset live in the top bar.</p>
+    <h4 class="serif" style="margin:16px 0 8px">Daily Anchors</h4>
+    <p style="margin:0 0 10px;font-size:12px;color:var(--text-muted)">First fruits tasks auto-seed each day at the top of priorities.</p>
+    <div class="anchor-settings" id="anchorSettings"></div>
+    <button type="button" class="btn-ghost" id="anchorAddBtn" style="margin-top:10px">+ Add anchor</button>
   </div>
 </section>
 
 <section id="calendarPanel" hidden aria-label="Calendar">
   <div class="page-head">
-    <div><h2 class="serif">Calendar</h2><p>Month view and daily agenda — ideas, Must-Dos, and your weekly rhythm.</p></div>
+    <div><h2 class="serif">Calendar</h2><p>Click a day to expand — schedule, plant, and move tasks inline.</p></div>
   </div>
   <button type="button" class="idea-cal-edit" id="myWeekToggle">Edit my week</button>
   <div class="my-week-panel" id="myWeekPanel"></div>
   <div class="cal-page-layout">
-    <div class="cal-main-col">
-      <div class="idea-cal-head">
-        <div class="idea-cal-nav">
-          <button type="button" id="ideaCalPrev" aria-label="Previous month">‹</button>
-          <div class="idea-cal-month" id="ideaCalMonthLabel"></div>
-          <button type="button" id="ideaCalNext" aria-label="Next month">›</button>
-        </div>
-        <div class="idea-cal-toggles">
-          <button type="button" class="idea-cal-toggle on" data-cal-view="month">Month</button>
-          <button type="button" class="idea-cal-toggle" data-cal-view="week">Week</button>
-        </div>
+    <div class="idea-cal-head">
+      <div class="idea-cal-nav">
+        <button type="button" id="ideaCalPrev" aria-label="Previous month">‹</button>
+        <div class="idea-cal-month" id="ideaCalMonthLabel"></div>
+        <button type="button" id="ideaCalNext" aria-label="Next month">›</button>
       </div>
-      <div class="cal-grid-wrap" id="ideaCalGridWrap"></div>
+      <div class="idea-cal-toggles">
+        <button type="button" class="idea-cal-toggle on" data-cal-view="month">Month</button>
+        <button type="button" class="idea-cal-toggle" data-cal-view="week">Week</button>
+      </div>
     </div>
-    <aside class="cal-agenda-panel cal-day-panel open" id="ideaCalDayPanel">
-      <h3 id="ideaCalDayTitle">Agenda</h3>
-      <p class="cal-day-empty" id="ideaCalDayEmpty">Select a day on the calendar.</p>
-      <div id="ideaCalDayCapNote" hidden class="cal-cap-note"></div>
-      <div id="ideaCalDaySlots"></div>
-    </aside>
+    <div class="cal-grid-wrap full-width" id="ideaCalGridWrap"></div>
   </div>
 </section>
 
@@ -1124,6 +1189,7 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
 
 <script src="faithfulness-store.js"></script>
 <script src="tags-ui.js"></script>
+<script src="projects-ui.js"></script>
 <script src="dashboard-ui.js"></script>
 <script>
 
@@ -1464,12 +1530,92 @@ function formatShortDay(dateStr){
   const d=new Date(dateStr+'T12:00:00');
   return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 }
-function showIdeaToast(msg){
+function showIdeaToast(msg, opts){
   const t=document.getElementById('ideaToast');
   if(!t) return;
-  t.textContent=msg; t.classList.add('show');
+  if(opts?.undo){
+    t.innerHTML=esc(msg)+' <button type="button" class="toast-undo">Undo</button>';
+    t.onclick=e=>{
+      if(e.target.classList.contains('toast-undo')){ opts.undo(); t.classList.remove('show'); t.onclick=null; }
+    };
+  } else {
+    t.textContent=msg; t.onclick=null;
+  }
+  t.classList.add('show');
   clearTimeout(showIdeaToast._t);
-  showIdeaToast._t=setTimeout(()=> t.classList.remove('show'), 3200);
+  showIdeaToast._t=setTimeout(()=>{ t.classList.remove('show'); t.onclick=null; }, opts?.duration||3200);
+}
+function calOriginTag(ev){
+  if(!faithStore) return '';
+  if(ev.type==='task' && ev.taskId){
+    const task=faithStore.getTask(ev.taskId);
+    if(task?.projectId) return 'project';
+    if(task?.seedId) return 'seed';
+  }
+  if(ev.type==='idea') return 'seed';
+  if(ev.type==='mustdo' && ev.mustDoId){
+    const t=faithStore.data.tasks.find(x=> x.legacyMustDoId===ev.mustDoId && x.date===ideaCalSelectedDay);
+    if(t?.projectId) return 'project';
+    if(t?.seedId) return 'seed';
+  }
+  return '';
+}
+function calItemRow(ev, dateStr){
+  const origin=calOriginTag(ev);
+  const drag=ev.type==='idea' ? ' draggable="true"' : '';
+  return '<div class="cal-item-row" data-ev="'+ev.id+'"'+(ev.ideaId?' data-idea-id="'+ev.ideaId+'"':'')+drag+'>'+
+    '<input type="checkbox" data-cal-done="'+ev.id+'"'+(ev.done?' checked':'')+' aria-label="Done">'+
+    '<span class="cal-item-text">'+esc(ev.text)+'</span>'+
+    (origin ? '<span class="cal-item-origin">'+origin+'</span>' : '')+
+    '<div class="cal-item-actions">'+
+    '<button type="button" data-cal-move="'+ev.id+'" title="Reschedule">→</button>'+
+    '<button type="button" data-cal-del="'+ev.id+'" title="Delete">×</button>'+
+    '</div></div>'+
+    (window._calReschedule===ev.id ? '<div class="cal-reschedule-row" data-cal-res="'+ev.id+'">'+
+    '<input type="date" data-cal-res-date value="'+dateStr+'">'+
+    '<select data-cal-res-slot>'+
+    ['beforeWork','duringWork','afterWork','eveningShutdown'].map(s=>
+      '<option value="'+s+'"'+(ev.slot===s?' selected':'')+'>'+PIPE_SLOT_LABELS[s]+'</option>'
+    ).join('')+'</select>'+
+    '<button type="button" data-cal-res-save="'+ev.id+'">Move</button></div>' : '');
+}
+function renderCalExpandedDay(dateStr){
+  const day=ideaCalDayCache[dateStr]||{};
+  const mustCount=(day.faithfulFew?.mustDo?.items||[]).filter(x=>!x.done && !x.anchorId).length;
+  const events=ideaEventsForDay(dateStr);
+  const slotOrder=['beforeWork','duringWork','afterWork','eveningShutdown'];
+  let timedHtml='';
+  if(faithStore){
+    const blocks=faithStore.getScheduleBlocksForDate(dateStr);
+    const timedTasks=faithStore.getTasksForDate(dateStr).filter(t=> t.timeSlot==='timed');
+    if(blocks.length||timedTasks.length){
+      timedHtml='<div class="cal-slot-block"><h4>Timed</h4>';
+      blocks.forEach(b=>{ timedHtml+='<div class="cal-slot-item">'+esc((b.startTime||'')+' '+(b.label||''))+'</div>'; });
+      timedTasks.forEach(t=>{
+        timedHtml+=calItemRow({type:'task',id:'t-'+t.id,taskId:t.id,text:t.title,done:!!t.completed,slot:'timed'}, dateStr);
+      });
+      timedHtml+='</div>';
+    }
+  }
+  const slotsHtml=slotOrder.map(sk=>{
+    const exec=day.execute?.[PIPE_SLOT_FIELDS[sk]]||'';
+    const slotEv=events.filter(e=> e.slot===sk || (e.type==='idea' && e.slot===sk));
+    let inner='';
+    if(exec && !slotEv.some(e=> e.type==='idea' && e.text===exec)) inner+='<div class="cal-slot-item">'+esc(exec)+'</div>';
+    slotEv.forEach(ev=>{ inner+=calItemRow(ev, dateStr); });
+    if(!inner) inner='<div class="cal-day-empty" style="margin:0;font-size:11px">Open space.</div>';
+    return '<div class="cal-slot-block"><h4>'+PIPE_SLOT_LABELS[sk]+'</h4>'+inner+'</div>';
+  }).join('');
+  const capNote=mustCount>=3 ? '<p class="cal-cap-note">This day is already full. Faithful means finishable.</p>' : '';
+  const addSlot=window._calAddSlot || 'beforeWork';
+  return '<div class="cal-expanded-inner" data-expanded-day="'+dateStr+'">'+
+    '<div class="cal-expanded-head" data-cal-collapse><h4>'+formatShortDay(dateStr)+'</h4>'+
+    '<button type="button" class="cal-expanded-close" data-cal-collapse aria-label="Collapse">×</button></div>'+
+    capNote+timedHtml+slotsHtml+
+    '<div class="cal-add-day"><input type="text" data-cal-add-inp placeholder="Add to this day…">'+
+    '<div class="cal-slot-chips">'+slotOrder.map(s=>
+      '<button type="button" class="'+(addSlot===s?'on':'')+'" data-cal-pick-slot="'+s+'">'+PIPE_SLOT_LABELS[s]+'</button>'
+    ).join('')+'</div></div></div>';
 }
 function triggerPipeShimmer(){
   const c=document.getElementById('pipelineConnector');
@@ -1763,7 +1909,6 @@ async function renderCalendar(){
     for(let d=1;d<=daysInMonth;d++) cells.push(monthStr+'-'+String(d).padStart(2,'0'));
     wrap.innerHTML=buildCalGrid(cells, today, false);
   }
-  if(ideaCalSelectedDay) renderCalDayPanel(ideaCalSelectedDay);
 }
 function buildCalGrid(dates,today,weekMode){
   let h='<div class="cal-weekdays">'+['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(w=>'<span>'+w+'</span>').join('')+'</div><div class="cal-grid">';
@@ -1771,64 +1916,113 @@ function buildCalGrid(dates,today,weekMode){
     if(!d){ h+='<div class="cal-cell other"></div>'; return; }
     const dt=new Date(d+'T12:00:00');
     const isToday=d===today;
-    const sel=d===ideaCalSelectedDay;
+    const expanded=d===ideaCalSelectedDay;
     const events=ideaEventsForDay(d);
     const bands=recurringBandsForDay(d);
-    h+='<div class="cal-cell'+(weekMode?'':'')+(isToday?' today':'')+(sel?' selected':'')+'" data-cdate="'+d+'" data-drop-day="'+d+'">'+
+    h+='<div class="cal-cell'+(isToday?' today':'')+(expanded?' expanded':'')+'" data-cdate="'+d+'" data-drop-day="'+d+'">'+
       '<div class="cal-cell-num">'+dt.getDate()+'</div>';
-    bands.slice(0,2).forEach((b,i)=>{ h+='<div class="cal-recur" style="top:'+(14+i*12)+'px">'+b+'</div>'; });
-    h+='<div class="cal-events">';
-    events.slice(0,4).forEach(ev=>{
-      const drag = ev.type==='idea' ? ' draggable="true"' : '';
-      h+='<div class="cal-event'+(ev.done?' done':'')+(ev.type==='mustdo'?' mustdo':'')+'"'+drag+' data-ev="'+ev.id+'"'+(ev.ideaId?' data-idea-id="'+ev.ideaId+'"':'')+' title="'+esc(ev.text)+'">'+esc(ev.text)+'</div>';
-    });
-    h+='</div></div>';
+    if(expanded){
+      h+=renderCalExpandedDay(d);
+    } else {
+      bands.slice(0,2).forEach((b,i)=>{ h+='<div class="cal-recur" style="top:'+(14+i*12)+'px">'+b+'</div>'; });
+      h+='<div class="cal-events">';
+      events.slice(0,4).forEach(ev=>{
+        const drag = ev.type==='idea' ? ' draggable="true"' : '';
+        h+='<div class="cal-event'+(ev.done?' done':'')+(ev.type==='mustdo'?' mustdo':'')+'"'+drag+' data-ev="'+ev.id+'"'+(ev.ideaId?' data-idea-id="'+ev.ideaId+'"':'')+' title="'+esc(ev.text)+'">'+esc(ev.text)+'</div>';
+      });
+      h+='</div>';
+    }
+    h+='</div>';
   });
   return h+'</div>';
 }
-function renderCalDayPanel(dateStr){
-  const panel=document.getElementById('ideaCalDayPanel');
-  const title=document.getElementById('ideaCalDayTitle');
-  const empty=document.getElementById('ideaCalDayEmpty');
-  const cap=document.getElementById('ideaCalDayCapNote');
-  const slots=document.getElementById('ideaCalDaySlots');
-  if(!panel||!dateStr) return;
-  panel.classList.add('open');
-  if(title) title.textContent=formatShortDay(dateStr);
-  const day=ideaCalDayCache[dateStr] || {};
-  const mustCount=(day.faithfulFew?.mustDo?.items||[]).filter(x=>!x.done).length;
-  if(cap){
-    if(mustCount>=3){ cap.hidden=false; cap.textContent='This day is already full. Faithful means finishable.'; }
-    else cap.hidden=true;
+async function calRescheduleEvent(evId, newDate, newSlot){
+  if(evId.startsWith('t-') && faithStore){
+    faithStore.updateTask(evId.slice(2), { date:newDate, timeSlot:newSlot||'beforeWork' });
+    await faithStore.save(); markDirty();
+    return;
   }
-  const events=ideaEventsForDay(dateStr);
-  if(empty) empty.hidden = events.length > 0;
-  if(!slots) return;
-  const slotOrder=['beforeWork','duringWork','afterWork','eveningShutdown'];
-  let timedHtml='';
-  if(faithStore){
-    const blocks=faithStore.getScheduleBlocksForDate(dateStr);
-    const timedTasks=faithStore.getTasksForDate(dateStr).filter(t=> t.timeSlot==='timed');
-    if(blocks.length||timedTasks.length){
-      timedHtml='<div class="cal-slot-block"><h4>Timed</h4>';
-      blocks.forEach(b=>{ timedHtml+='<div class="cal-slot-item">'+esc((b.startTime||'')+' '+(b.label||''))+'</div>'; });
-      timedTasks.forEach(t=>{
-        timedHtml+='<label class="cal-slot-item"><input type="checkbox" data-cal-task="'+t.id+'"'+(t.completed?' checked':'')+'><span>'+esc(t.title)+'</span></label>';
-      });
-      timedHtml+='</div>';
+  if(evId.startsWith('idea-')){
+    await moveIdeaSchedule(evId.slice(5), newDate);
+    return;
+  }
+  if(evId.startsWith('md-') && ideaCalSelectedDay){
+    const mustDoId=evId.slice(3);
+    const oldDate=ideaCalSelectedDay;
+    if(oldDate!==newDate){
+      const oldDay=await getDayDataByDate(oldDate);
+      const md=oldDay.faithfulFew?.mustDo?.items?.find(x=>x.id===mustDoId);
+      if(md){
+        oldDay.faithfulFew.mustDo.items=oldDay.faithfulFew.mustDo.items.filter(x=>x.id!==mustDoId);
+        await saveDayDataByDate(oldDate,oldDay);
+        const newDay=await getDayDataByDate(newDate);
+        if(!newDay.faithfulFew.mustDo.items) newDay.faithfulFew.mustDo.items=[];
+        newDay.faithfulFew.mustDo.items.push({...md, done:!!md.done});
+        await saveDayDataByDate(newDate,newDay);
+      }
+      const task=faithStore?.findTaskByLegacyMustDo(mustDoId, oldDate);
+      if(task) faithStore.updateTask(task.id, { date:newDate, timeSlot:newSlot||'beforeWork' });
+      await faithStore?.save(); markDirty();
     }
   }
-  slots.innerHTML=timedHtml+slotOrder.map(sk=>{
-    const exec=day.execute?.[PIPE_SLOT_FIELDS[sk]]||'';
-    const slotEv=events.filter(e=> e.slot===sk || (e.type==='idea' && e.slot===sk));
-    let inner='';
-    if(exec && !slotEv.some(e=> e.type==='idea' && e.text===exec)) inner+='<div class="cal-slot-item">'+esc(exec)+'</div>';
-    slotEv.forEach(ev=>{
-      inner+='<label class="cal-slot-item"><input type="checkbox" data-cal-done="'+ev.id+'"'+(ev.done?' checked':'')+'><span>'+esc(ev.text)+'</span></label>';
-    });
-    if(!inner) inner='<div class="cal-day-empty" style="margin:0">Open space is not wasted space.</div>';
-    return '<div class="cal-slot-block"><h4>'+PIPE_SLOT_LABELS[sk]+'</h4>'+inner+'</div>';
-  }).join('');
+}
+async function calDeleteEvent(evId, dateStr){
+  if(!dateStr) return;
+  if(evId.startsWith('t-') && faithStore){
+    const task=faithStore.getTask(evId.slice(2));
+    if(!task) return;
+    const snap=JSON.parse(JSON.stringify(task));
+    await faithStore.deleteTaskAndSave(task.id);
+    showIdeaToast('Task removed.', { undo: async ()=>{
+      faithStore.data.tasks.push(snap);
+      await faithStore.save(); markDirty(); renderCalendar();
+      if(typeof renderDashboard==='function') renderDashboard();
+    }});
+    return;
+  }
+  if(evId.startsWith('md-')){
+    const mustDoId=evId.slice(3);
+    const day=await getDayDataByDate(dateStr);
+    const md=day.faithfulFew?.mustDo?.items?.find(x=>x.id===mustDoId);
+    if(!md) return;
+    const mdSnap={ id:md.id, text:md.text, done:md.done, anchorId:md.anchorId||null };
+    day.faithfulFew.mustDo.items=day.faithfulFew.mustDo.items.filter(x=>x.id!==mustDoId);
+    await saveDayDataByDate(dateStr,day);
+    const task=faithStore?.findTaskByLegacyMustDo(mustDoId, dateStr);
+    const taskSnap=task ? JSON.parse(JSON.stringify(task)) : null;
+    if(task) await faithStore.deleteTaskAndSave(task.id);
+    showIdeaToast('Item removed.', { undo: async ()=>{
+      const d=await getDayDataByDate(dateStr);
+      if(!d.faithfulFew.mustDo.items) d.faithfulFew.mustDo.items=[];
+      d.faithfulFew.mustDo.items.unshift(mdSnap);
+      await saveDayDataByDate(dateStr,d);
+      if(taskSnap) faithStore.data.tasks.push(taskSnap);
+      await faithStore?.save(); markDirty(); renderCalendar();
+      if(typeof renderDashboard==='function') renderDashboard();
+    }});
+    return;
+  }
+  if(evId.startsWith('idea-')){
+    const ideaId=evId.slice(5);
+    const idea=globals.ideas.find(x=>x.id===ideaId);
+    if(idea?.flow?.scheduleDate){
+      const oldDate=idea.flow.scheduleDate;
+      const slot=idea.flow.scheduleSlot||'beforeWork';
+      const field=PIPE_SLOT_FIELDS[slot];
+      const day=await getDayDataByDate(oldDate);
+      if(day.execute[field]===idea.flow.steps?.[0]) day.execute[field]='';
+      await saveDayDataByDate(oldDate,day);
+      idea.flow.scheduleDate='';
+      markDirty();
+      showIdeaToast('Idea unscheduled.', { undo: async ()=>{
+        idea.flow.scheduleDate=oldDate;
+        const d=await getDayDataByDate(oldDate);
+        d.execute[field]=idea.flow.steps?.[0]||'';
+        await saveDayDataByDate(oldDate,d);
+        markDirty(); renderCalendar();
+      }});
+    }
+  }
 }
 async function moveIdeaSchedule(ideaId,newDate){
   const idea=globals.ideas.find(x=>x.id===ideaId);
@@ -1920,7 +2114,6 @@ function loadIdeas(){
 function loadCalendar(){
   ensureIdeas(); ensureMyWeek();
   renderMyWeekPanel();
-  if(!ideaCalSelectedDay) ideaCalSelectedDay = iso(dayOf(dayOffset));
   renderCalendar();
 }
 function bindIdeasPageEvents(){
@@ -1981,30 +2174,72 @@ function bindIdeasPageEvents(){
     const rm=e.target.closest('[data-mw-rm]');
     if(rm){ const row=rm.closest('[data-dow]'); globals.myWeek[+row.dataset.dow].splice(+row.dataset.bi,1); markDirty(); renderMyWeekPanel(); renderCalendar(); }
   });
-  document.getElementById('ideaCalGridWrap')?.addEventListener('click', e=>{
+  document.getElementById('ideaCalGridWrap')?.addEventListener('click', async e=>{
+    if(e.target.closest('[data-cal-collapse]')){
+      ideaCalSelectedDay=null; window._calReschedule=null; renderCalendar(); return;
+    }
+    if(e.target.closest('[data-cal-pick-slot]')){
+      window._calAddSlot=e.target.closest('[data-cal-pick-slot]').dataset.calPickSlot;
+      renderCalendar(); return;
+    }
+    if(e.target.closest('[data-cal-move]')){
+      window._calReschedule=e.target.closest('[data-cal-move]').dataset.calMove;
+      renderCalendar(); return;
+    }
+    if(e.target.closest('[data-cal-res-save]')){
+      const evId=e.target.closest('[data-cal-res-save]').dataset.calResSave;
+      const row=e.target.closest('[data-cal-res]');
+      const newDate=row?.querySelector('[data-cal-res-date]')?.value;
+      const newSlot=row?.querySelector('[data-cal-res-slot]')?.value;
+      if(newDate && ideaCalSelectedDay) await calRescheduleEvent(evId, newDate, newSlot);
+      window._calReschedule=null; renderCalendar(); return;
+    }
+    if(e.target.closest('[data-cal-del]')){
+      await calDeleteEvent(e.target.closest('[data-cal-del]').dataset.calDel, ideaCalSelectedDay);
+      renderCalendar();
+      if(typeof renderDashboard==='function') renderDashboard();
+      return;
+    }
     const cell=e.target.closest('[data-cdate]');
-    if(cell){ ideaCalSelectedDay=cell.dataset.cdate; renderCalendar(); renderCalDayPanel(ideaCalSelectedDay); }
+    if(cell && !e.target.closest('.cal-expanded-inner')){
+      const d=cell.dataset.cdate;
+      ideaCalSelectedDay=ideaCalSelectedDay===d ? null : d;
+      window._calReschedule=null;
+      renderCalendar();
+    }
   });
-  document.getElementById('ideaCalGridWrap')?.addEventListener('dragstart', e=>{
-    const ev=e.target.closest('[data-idea-id]');
-    if(ev?.dataset.ideaId){ dragIdeaId=ev.dataset.ideaId; e.dataTransfer.setData('text/plain', dragIdeaId); }
+  document.getElementById('ideaCalGridWrap')?.addEventListener('keydown', async e=>{
+    if(e.target.matches('[data-cal-add-inp]') && e.key==='Enter'){
+      const text=e.target.value.trim();
+      const slot=window._calAddSlot||'beforeWork';
+      if(text && ideaCalSelectedDay && faithStore){
+        faithStore.createTask({ title:text, date:ideaCalSelectedDay, timeSlot:slot, tag:'stewardship' });
+        await faithStore.save(); markDirty();
+        window._calAddSlot=slot;
+        renderCalendar();
+        if(typeof renderDashboard==='function') renderDashboard();
+      }
+    }
   });
-  document.getElementById('ideaCalGridWrap')?.addEventListener('dragover', e=>{ if(e.target.closest('[data-drop-day]')) e.preventDefault(); });
-  document.getElementById('ideaCalGridWrap')?.addEventListener('drop', e=>{
-    const cell=e.target.closest('[data-drop-day]');
-    if(cell && dragIdeaId){ moveIdeaSchedule(dragIdeaId, cell.dataset.dropDay); dragIdeaId=null; }
-  });
-  document.getElementById('ideaCalDaySlots')?.addEventListener('change', async e=>{
-    const taskId=e.target.dataset.calTask;
+  document.getElementById('ideaCalGridWrap')?.addEventListener('change', async e=>{
+    const taskId=e.target.dataset?.calTask;
     if(taskId && faithStore){
       if(e.target.checked) await faithStore.completeTask(taskId);
       else await faithStore.uncompleteTask(taskId);
-      renderCalendar(); renderCalDayPanel(ideaCalSelectedDay);
-      if(typeof renderDashboard === 'function') renderDashboard();
+      renderCalendar();
+      if(typeof renderDashboard==='function') renderDashboard();
       return;
     }
     if(!e.target.dataset.calDone) return;
     const id=e.target.dataset.calDone;
+    if(id.startsWith('t-') && faithStore){
+      const tid=id.slice(2);
+      if(e.target.checked) await faithStore.completeTask(tid);
+      else await faithStore.uncompleteTask(tid);
+      renderCalendar();
+      if(typeof renderDashboard==='function') renderDashboard();
+      return;
+    }
     if(id.startsWith('idea-')){
       const ideaId=id.slice(5);
       const idea=globals.ideas.find(x=>x.id===ideaId);
@@ -2026,6 +2261,46 @@ function bindIdeasPageEvents(){
       const day=await getDayDataByDate(ideaCalSelectedDay);
       const md=day.faithfulFew?.mustDo?.items?.find(x=>x.id===mustDoId);
       if(md){ md.done=e.target.checked; await saveDayDataByDate(ideaCalSelectedDay,day); syncIdeaFromMustDo(mustDoId,e.target.checked); renderCalendar(); }
+    }
+  });
+  document.getElementById('ideaCalGridWrap')?.addEventListener('dragstart', e=>{
+    const ev=e.target.closest('[data-idea-id]');
+    if(ev?.dataset.ideaId){ dragIdeaId=ev.dataset.ideaId; e.dataTransfer.setData('text/plain', dragIdeaId); }
+  });
+  document.getElementById('ideaCalGridWrap')?.addEventListener('dragover', e=>{ if(e.target.closest('[data-drop-day]')) e.preventDefault(); });
+  document.getElementById('ideaCalGridWrap')?.addEventListener('drop', e=>{
+    const cell=e.target.closest('[data-drop-day]');
+    if(cell && dragIdeaId){ moveIdeaSchedule(dragIdeaId, cell.dataset.dropDay); dragIdeaId=null; }
+  });
+  document.addEventListener('click', e=>{
+    if(!ideaCalSelectedDay || !isCalendar()) return;
+    const wrap=document.getElementById('ideaCalGridWrap');
+    if(wrap && !wrap.contains(e.target)){ ideaCalSelectedDay=null; window._calReschedule=null; renderCalendar(); }
+  });
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Escape' && ideaCalSelectedDay && isCalendar()){
+      ideaCalSelectedDay=null; window._calReschedule=null; renderCalendar();
+    }
+  });
+  document.getElementById('anchorSettings')?.addEventListener('input', saveAnchorSettingsFromDOM);
+  document.getElementById('anchorSettings')?.addEventListener('change', saveAnchorSettingsFromDOM);
+  document.getElementById('anchorAddBtn')?.addEventListener('click', ()=>{
+    if(!faithStore) return;
+    const cfg=faithStore.getDailyAnchorConfig();
+    cfg.push({ id:uid(), title:'New anchor', durationMin:null, enabled:true });
+    faithStore.setDailyAnchorConfig(cfg);
+    renderAnchorSettings();
+    saveAnchorSettingsFromDOM();
+  });
+  document.getElementById('anchorSettings')?.addEventListener('click', e=>{
+    if(e.target.closest('[data-anchor-rm]')){
+      const row=e.target.closest('[data-anchor-row]');
+      const idx=+row?.dataset.anchorIdx;
+      if(Number.isNaN(idx) || !faithStore) return;
+      const cfg=faithStore.getDailyAnchorConfig().filter((_,i)=> i!==idx);
+      faithStore.setDailyAnchorConfig(cfg);
+      renderAnchorSettings();
+      saveAnchorSettingsFromDOM();
     }
   });
   document.getElementById('ideaFab')?.addEventListener('click', ()=>{ setMode('ideas'); setTimeout(()=> document.getElementById('pipeIdeaText')?.focus(), 200); });
@@ -2160,18 +2435,41 @@ function dashPeriodLabel(){
   const prefix = dayOffset===0 ? 'Today' : dayLabelFor(dayOffset);
   return prefix + ' — ' + d.toLocaleDateString('en-US',{weekday:'short', month:'short', day:'numeric', year:'numeric'});
 }
-function renderProjects(){
-  const el = document.getElementById('projectsList');
+function renderAnchorSettings(){
+  const el=document.getElementById('anchorSettings');
   if(!el || !faithStore) return;
-  const projects = faithStore.data.projects || [];
-  el.innerHTML = projects.length ? projects.map(p=>{
-    const pc = faithStore.getProjectPercentComplete(p.id);
-    const tags = typeof tagChipsHtml === 'function' ? tagChipsHtml(p.tags, { showAdd:true, entityType:'project', entityId:p.id }) : '';
-    return '<div class="proj-card"><h4>'+esc(p.title)+'</h4>'+tags+
-      '<div class="dash-proj-bar" style="margin-top:8px"><div class="dash-proj-fill" style="width:'+pc+'%"></div></div>'+
-      '<div style="font-size:12px;color:var(--text-muted);margin-top:6px">'+pc+'% complete</div></div>';
-  }).join('') : '<p class="dash-empty">No projects yet — link tasks to a project as you work.</p>';
+  const cfg=faithStore.getDailyAnchorConfig();
+  el.innerHTML=cfg.map((a,i)=>
+    '<div class="anchor-row" data-anchor-row data-anchor-idx="'+i+'">'+
+    '<input type="text" data-anchor-title value="'+esc(a.title)+'" placeholder="Anchor title">'+
+    '<input type="number" data-anchor-dur placeholder="min" value="'+(a.durationMin??'')+'" min="0">'+
+    '<label style="font-size:11px;display:flex;align-items:center;gap:4px"><input type="checkbox" data-anchor-enabled'+(a.enabled?' checked':'')+'> On</label>'+
+    '<button type="button" class="ff-rm" data-anchor-rm aria-label="Remove">×</button></div>'
+  ).join('');
 }
+async function saveAnchorSettingsFromDOM(){
+  if(!faithStore) return;
+  const rows=[...document.querySelectorAll('#anchorSettings [data-anchor-row]')];
+  const prev=faithStore.getDailyAnchorConfig();
+  const cfg=rows.map((row,i)=>({
+    id: prev[i]?.id || uid(),
+    title: row.querySelector('[data-anchor-title]')?.value.trim() || 'Anchor',
+    durationMin: row.querySelector('[data-anchor-dur]')?.value ? Number(row.querySelector('[data-anchor-dur]').value) : null,
+    enabled: !!row.querySelector('[data-anchor-enabled]')?.checked
+  }));
+  faithStore.setDailyAnchorConfig(cfg);
+  await faithStore.save();
+  const today=iso(dayOf(dayOffset));
+  faithStore.ensureDailyAnchors(today);
+  await faithStore.save();
+  if(iso(dayOf(dayOffset))===today && dayData){
+    faithStore.syncMustDosFromDay(today, dayData);
+    renderFFLists();
+  }
+  if(typeof renderDashboard==='function') renderDashboard();
+  markDirty?.();
+}
+function loadSettings(){ renderAnchorSettings(); }
 function currentKey(){
   if(isDaily()) return dayKeyFor(dayOffset);
   if(isWeekly()) return weekKeyFor(weekOffset);
@@ -2551,9 +2849,24 @@ function renderFFLists(){
     const items = ffGetItems(dayData, f.key);
     const list = document.querySelector('[data-ff-list="'+f.key+'"]');
     if(list){
-      list.innerHTML = items.length
-        ? items.map(it=> renderFFItem(it, f.key)).join('')
-        : '<li class="hint" style="list-style:none;padding:2px 0">No items yet — add below.</li>';
+      if(f.key==='mustDo'){
+        const anchors=items.filter(it=> it.anchorId);
+        const rest=items.filter(it=> !it.anchorId);
+        let html='';
+        if(anchors.length){
+          html+='<li class="ff-first-fruits-wrap"><div class="ff-first-label-row"><span>✦</span> First fruits</div><ul class="ff-items ff-anchor-items">';
+          html+=anchors.map(it=> renderFFItem(it, f.key)).join('');
+          html+='</ul></li>';
+          if(rest.length) html+='<li class="ff-pri-divider"></li>';
+        }
+        html+=rest.length ? rest.map(it=> renderFFItem(it, f.key)).join('')
+          : (!anchors.length ? '<li class="hint" style="list-style:none;padding:2px 0">No items yet — add below.</li>' : '');
+        list.innerHTML=html;
+      } else {
+        list.innerHTML = items.length
+          ? items.map(it=> renderFFItem(it, f.key)).join('')
+          : '<li class="hint" style="list-style:none;padding:2px 0">No items yet — add below.</li>';
+      }
     }
     const card = document.querySelector('.ff-card[data-ff="'+f.key+'"]');
     if(card) card.classList.toggle('done', ffCategoryComplete(items));
@@ -3617,7 +3930,8 @@ async function loadCurrent(){
   if(isDashboard()) loadDashboard();
   else if(isTag()) loadTagLens?.();
   else if(isCalendar()) loadCalendar();
-  else if(isProjects()) renderProjects();
+  else if(isProjects()) loadProjects?.();
+  else if(isSettings()) loadSettings();
   else if(isJournal()) await loadJournal();
   else if(isPrayer()) loadPrayer();
   else if(isIdeas()) loadIdeas();
