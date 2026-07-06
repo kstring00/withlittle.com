@@ -437,6 +437,7 @@ body.view-prayer .site-foot,body.view-journal .site-foot{display:none}
 .seed-chip .dot.gold{background:var(--gold)}
 .seed-chip .dot.harvest{background:var(--green)}
 .seed-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.seed-chip.harvested{opacity:.72;cursor:default}
 .seed-empty{font-size:12px;color:var(--mist);font-style:italic}
 .seed-view-all{font-size:11px;color:var(--gold);font-weight:600;cursor:pointer;border:none;background:none;font-family:inherit;padding:0}
 .seed-list-view{display:none;margin-top:12px;border:1px solid var(--line-soft);border-radius:12px;padding:12px;background:var(--cream-raised)}
@@ -1241,7 +1242,7 @@ function renderPipeWeekStrip(){
   }).join('');
 }
 function updatePipelineUI(){
-  const blocked = pipeBlocked() && pipeStage >= 2;
+  const blocked = pipeBlocked();
   const lock=document.getElementById('pipePlanLock');
   if(lock) lock.hidden = !blocked;
   [1,2,3,4].forEach(n=>{
@@ -1252,14 +1253,24 @@ function updatePipelineUI(){
     card.classList.toggle('locked', blocked && n===2);
   });
   const keep=document.getElementById('pipeKeepGoing');
-  if(keep){ keep.disabled=!readPipeForm().text; keep.style.opacity=keep.disabled?'.5':''; }
+  if(keep){
+    const noText=!readPipeForm().text;
+    keep.disabled=noText||blocked;
+    keep.style.opacity=keep.disabled?'.5':'';
+    if(blocked) keep.title='Two ideas are already growing — save to the Seedbed for now';
+    else keep.removeAttribute('title');
+  }
   const plant=document.getElementById('pipePlantBtn');
   const f=readPipeForm();
   if(plant) plant.disabled = !f.text || !f.steps[0] || !f.firstAction || !f.scheduleDate || blocked;
   const conf=document.getElementById('pipeScheduleConfirm');
   if(conf){
     if(pipeStage>=3 && f.steps[0] && f.scheduleDate && f.scheduleSlot){
-      conf.textContent = 'Step 1 → '+formatCalDay(f.scheduleDate)+', '+PIPE_SLOT_LABELS[f.scheduleSlot];
+      let msg='Step 1 → '+formatCalDay(f.scheduleDate)+', '+PIPE_SLOT_LABELS[f.scheduleSlot];
+      const day=ideaCalDayCache[f.scheduleDate];
+      const mustCount=(day?.faithfulFew?.mustDo?.items||[]).filter(x=>!x.done).length;
+      if(mustCount>=3) msg+=' · This day is already full. Faithful means finishable.';
+      conf.textContent=msg;
     } else conf.textContent='';
   }
   const mustLabel=document.getElementById('pipeMustDoLabel');
@@ -1309,6 +1320,7 @@ function onPipeSchedulePick(){
   if(f.scheduleDate && f.scheduleSlot && f.steps[0]){
     pipeStage=Math.max(pipeStage,4);
     upsertPipeDraft('seedbed');
+    if(f.scheduleDate && !ideaCalDayCache[f.scheduleDate]) getDayDataByDate(f.scheduleDate).then(d=>{ ideaCalDayCache[f.scheduleDate]=d; updatePipelineUI(); });
   }
   updatePipelineUI();
 }
@@ -1356,7 +1368,7 @@ function loadSeedbedChip(ideaId){
 }
 function seedbedIdeas(){
   ensureIdeas();
-  return globals.ideas.map(normalizeIdea).filter(i=> ['seedbed','growing','resting'].includes(i.status) && i.status!=='harvested')
+  return globals.ideas.map(normalizeIdea).filter(i=> ['seedbed','growing','resting','harvested'].includes(i.status))
     .sort((a,b)=>(b.updatedAt||b.createdAt).localeCompare(a.updatedAt||a.createdAt));
 }
 function renderSeedbed(){
@@ -1371,8 +1383,8 @@ function renderSeedbed(){
     shelf.innerHTML='<span class="seed-empty">No seeds waiting. Capture one above.</span>';
   } else {
     shelf.innerHTML=shown.map(i=>{
-      const dot=i.status==='growing'?'gold':(i.status==='resting'?'':'');
-      return '<button type="button" class="seed-chip" data-seed="'+i.id+'"><span class="dot '+dot+'"></span><span>'+esc(i.text)+'</span></button>';
+      const dot=i.status==='growing'?'gold':(i.status==='harvested'?'harvest':(i.status==='resting'?'':''));
+      return '<button type="button" class="seed-chip'+(i.status==='harvested'?' harvested':'')+'" data-seed="'+i.id+'"'+(i.status==='harvested'?' disabled':'')+'><span class="dot '+dot+'"></span><span>'+esc(i.text)+'</span></button>';
     }).join('');
   }
   if(list && seedbedListOpen){
@@ -1567,8 +1579,10 @@ function renderIdeaTriage(){
 function loadIdeas(){
   ensureIdeas(); ensureMyWeek();
   globals.ideas=globals.ideas.map(raw=> normalizeIdea(raw));
-  if(!pipeEditingId) resetPipeForm();
-  else writePipeForm(normalizeIdea(globals.ideas.find(x=>x.id===pipeEditingId)));
+  if(pipeEditingId){
+    const idea=globals.ideas.find(x=>x.id===pipeEditingId);
+    if(idea) writePipeForm(idea); else resetPipeForm();
+  } else resetPipeForm();
   renderSeedbed();
   renderMyWeekPanel();
   renderIdeaCalendar();
