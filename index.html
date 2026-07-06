@@ -1436,7 +1436,7 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold)}
 <script src="tags-ui.js"></script>
 <script src="projects-ui.js"></script>
 <script src="journal-ui.js"></script>
-<script src="ideas-hub.js?v=3" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
+<script src="ideas-hub.js?v=4" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
 <script src="dashboard-ui.js"></script>
 <script>
 
@@ -4205,10 +4205,18 @@ function updateViewUI(){
   else if(isTag()) document.getElementById('periodLabel').textContent = 'Tags';
   const foot = document.querySelector('.site-foot');
   if(foot) foot.style.display = (isIdeas()||isPrayer()||isDashboard()||isCalendar()||isTag()) ? 'none' : '';
+  if(isIdeas() && typeof loadIdeasHub === 'function'){
+    requestAnimationFrame(function(){ loadIdeasHub(); });
+  }
 }
 async function loadCurrent(){
   updateViewUI();
-  if(authUser) await syncPullForView();
+  // Start cloud sync in parallel — never block Ideas Hub (or other views) on sync
+  const syncTask = authUser ? Promise.race([
+    syncPullForView().catch(e => { console.warn('[sync] pull failed', e); }),
+    new Promise(r => setTimeout(r, 2500))
+  ]) : Promise.resolve();
+
   if(isDashboard()) loadDashboard();
   else if(isTag()) loadTagLens?.();
   else if(isCalendar()) loadCalendar();
@@ -4220,6 +4228,11 @@ async function loadCurrent(){
   else if(isDaily()) await loadDaily();
   else if(isWeekly()) await loadWeekly();
   else if(isMonthly()) await loadMonthly();
+
+  await syncTask;
+  if(isIdeas()) loadIdeas();
+  else if(isPrayer()) loadPrayer();
+  else if(isDashboard()) loadDashboard();
 }
 async function loadDaily(){
   const isSat = isSaturdayRecovery();

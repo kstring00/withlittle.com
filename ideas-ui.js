@@ -774,4 +774,24 @@
     ).sort((a,b)=> (a.createdAt||'').localeCompare(b.createdAt||'')).slice(0, limit||3);
   };
 
+  function autoBootIdeasHub(){
+    function tryBoot(){
+      var panel = document.getElementById('ideasPanel');
+      if(panel && !panel.hidden && typeof root.loadIdeasHub === 'function'){
+        root.loadIdeasHub();
+      }
+    }
+    if(typeof document !== 'undefined'){
+      if(document.readyState === 'loading'){
+        document.addEventListener('DOMContentLoaded', tryBoot);
+      }
+      document.addEventListener('click', function(e){
+        if(e.target && e.target.closest && e.target.closest('[data-nav="ideas"]')){
+          setTimeout(tryBoot, 0);
+        }
+      });
+    }
+  }
+  autoBootIdeasHub();
+
 })(typeof window !== 'undefined' ? window : globalThis);
