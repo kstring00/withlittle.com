@@ -1,0 +1,508 @@
+/**
+ * Stewardship Store — the relational data layer behind the calendar.
+ *
+ * Life Areas → Goals → Projects → Tasks (→ Subtasks) → Calendar Blocks → Reflections.
+ * Habits, templates, and per-day metadata (theme, prayer, Big Three, evening
+ * reflection) all hang off the same store so every object can link to the day.
+ *
+ * Persistence: single JSON document under the `fs-stewardship` storage key
+ * (localStorage via window.storage, synced to the cloud like fs-globals).
+ */
+(function(root){
+  'use strict';
+
+  const STORAGE_KEY = 'fs-stewardship';
+  const SAVE_DELAY = 600;
+
+  const CATEGORIES = [
+    { id:'spiritual',     label:'Spiritual',     color:'#b8892a' },
+    { id:'work',          label:'Work',          color:'#5f7a99' },
+    { id:'deepwork',      label:'Deep Work',     color:'#5b6ba8' },
+    { id:'health',        label:'Health',        color:'#427a52' },
+    { id:'rest',          label:'Rest',          color:'#6a9a94' },
+    { id:'relationships', label:'Relationships', color:'#b06a76' },
+    { id:'leadership',    label:'Leadership',    color:'#7a5fa0' },
+    { id:'learning',      label:'Learning',      color:'#4a7c9b' },
+    { id:'admin',         label:'Admin',         color:'#8a8071' },
+    { id:'personal',      label:'Personal',      color:'#b07a4f' },
+    { id:'recovery',      label:'Recovery',      color:'#7d8a98' }
+  ];
+  const LIFE_AREAS = ['Faith','Health','Leadership','Work','Relationships','Finances','Learning','Home'];
+  const PRIORITIES = ['high','medium','low'];
+  const URGENCIES = ['today','week','later','someday'];
+  const ENERGIES = ['high','medium','low'];
+
+  function uid(){
+    if(typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+    return 'id-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,9);
+  }
+  function nowIso(){ return new Date().toISOString(); }
+  function todayStr(off){
+    const d = new Date(); d.setDate(d.getDate()+(off||0)); d.setHours(12,0,0,0);
+    return d.toISOString().slice(0,10);
+  }
+  function dowOf(dateStr){ return new Date(dateStr+'T12:00:00').getDay(); }
+
+  let data = null;
+  let saveTimer = null;
+  let readyPromise = null;
+
+  function blankData(){
+    return {
+      version: 1,
+      goals: [], projects: [], tasks: [], habits: [], events: [], templates: [],
+      days: {},          // date → { theme, prayer, bigThree:[taskId], reflection, scripture }
+      meta: { seeded: false }
+    };
+  }
+
+  /* ── normalization ─────────────────────────────────────────── */
+  function normTask(t){
+    return {
+      id: t.id || uid(), title: t.title || '', notes: t.notes || '',
+      priority: PRIORITIES.includes(t.priority) ? t.priority : 'medium',
+      urgency: URGENCIES.includes(t.urgency) ? t.urgency : 'week',
+      energy: ENERGIES.includes(t.energy) ? t.energy : 'medium',
+      durationMin: t.durationMin || null, dueDate: t.dueDate || '',
+      goalId: t.goalId || null, projectId: t.projectId || null,
+      status: t.status === 'done' || t.status === 'archived' ? t.status : 'todo',
+      subtasks: Array.isArray(t.subtasks) ? t.subtasks.map(s=>({ id:s.id||uid(), text:s.text||'', done:!!s.done })) : [],
+      scheduledEventId: t.scheduledEventId || null,
+      createdAt: t.createdAt || nowIso(), completedAt: t.completedAt || null
+    };
+  }
+  function normEvent(e){
+    return {
+      id: e.id || uid(), title: e.title || '', date: e.date || todayStr(),
+      startMin: typeof e.startMin === 'number' ? e.startMin : 540,
+      endMin: typeof e.endMin === 'number' ? e.endMin : 600,
+      category: CATEGORIES.some(c=>c.id===e.category) ? e.category : 'personal',
+      priority: PRIORITIES.includes(e.priority) ? e.priority : 'medium',
+      energy: ENERGIES.includes(e.energy) ? e.energy : 'medium',
+      goalId: e.goalId || null, projectId: e.projectId || null,
+      taskIds: Array.isArray(e.taskIds) ? e.taskIds.slice() : [],
+      habitIds: Array.isArray(e.habitIds) ? e.habitIds.slice() : [],
+      notes: e.notes || '', reflection: e.reflection || '',
+      done: !!e.done, completedAt: e.completedAt || null,
+      createdAt: e.createdAt || nowIso(), updatedAt: e.updatedAt || null
+    };
+  }
+  function normHabit(h){
+    return {
+      id: h.id || uid(), title: h.title || '', icon: h.icon || '○',
+      frequency: ['daily','weekdays','weekly'].includes(h.frequency) ? h.frequency : 'daily',
+      days: Array.isArray(h.days) ? h.days.slice() : [0],   // for weekly
+      targetTime: ['morning','midday','evening','any'].includes(h.targetTime) ? h.targetTime : 'any',
+      goalId: h.goalId || null, notes: h.notes || '',
+      log: h.log && typeof h.log === 'object' ? h.log : {},
+      createdAt: h.createdAt || nowIso()
+    };
+  }
+  function normalize(raw){
+    const d = Object.assign(blankData(), raw || {});
+    d.goals = (d.goals||[]).map(g=>({
+      id:g.id||uid(), title:g.title||'', lifeArea:g.lifeArea||'Faith', why:g.why||'',
+      deadline:g.deadline||'', milestones:(g.milestones||[]).map(m=>({id:m.id||uid(),title:m.title||'',done:!!m.done})),
+      createdAt:g.createdAt||nowIso()
+    }));
+    d.projects = (d.projects||[]).map(p=>({
+      id:p.id||uid(), goalId:p.goalId||null, title:p.title||'',
+      status:p.status==='done'?'done':'active', createdAt:p.createdAt||nowIso()
+    }));
+    d.tasks = (d.tasks||[]).map(normTask);
+    d.habits = (d.habits||[]).map(normHabit);
+    d.events = (d.events||[]).map(normEvent);
+    d.templates = (d.templates||[]).map(t=>Object.assign(normEvent(t), { id:t.id||uid(), date:'', done:false }));
+    if(!d.days || typeof d.days !== 'object') d.days = {};
+    return d;
+  }
+
+  /* ── persistence ───────────────────────────────────────────── */
+  async function load(){
+    try{
+      const raw = await root.storage?.get(STORAGE_KEY);
+      data = normalize(raw?.value ? JSON.parse(raw.value) : null);
+    }catch(e){
+      console.warn('[StewStore] load failed, starting fresh', e);
+      data = blankData();
+    }
+    if(!data.meta.seeded){ seedSampleData(); data.meta.seeded = true; persistNow(); }
+    return data;
+  }
+  function init(){
+    if(!readyPromise) readyPromise = load();
+    return readyPromise;
+  }
+  async function persistNow(){
+    if(!data) return;
+    try{ await root.storage?.set(STORAGE_KEY, JSON.stringify(data)); }
+    catch(e){ console.warn('[StewStore] save failed', e); }
+    if(typeof root.scheduleCloudPush === 'function') root.scheduleCloudPush([STORAGE_KEY]);
+  }
+  function save(){ clearTimeout(saveTimer); saveTimer = setTimeout(persistNow, SAVE_DELAY); }
+  function touch(obj){ if(obj) obj.updatedAt = nowIso(); save(); }
+
+  /* ── goals & projects ──────────────────────────────────────── */
+  function getGoals(){ return data.goals; }
+  function getGoal(id){ return data.goals.find(g=>g.id===id) || null; }
+  function createGoal(p){ const g = normalize({goals:[p]}).goals[0]; data.goals.push(g); save(); return g; }
+  function updateGoal(id,p){ const g = getGoal(id); if(g){ Object.assign(g,p); save(); } return g; }
+  function deleteGoal(id){
+    data.goals = data.goals.filter(g=>g.id!==id);
+    data.projects.forEach(p=>{ if(p.goalId===id) p.goalId=null; });
+    data.tasks.forEach(t=>{ if(t.goalId===id) t.goalId=null; });
+    data.habits.forEach(h=>{ if(h.goalId===id) h.goalId=null; });
+    data.events.forEach(e=>{ if(e.goalId===id) e.goalId=null; });
+    save();
+  }
+  function goalProgress(id){
+    const tasks = data.tasks.filter(t=>t.goalId===id && t.status!=='archived');
+    const g = getGoal(id);
+    const parts = tasks.length + (g ? g.milestones.length : 0);
+    if(!parts) return null;
+    const done = tasks.filter(t=>t.status==='done').length +
+      (g ? g.milestones.filter(m=>m.done).length : 0);
+    return Math.round(done/parts*100);
+  }
+  function getProjects(goalId){
+    return goalId ? data.projects.filter(p=>p.goalId===goalId) : data.projects;
+  }
+  function getProject(id){ return data.projects.find(p=>p.id===id) || null; }
+  function createProject(p){ const o = normalize({projects:[p]}).projects[0]; data.projects.push(o); save(); return o; }
+  function updateProject(id,p){ const o = getProject(id); if(o){ Object.assign(o,p); save(); } return o; }
+  function deleteProject(id){
+    data.projects = data.projects.filter(p=>p.id!==id);
+    data.tasks.forEach(t=>{ if(t.projectId===id) t.projectId=null; });
+    data.events.forEach(e=>{ if(e.projectId===id) e.projectId=null; });
+    save();
+  }
+
+  /* ── tasks & subtasks ──────────────────────────────────────── */
+  function getTasks(f){
+    let list = data.tasks;
+    if(f?.goalId) list = list.filter(t=>t.goalId===f.goalId);
+    if(f?.projectId) list = list.filter(t=>t.projectId===f.projectId);
+    if(f?.status) list = list.filter(t=>t.status===f.status);
+    return list;
+  }
+  function getTask(id){ return data.tasks.find(t=>t.id===id) || null; }
+  function createTask(p){ const t = normTask(p||{}); data.tasks.push(t); save(); return t; }
+  function updateTask(id,p){
+    const t = getTask(id); if(!t) return null;
+    Object.assign(t,p);
+    if(p.status==='done' && !t.completedAt) t.completedAt = nowIso();
+    if(p.status==='todo') t.completedAt = null;
+    save(); return t;
+  }
+  function deleteTask(id){
+    data.tasks = data.tasks.filter(t=>t.id!==id);
+    data.events.forEach(e=>{ e.taskIds = e.taskIds.filter(x=>x!==id); });
+    Object.values(data.days).forEach(dm=>{ if(dm.bigThree) dm.bigThree = dm.bigThree.filter(x=>x!==id); });
+    save();
+  }
+  function toggleSubtask(taskId, subId){
+    const t = getTask(taskId); if(!t) return;
+    const s = t.subtasks.find(x=>x.id===subId); if(!s) return;
+    s.done = !s.done;
+    save();
+  }
+  function addSubtask(taskId, text){
+    const t = getTask(taskId); if(!t) return null;
+    const s = { id: uid(), text: text, done: false };
+    t.subtasks.push(s); save(); return s;
+  }
+  const URGENCY_RANK = { today:0, week:1, later:2, someday:3 };
+  const PRIORITY_RANK = { high:0, medium:1, low:2 };
+  function overflowTasks(){
+    return data.tasks
+      .filter(t=>t.status==='todo' && !t.scheduledEventId)
+      .sort((a,b)=> (URGENCY_RANK[a.urgency]-URGENCY_RANK[b.urgency]) ||
+        (PRIORITY_RANK[a.priority]-PRIORITY_RANK[b.priority]));
+  }
+  /** Overflow moves: later-today | tomorrow | this-week | someday | archive */
+  function moveTask(id, dest){
+    const t = getTask(id); if(!t) return;
+    if(dest==='archive'){ t.status='archived'; }
+    else if(dest==='someday'){ t.urgency='someday'; t.dueDate=''; }
+    else if(dest==='later-today'){ t.urgency='today'; t.dueDate=todayStr(); }
+    else if(dest==='tomorrow'){ t.urgency='today'; t.dueDate=todayStr(1); }
+    else if(dest==='this-week'){ t.urgency='week'; t.dueDate=''; }
+    save();
+  }
+
+  /* ── habits ────────────────────────────────────────────────── */
+  function getHabits(){ return data.habits; }
+  function getHabit(id){ return data.habits.find(h=>h.id===id) || null; }
+  function createHabit(p){ const h = normHabit(p||{}); data.habits.push(h); save(); return h; }
+  function updateHabit(id,p){ const h = getHabit(id); if(h){ Object.assign(h,p); save(); } return h; }
+  function deleteHabit(id){
+    data.habits = data.habits.filter(h=>h.id!==id);
+    data.events.forEach(e=>{ e.habitIds = e.habitIds.filter(x=>x!==id); });
+    save();
+  }
+  function habitAppliesOn(h, dateStr){
+    const dow = dowOf(dateStr);
+    if(h.frequency==='daily') return true;
+    if(h.frequency==='weekdays') return dow>=1 && dow<=5;
+    return h.days.includes(dow);
+  }
+  function habitsForDate(dateStr){ return data.habits.filter(h=>habitAppliesOn(h,dateStr)); }
+  function habitDone(id, dateStr){ const h = getHabit(id); return !!h?.log[dateStr]; }
+  function toggleHabit(id, dateStr){
+    const h = getHabit(id); if(!h) return;
+    if(h.log[dateStr]) delete h.log[dateStr]; else h.log[dateStr] = true;
+    save();
+  }
+  function habitStreak(id){
+    const h = getHabit(id); if(!h) return 0;
+    let streak = 0;
+    for(let off=0; off>-120; off--){
+      const d = todayStr(off);
+      if(!habitAppliesOn(h,d)) continue;
+      if(h.log[d]) streak++;
+      else if(off===0) continue;   // today isn't over — an unchecked today doesn't break the streak
+      else break;
+    }
+    return streak;
+  }
+
+  /* ── events & templates ────────────────────────────────────── */
+  function getEvents(){ return data.events; }
+  function getEvent(id){ return data.events.find(e=>e.id===id) || null; }
+  function eventsForDate(dateStr){
+    return data.events.filter(e=>e.date===dateStr).sort((a,b)=>a.startMin-b.startMin);
+  }
+  function createEvent(p){
+    const e = normEvent(p||{});
+    data.events.push(e);
+    e.taskIds.forEach(tid=>{ const t = getTask(tid); if(t) t.scheduledEventId = e.id; });
+    save(); return e;
+  }
+  function updateEvent(id,p){
+    const e = getEvent(id); if(!e) return null;
+    const oldTasks = e.taskIds.slice();
+    Object.assign(e,p);
+    if(p.done && !e.completedAt) e.completedAt = nowIso();
+    if(p.done===false) e.completedAt = null;
+    if(p.taskIds){
+      oldTasks.filter(t=>!p.taskIds.includes(t)).forEach(tid=>{
+        const t = getTask(tid); if(t && t.scheduledEventId===id) t.scheduledEventId = null;
+      });
+      p.taskIds.forEach(tid=>{ const t = getTask(tid); if(t) t.scheduledEventId = id; });
+    }
+    touch(e); return e;
+  }
+  function deleteEvent(id){
+    const e = getEvent(id); if(!e) return;
+    e.taskIds.forEach(tid=>{ const t = getTask(tid); if(t && t.scheduledEventId===id) t.scheduledEventId = null; });
+    data.events = data.events.filter(x=>x.id!==id);
+    save();
+  }
+  function duplicateEvent(id, dateStr){
+    const e = getEvent(id); if(!e) return null;
+    const copy = normEvent(Object.assign({}, e, {
+      id:null, date:dateStr||e.date, done:false, completedAt:null, reflection:'', taskIds:[], createdAt:null
+    }));
+    data.events.push(copy); save(); return copy;
+  }
+  /** Complete an event and optionally sweep its linked work along with it. */
+  function completeEvent(id, opts){
+    const e = getEvent(id); if(!e) return null;
+    e.done = true; e.completedAt = nowIso();
+    if(opts?.reflection != null) e.reflection = opts.reflection;
+    if(opts?.completeTasks) e.taskIds.forEach(tid=>updateTask(tid,{status:'done'}));
+    if(opts?.checkHabits) e.habitIds.forEach(hid=>{ if(!habitDone(hid,e.date)) toggleHabit(hid,e.date); });
+    touch(e); return e;
+  }
+  function getTemplates(){ return data.templates; }
+  function saveTemplate(fromEventId, name){
+    const e = getEvent(fromEventId); if(!e) return null;
+    const tpl = normEvent(Object.assign({}, e, { id:null, date:'', done:false, completedAt:null, reflection:'', taskIds:[] }));
+    tpl.title = name || e.title;
+    data.templates.push(tpl); save(); return tpl;
+  }
+  function deleteTemplate(id){ data.templates = data.templates.filter(t=>t.id!==id); save(); }
+  function createEventFromTemplate(tplId, dateStr, startMin){
+    const tpl = data.templates.find(t=>t.id===tplId); if(!tpl) return null;
+    const dur = tpl.endMin - tpl.startMin;
+    const start = typeof startMin === 'number' ? startMin : tpl.startMin;
+    return createEvent(Object.assign({}, tpl, {
+      id:null, date:dateStr, startMin:start, endMin:start+dur, done:false, createdAt:null
+    }));
+  }
+  /** Schedule an unscheduled task as a calendar block. */
+  function scheduleTask(taskId, dateStr, startMin){
+    const t = getTask(taskId); if(!t) return null;
+    const goal = t.goalId ? getGoal(t.goalId) : null;
+    const catByArea = { Faith:'spiritual', Health:'health', Leadership:'leadership', Work:'work',
+      Relationships:'relationships', Finances:'admin', Learning:'learning', Home:'personal' };
+    const dur = t.durationMin || 45;
+    return createEvent({
+      title: t.title, date: dateStr, startMin: startMin, endMin: startMin + dur,
+      category: goal ? (catByArea[goal.lifeArea] || 'work') : 'work',
+      priority: t.priority, energy: t.energy,
+      goalId: t.goalId, projectId: t.projectId, taskIds: [taskId]
+    });
+  }
+
+  /* ── day meta: theme, prayer, Big Three, evening reflection ── */
+  function getDayMeta(dateStr){
+    if(!data.days[dateStr]) data.days[dateStr] = { theme:'', prayer:'', bigThree:[], reflection:'' };
+    const dm = data.days[dateStr];
+    if(!Array.isArray(dm.bigThree)) dm.bigThree = [];
+    return dm;
+  }
+  function setDayMeta(dateStr, patch){
+    Object.assign(getDayMeta(dateStr), patch); save();
+  }
+  function toggleBigThree(dateStr, taskId){
+    const dm = getDayMeta(dateStr);
+    if(dm.bigThree.includes(taskId)){
+      dm.bigThree = dm.bigThree.filter(x=>x!==taskId);
+    } else {
+      if(dm.bigThree.length >= 3) return false;   // only three things get the crown
+      dm.bigThree.push(taskId);
+    }
+    save(); return true;
+  }
+
+  /* ── Faithfulness Ring ─────────────────────────────────────── */
+  /**
+   * Gentle math: the score is the average of the rhythms that are actually in
+   * play today (planned blocks kept, habits, Big Three). An empty day is an
+   * invitation, not a zero.
+   */
+  function ringForDate(dateStr){
+    const events = eventsForDate(dateStr);
+    const plannedMin = events.reduce((s,e)=>s+(e.endMin-e.startMin),0);
+    const keptMin = events.filter(e=>e.done).reduce((s,e)=>s+(e.endMin-e.startMin),0);
+    const deepMin = events.filter(e=>e.category==='deepwork' && e.done).reduce((s,e)=>s+(e.endMin-e.startMin),0);
+    const restMin = events.filter(e=>e.category==='rest' && e.done).reduce((s,e)=>s+(e.endMin-e.startMin),0);
+    const habits = habitsForDate(dateStr);
+    const habitsDone = habits.filter(h=>habitDone(h.id,dateStr)).length;
+    const spiritualHabits = habits.filter(h=>h.targetTime==='morning' && h.goalId && getGoal(h.goalId)?.lifeArea==='Faith');
+    const prayerDone = events.some(e=>e.category==='spiritual' && e.done) ||
+      habits.some(h=>habitDone(h.id,dateStr) && (h.goalId ? getGoal(h.goalId)?.lifeArea==='Faith' : /pray|bible|scripture/i.test(h.title))) ||
+      spiritualHabits.some(h=>habitDone(h.id,dateStr));
+    const dm = getDayMeta(dateStr);
+    const bigTotal = dm.bigThree.length;
+    const bigDone = dm.bigThree.filter(tid=>getTask(tid)?.status==='done').length;
+
+    const parts = [];
+    if(events.length) parts.push(events.filter(e=>e.done).length/events.length);
+    if(habits.length) parts.push(habitsDone/habits.length);
+    if(bigTotal) parts.push(bigDone/bigTotal);
+    const score = parts.length ? Math.round(parts.reduce((a,b)=>a+b,0)/parts.length*100) : null;
+
+    return {
+      plannedMin, keptMin, deepMin, restMin,
+      eventsTotal: events.length, eventsDone: events.filter(e=>e.done).length,
+      habitsTotal: habits.length, habitsDone,
+      bigTotal, bigDone, prayerDone, score,
+      keptPct: events.length ? events.filter(e=>e.done).length/events.length : 0,
+      habitPct: habits.length ? habitsDone/habits.length : 0,
+      bigPct: bigTotal ? bigDone/bigTotal : 0
+    };
+  }
+
+  /* ── sample data (first run only) ──────────────────────────── */
+  function seedSampleData(){
+    const t0 = todayStr(), t1 = todayStr(1);
+    const gBody = createGoal({ title:'Build a healthy body', lifeArea:'Health',
+      why:'My body is entrusted to me — strength for family, work, and service.',
+      milestones:[{title:'Train 3× per week for a month'},{title:'Sleep by 10:30 for two weeks'}] });
+    const gLead = createGoal({ title:'Become a stronger leader', lifeArea:'Leadership',
+      why:'Lead people the way the Lord leads me — with clarity and care.',
+      milestones:[{title:'Complete one mentorship cycle'},{title:'Apply one lesson each week'}] });
+    const gWalk = createGoal({ title:'Walk closely with God', lifeArea:'Faith',
+      why:'Everything else flows from this.', milestones:[{title:'Psalms in July'}] });
+
+    const pStrength = createProject({ goalId:gBody.id, title:'July strength cycle' });
+    const pED  = createProject({ goalId:gLead.id, title:'Executive Director mentorship' });
+    createProject({ goalId:gLead.id, title:'Clinical Director mentorship' });
+    createProject({ goalId:gLead.id, title:'Director of Operations mentorship' });
+    const pPsalms = createProject({ goalId:gWalk.id, title:'Psalms in July' });
+
+    const tTrain = createTask({ title:'Train chest and biceps', goalId:gBody.id, projectId:pStrength.id,
+      priority:'high', urgency:'today', energy:'high', durationMin:60, dueDate:t0,
+      subtasks:[{text:'Warm up cardio'},{text:'Chest press'},{text:'Incline press'},{text:'Biceps curls'},{text:'Cooldown cardio'}] });
+    const tQuestions = createTask({ title:'Write questions for ED session', goalId:gLead.id, projectId:pED.id,
+      priority:'high', urgency:'today', energy:'medium', durationMin:30, dueDate:t0 });
+    const tPsalm = createTask({ title:'Read Psalm 119 slowly', goalId:gWalk.id, projectId:pPsalms.id,
+      priority:'medium', urgency:'today', energy:'low', durationMin:20 });
+    createTask({ title:'Apply one leadership lesson at work', goalId:gLead.id, projectId:pED.id,
+      priority:'medium', urgency:'week', energy:'medium', durationMin:15 });
+    createTask({ title:'Meal prep for the week', goalId:gBody.id, projectId:pStrength.id,
+      priority:'medium', urgency:'week', energy:'medium', durationMin:90 });
+    createTask({ title:'Review monthly budget', priority:'low', urgency:'later', energy:'low', durationMin:30 });
+    createTask({ title:'Memorize Colossians 3:23', goalId:gWalk.id, priority:'low', urgency:'someday', energy:'low' });
+
+    const hPray = createHabit({ title:'Morning prayer', icon:'🙏', frequency:'daily', targetTime:'morning', goalId:gWalk.id });
+    const hBible = createHabit({ title:'Bible reading', icon:'📖', frequency:'daily', targetTime:'morning', goalId:gWalk.id });
+    const hGym = createHabit({ title:'Gym', icon:'💪', frequency:'weekdays', targetTime:'evening', goalId:gBody.id });
+    createHabit({ title:'Journaling', icon:'✒', frequency:'daily', targetTime:'evening' });
+    const hReflect = createHabit({ title:'Evening reflection', icon:'🌙', frequency:'daily', targetTime:'evening' });
+    createHabit({ title:'Clean room', icon:'🧺', frequency:'weekly', days:[6], targetTime:'any' });
+    createHabit({ title:'Budget check', icon:'📊', frequency:'weekly', days:[5], targetTime:'any' });
+    createHabit({ title:'Leadership reading', icon:'📚', frequency:'weekdays', targetTime:'midday', goalId:gLead.id });
+    // a little history so streaks feel alive
+    [hPray,hBible,hReflect].forEach(h=>{ for(let off=-1; off>=-4; off--) h.log[todayStr(off)] = true; });
+    hGym.log[todayStr(-1)] = true; hGym.log[todayStr(-2)] = true;
+
+    const evPrayer = createEvent({ title:'Morning prayer & Scripture', date:t0, startMin:6*60, endMin:6*60+30,
+      category:'spiritual', energy:'low', goalId:gWalk.id, projectId:pPsalms.id,
+      habitIds:[hPray.id,hBible.id], taskIds:[tPsalm.id],
+      notes:'Begin before the noise begins.' });
+    createEvent({ title:'Deep work — priority project', date:t0, startMin:9*60, endMin:11*60,
+      category:'deepwork', priority:'high', energy:'high', goalId:gLead.id,
+      notes:'Phone in the other room.' });
+    createEvent({ title:'Lunch + reset', date:t0, startMin:12*60, endMin:13*60, category:'rest', energy:'low',
+      notes:'Rest. Recharge. Reflect.' });
+    createEvent({ title:'Admin + email sweep', date:t0, startMin:15*60+30, endMin:16*60+30, category:'admin', energy:'low' });
+    createEvent({ title:'Workout — chest & biceps', date:t0, startMin:17*60, endMin:18*60,
+      category:'health', priority:'high', energy:'high', goalId:gBody.id, projectId:pStrength.id,
+      taskIds:[tTrain.id], habitIds:[hGym.id],
+      notes:'Discipline in the body. Freedom in the mind.' });
+    createEvent({ title:'Evening reflection + journal', date:t0, startMin:21*60, endMin:21*60+20,
+      category:'spiritual', energy:'low', habitIds:[hReflect.id],
+      notes:'What did I steward well today?' });
+    createEvent({ title:'Mentorship session — Executive Director', date:t1, startMin:13*60, endMin:14*60,
+      category:'leadership', priority:'high', energy:'medium', goalId:gLead.id, projectId:pED.id,
+      taskIds:[tQuestions.id], notes:'Bring prepared questions. Listen first.' });
+
+    // completing the first block makes the ring meaningful on first open
+    completeEvent(evPrayer.id, { checkHabits:true });
+    updateTask(tPsalm.id, { status:'done' });
+
+    const dm = getDayMeta(t0);
+    dm.bigThree = [tTrain.id, tQuestions.id, tPsalm.id];
+    dm.theme = 'Faithful in the small things';
+    dm.prayer = 'Lord, help me steward the time, talents, and relationships You entrusted to me today.';
+
+    data.templates.push(
+      Object.assign(normEvent({ title:'Workout — strength', category:'health', startMin:17*60, endMin:18*60,
+        energy:'high', goalId:gBody.id, projectId:pStrength.id, notes:'Warm up · main lifts · cooldown' }), { date:'' }),
+      Object.assign(normEvent({ title:'Deep work block', category:'deepwork', startMin:9*60, endMin:10*60+30,
+        energy:'high', notes:'One task. No inputs.' }), { date:'' }),
+      Object.assign(normEvent({ title:'Mentorship session', category:'leadership', startMin:13*60, endMin:14*60,
+        energy:'medium', goalId:gLead.id, notes:'Prepared questions · notes · one application' }), { date:'' })
+    );
+  }
+
+  root.StewStore = {
+    init, load, save,
+    get data(){ return data; },
+    CATEGORIES, LIFE_AREAS, PRIORITIES, URGENCIES, ENERGIES,
+    getGoals, getGoal, createGoal, updateGoal, deleteGoal, goalProgress,
+    getProjects, getProject, createProject, updateProject, deleteProject,
+    getTasks, getTask, createTask, updateTask, deleteTask, toggleSubtask, addSubtask,
+    overflowTasks, moveTask, scheduleTask,
+    getHabits, getHabit, createHabit, updateHabit, deleteHabit,
+    habitsForDate, habitAppliesOn, habitDone, toggleHabit, habitStreak,
+    getEvents, getEvent, eventsForDate, createEvent, updateEvent, deleteEvent,
+    duplicateEvent, completeEvent,
+    getTemplates, saveTemplate, deleteTemplate, createEventFromTemplate,
+    getDayMeta, setDayMeta, toggleBigThree, ringForDate
+  };
+
+})(typeof window !== 'undefined' ? window : globalThis);

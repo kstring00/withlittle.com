@@ -1105,118 +1105,357 @@ body.view-dashboard #dailyBoard,body.view-dashboard #weeklyBoard,body.view-dashb
 body.view-dashboard #journalPanel,body.view-dashboard #ideasPanel,body.view-dashboard #prayerPanel,
 body.view-dashboard #calendarPanel,body.view-dashboard #tagLensPanel,body.view-dashboard #projectsPanel,
 body.view-dashboard #settingsPanel,body.view-dashboard #mentorshipPanel{display:none!important}
-#calendarPanel .cal-page-layout{display:block}
-#calendarPanel .cal-agenda-panel{display:none!important}
-body.view-calendar .app-content{padding:0;overflow:hidden}
-body.view-calendar #calendarPanel{display:flex!important;flex:1;min-height:0;flex-direction:column}
+/* ── Stewardship Calendar ─────────────────────────────────── */
 #calendarPanel{
-  --ncal-bg:var(--bg-card);--ncal-bg-sub:var(--bg-page);--ncal-border:var(--border);--ncal-text:var(--text-primary);--ncal-muted:var(--text-muted);
-  --ncal-accent:var(--gold);--ncal-accent-soft:var(--gold-dim);--ncal-today:var(--gold);--ncal-shadow:0 8px 24px color-mix(in srgb,var(--text-primary) 8%,transparent);
-  background:var(--ncal-bg);color:var(--ncal-text);min-height:calc(100vh - 57px);
+  /* calm, muted category palette */
+  --cat-spiritual:#b8892a; --cat-work:#5f7a99; --cat-deepwork:#5b6ba8; --cat-health:#427a52;
+  --cat-rest:#6a9a94; --cat-relationships:#b06a76; --cat-leadership:#7a5fa0; --cat-learning:#4a7c9b;
+  --cat-admin:#8a8071; --cat-personal:#b07a4f; --cat-recovery:#7d8a98;
+  max-width:1480px;margin:0 auto;
 }
-.ncal-shell{display:grid;grid-template-columns:240px 1fr 260px;min-height:calc(100vh - 57px);height:100%}
-@media(max-width:1100px){.ncal-shell{grid-template-columns:200px 1fr}.ncal-aside{display:none}}
-@media(max-width:760px){.ncal-shell{grid-template-columns:1fr}.ncal-sidebar{display:none}}
-.ncal-sidebar{border-right:1px solid var(--ncal-border);padding:16px 14px;overflow-y:auto;background:var(--ncal-bg-sub)}
-.ncal-sidebar-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ncal-muted);margin:0 0 10px}
-.ncal-sidebar-section{margin-top:20px}
-.ncal-mini{margin-bottom:8px}
-.ncal-mini-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:13px;font-weight:600}
-.ncal-mini-nav{border:none;background:transparent;width:24px;height:24px;border-radius:6px;cursor:pointer;color:var(--ncal-muted);font-size:16px}
-.ncal-mini-nav:hover{background:var(--bg-hover)}
-.ncal-mini-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.ncal-mini-dow{text-align:center;font-size:10px;color:var(--ncal-muted);padding:2px 0}
-.ncal-mini-day{border:none;background:transparent;font-size:11px;padding:4px 0;border-radius:6px;cursor:pointer;color:var(--ncal-text);font-family:inherit}
-.ncal-mini-day:hover{background:var(--bg-hover)}
-.ncal-mini-day.today{background:var(--ncal-today);color:var(--text-on-gold);font-weight:600}
-.ncal-mini-day.empty{pointer-events:none}
-.ncal-filter{display:flex;align-items:center;gap:8px;font-size:13px;padding:5px 0;cursor:pointer}
-.ncal-filter input{accent-color:var(--ncal-today)}
-.ncal-filter-dot{width:8px;height:8px;border-radius:2px;flex:none}
-.ncal-text-btn{border:none;background:none;padding:0;font-size:12px;color:var(--ncal-muted);cursor:pointer;font-family:inherit;text-align:left}
-.ncal-text-btn:hover{color:var(--ncal-text);text-decoration:underline}
-.ncal-my-week{margin-top:10px;padding-top:10px;border-top:1px solid var(--ncal-border);font-size:11px}
-.ncal-mw-day{margin-bottom:12px}
-.ncal-mw-day h5{margin:0 0 6px;font-size:10px;text-transform:uppercase;color:var(--ncal-muted)}
-.ncal-mw-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px}
-.ncal-mw-row input{font-size:11px;padding:4px 6px;border:1px solid var(--ncal-border);border-radius:6px;font-family:inherit}
-.ncal-mw-rm{border:none;background:none;color:var(--ncal-muted);cursor:pointer}
-.ncal-center{display:flex;flex-direction:column;min-width:0;min-height:0}
-.ncal-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-bottom:1px solid var(--ncal-border);flex-wrap:wrap}
-.ncal-title{margin:0;font-size:22px;font-weight:700;letter-spacing:-.02em}
-.ncal-toolbar-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.ncal-select,.ncal-btn,.ncal-icon-btn{font-family:inherit;font-size:12px;border-radius:8px;cursor:pointer}
-.ncal-select{border:1px solid var(--ncal-border);padding:6px 10px;background:var(--ncal-bg);color:var(--ncal-text)}
-.ncal-btn{border:1px solid var(--ncal-border);background:var(--ncal-bg);color:var(--ncal-text);padding:6px 12px}
-.ncal-btn:hover{background:var(--bg-hover)}
-.ncal-btn-primary{background:var(--ncal-text);color:var(--bg-card);border-color:var(--ncal-text)}
-.ncal-btn-primary:hover{filter:brightness(1.1)}
-.ncal-btn-danger{border-color:var(--red-border-soft);color:var(--red);background:var(--bg-card)}
-.ncal-btn-danger:hover{background:var(--red-bg)}
-.ncal-icon-btn{width:32px;height:32px;border:1px solid var(--ncal-border);background:var(--ncal-bg);font-size:18px;line-height:1;padding:0}
-.ncal-grid-scroll{flex:1;overflow:auto;min-height:0}
-.ncal-week{min-width:720px}
-.ncal-week-head{display:grid;grid-template-columns:56px repeat(7,1fr);border-bottom:1px solid var(--ncal-border);position:sticky;top:0;background:var(--ncal-bg);z-index:3}
-.ncal-gutter-spacer{grid-column:1}
-.ncal-col-head{padding:10px 8px;text-align:center;border-left:1px solid var(--ncal-border)}
-.ncal-col-head.today .ncal-dom{background:var(--ncal-today);color:var(--text-on-gold);border-radius:999px;display:inline-flex;width:28px;height:28px;align-items:center;justify-content:center}
-.ncal-dow{display:block;font-size:11px;color:var(--ncal-muted);text-transform:uppercase}
-.ncal-dom{display:block;font-size:18px;font-weight:600;margin-top:2px}
-.ncal-allday-row{display:grid;grid-template-columns:56px repeat(7,1fr);border-bottom:1px solid var(--ncal-border);min-height:36px}
-.ncal-gutter-label{font-size:10px;color:var(--ncal-muted);padding:8px 6px;text-align:right}
-.ncal-allday-col{border-left:1px solid var(--ncal-border);padding:4px;display:flex;flex-wrap:wrap;gap:3px;align-content:flex-start}
-.ncal-allday-pill{border:none;border-radius:4px;padding:2px 6px;font-size:10px;background:color-mix(in srgb,var(--ev-color) 18%,var(--ncal-bg));color:var(--ncal-text);cursor:pointer;font-family:inherit;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ncal-week-body{display:grid;grid-template-columns:56px 1fr}
-.ncal-time-gutter{border-right:1px solid var(--ncal-border)}
-.ncal-hour-label{font-size:10px;color:var(--ncal-muted);text-align:right;padding:0 6px;transform:translateY(-6px);box-sizing:border-box}
-.ncal-cols{display:grid;grid-template-columns:repeat(7,1fr)}
-.ncal-day-col{position:relative;border-left:1px solid var(--ncal-border)}
-.ncal-hour-slot{border-bottom:1px solid var(--ncal-border);cursor:pointer}
-.ncal-hour-slot:hover{background:color-mix(in srgb,var(--text-primary) 3%,transparent)}
-.ncal-now-line{position:absolute;left:0;right:0;height:2px;background:var(--ncal-accent);z-index:2;pointer-events:none}
-.ncal-now-badge{position:absolute;left:-52px;top:-8px;background:var(--ncal-accent);color:var(--text-on-gold);font-size:10px;padding:2px 6px;border-radius:4px;white-space:nowrap}
-.ncal-event{position:absolute;left:3px;right:3px;border:none;border-radius:6px;padding:4px 6px;text-align:left;cursor:pointer;font-family:inherit;overflow:hidden;
-  background:color-mix(in srgb,var(--ev-color) 22%,var(--ncal-bg));border-left:3px solid var(--ev-color);z-index:1}
-.ncal-event:hover{filter:brightness(.98);box-shadow:0 2px 8px color-mix(in srgb,var(--text-primary) 8%,transparent)}
-.ncal-event.done{opacity:.55;text-decoration:line-through}
-.ncal-event-title{display:block;font-size:11px;font-weight:600;line-height:1.25;color:var(--ncal-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ncal-event-time{display:block;font-size:10px;color:var(--ncal-muted);margin-top:2px}
-.ncal-month{padding:16px 20px}
-.ncal-month-head,.ncal-month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-.ncal-month-head span{text-align:center;font-size:11px;color:var(--ncal-muted);padding:6px}
-.ncal-month-cell{border:1px solid var(--ncal-border);border-radius:10px;min-height:88px;padding:8px;background:var(--ncal-bg);cursor:pointer;font-family:inherit;text-align:left}
-.ncal-month-cell:hover{background:var(--bg-hover)}
-.ncal-month-cell.today{box-shadow:inset 0 0 0 2px var(--ncal-today)}
-.ncal-month-num{font-size:13px;font-weight:600}
-.ncal-month-dots{display:flex;gap:3px;margin-top:6px;flex-wrap:wrap}
-.ncal-dot{width:6px;height:6px;border-radius:99px}
-.ncal-aside{border-left:1px solid var(--ncal-border);padding:16px;overflow-y:auto;background:var(--ncal-bg-sub)}
-.ncal-search-wrap{margin-bottom:16px}
-.ncal-search{width:100%;border:1px solid var(--ncal-border);border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;background:var(--ncal-bg)}
-.ncal-aside-card{background:var(--ncal-bg);border:1px solid var(--ncal-border);border-radius:10px;padding:12px;margin-bottom:12px}
-.ncal-aside-card h4{margin:0 0 8px;font-size:13px;font-weight:600}
-.ncal-aside-card p{margin:0;font-size:12px;line-height:1.45}
-.ncal-muted{color:var(--ncal-muted)}
-.ncal-kbd-list{list-style:none;margin:0;padding:0;font-size:12px}
-.ncal-kbd-list li{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--ncal-border)}
-.ncal-kbd-list li:last-child{border-bottom:none}
-.ncal-kbd-list kbd{font-size:10px;padding:2px 6px;border:1px solid var(--ncal-border);border-radius:4px;background:var(--ncal-bg);color:var(--ncal-muted)}
-.ncal-drawer-backdrop{position:fixed;inset:0;background:var(--overlay-backdrop);z-index:80}
-.ncal-drawer{position:fixed;top:0;right:0;width:min(380px,100vw);height:100vh;background:var(--ncal-bg);border-left:1px solid var(--ncal-border);
-  box-shadow:var(--ncal-shadow);z-index:81;padding:20px 18px;overflow-y:auto}
-.ncal-drawer-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-.ncal-drawer-close{border:none;background:none;font-size:22px;cursor:pointer;color:var(--ncal-muted)}
-.ncal-drawer-title{width:100%;border:none;font-size:28px;font-weight:600;padding:0;margin:0 0 16px;font-family:inherit;color:var(--ncal-text)}
-.ncal-drawer-title:focus{outline:none}
-.ncal-drawer-title::placeholder{color:var(--text-muted)}
-.ncal-drawer-row{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--ncal-border);font-size:13px}
-.ncal-drawer-icon{width:20px;text-align:center;opacity:.55;flex:none;padding-top:2px}
-.ncal-drawer-time{font-weight:500}
-.ncal-drawer-date{font-size:12px;color:var(--ncal-muted);margin-top:2px}
-.ncal-drawer-row input,.ncal-drawer-row select,.ncal-drawer-desc{font-size:13px;font-family:inherit;border:1px solid var(--ncal-border);border-radius:6px;padding:6px 8px;background:var(--ncal-bg);color:var(--ncal-text)}
-.ncal-drawer-desc{width:100%;margin-top:12px;resize:vertical;min-height:72px}
-.ncal-drawer-actions{display:flex;gap:8px;margin-top:20px;justify-content:flex-end}
-.ncal-check{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer}
+.stew-boot{padding:48px 12px;text-align:center;color:var(--text-muted);font-style:italic}
+.stew-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-xl);
+  padding:18px 20px;box-shadow:0 1px 3px var(--shadow-elevated)}
+.stew-card-kicker{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-text);margin-bottom:8px}
+.stew-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.stew-card-meta{font-size:11px;color:var(--text-secondary);font-variant-numeric:tabular-nums}
+.stew-empty{font-size:12px;color:var(--text-muted);font-style:italic;margin:6px 0;line-height:1.5}
+.stew-text-link{border:none;background:none;padding:8px 0 0;font-size:12px;color:var(--gold-text);cursor:pointer;font-family:inherit;text-align:left}
+.stew-text-link:hover{text-decoration:underline}
+.stew-x{border:none;background:none;color:var(--text-muted);cursor:pointer;font-size:15px;line-height:1;padding:2px 6px;flex:none;border-radius:6px}
+.stew-x:hover{color:var(--red)}
+.stew-chip{font-size:10px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--chip-bg);color:var(--text-secondary);white-space:nowrap}
+.stew-chip.pri-high{background:var(--gold-dim);color:var(--gold-text)}
+.stew-chip.pri-medium{background:var(--chip-bg);color:var(--text-secondary)}
+.stew-chip.pri-low{background:transparent;color:var(--text-muted);border:1px dashed var(--border)}
+.stew-cat-pill{font-size:10px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap;
+  background:color-mix(in srgb,var(--cat) 14%,transparent);color:color-mix(in srgb,var(--cat) 72%,var(--text-primary))}
+.stew-progress{height:5px;background:var(--bar-track);border-radius:99px;overflow:hidden;margin:10px 0 4px}
+.stew-progress-fill{height:100%;background:var(--gold);border-radius:99px;transition:width .4s ease}
+.stew-add-row{margin-top:8px}
+.stew-add-input{width:100%;border:none;border-bottom:1px solid var(--border);border-radius:0;background:transparent;
+  padding:7px 2px;font:12px/1.4 inherit;color:var(--text-primary)}
+.stew-add-input:focus{outline:none;border-bottom-color:var(--gold);box-shadow:none}
+
+/* toolbar */
+.stew-toolbar{margin-bottom:16px}
+.stew-toolbar-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.stew-view-tabs{display:flex;background:var(--bg-card-2);border-radius:10px;padding:3px;gap:2px;flex:none}
+.stew-view-tab{border:none;background:transparent;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;
+  cursor:pointer;color:var(--text-secondary);font-family:inherit;transition:background .15s,color .15s}
+.stew-view-tab.on{background:var(--bg-card);color:var(--text-primary);box-shadow:0 1px 3px var(--shadow-elevated)}
+.stew-date-nav{display:flex;align-items:center;gap:6px}
+.stew-nav-btn{border:1px solid var(--border);background:var(--bg-card);width:30px;height:30px;border-radius:8px;
+  cursor:pointer;color:var(--text-secondary);font-size:16px;line-height:1;font-family:inherit}
+.stew-nav-btn:hover{color:var(--text-primary);border-color:var(--gold-border-soft)}
+.stew-date-label{font-family:"Cormorant Garamond",serif;font-size:18px;font-weight:600;color:var(--text-primary);
+  min-width:200px;text-align:center}
+.stew-today-btn{border:1px solid var(--border);background:var(--bg-card);border-radius:8px;padding:6px 12px;
+  font-size:12px;cursor:pointer;color:var(--text-secondary);font-family:inherit}
+.stew-today-btn:hover{color:var(--gold-text);border-color:var(--gold-border-soft)}
+.stew-toolbar-tools{display:flex;align-items:center;gap:8px;flex:1;min-width:260px;justify-content:flex-end;flex-wrap:wrap}
+.stew-quick-add{flex:1;min-width:200px;max-width:420px;border:1px solid var(--border);border-radius:10px;
+  padding:8px 12px;font:12px/1.4 inherit;background:var(--bg-card);color:var(--text-primary)}
+.stew-search{width:130px;border:1px solid var(--border);border-radius:10px;padding:8px 12px;font:12px/1.4 inherit;
+  background:var(--bg-card);color:var(--text-primary)}
+.stew-new-btn{white-space:nowrap}
+.stew-filter-row{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.stew-filter-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--bg-card);
+  border-radius:999px;padding:4px 11px;font-size:11px;cursor:pointer;color:var(--text-secondary);font-family:inherit;
+  transition:opacity .15s,border-color .15s}
+.stew-filter-chip .stew-filter-dot{width:8px;height:8px;border-radius:99px;background:var(--cat)}
+.stew-filter-chip:not(.on){opacity:.42}
+.stew-filter-chip:hover{border-color:var(--gold-border-soft);opacity:1}
+.stew-filter-clear{border:none;background:none;font-size:11px;color:var(--gold-text);cursor:pointer;font-family:inherit;padding:4px 6px}
+
+/* day view */
+.stew-top-row{display:grid;grid-template-columns:1.1fr 1fr .9fr;gap:16px;margin-bottom:16px}
+@media(max-width:1100px){.stew-top-row{grid-template-columns:1fr 1fr}.stew-verse{grid-column:1/-1}}
+@media(max-width:720px){.stew-top-row{grid-template-columns:1fr}}
+.stew-theme-input{width:100%;border:none;background:transparent;font-size:19px;font-weight:600;font-style:italic;
+  color:var(--text-primary);padding:2px 0;border-radius:0}
+.stew-theme-input:focus{outline:none;box-shadow:none}
+.stew-prayer-input{width:100%;border:none;background:transparent;font-size:13px;line-height:1.5;color:var(--text-secondary);
+  resize:none;padding:2px 0;border-radius:0}
+.stew-prayer-input:focus{outline:none;box-shadow:none;color:var(--text-primary)}
+.stew-b3-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid color-mix(in srgb,var(--border) 55%,transparent)}
+.stew-b3-row:last-of-type{border-bottom:none}
+.stew-b3-row.done .stew-b3-title{text-decoration:line-through;color:var(--text-secondary)}
+.stew-b3-num{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--gold-border);color:var(--gold-text);
+  font-size:12px;font-weight:700;display:grid;place-items:center;flex:none;font-family:"Cormorant Garamond",serif}
+.stew-b3-main{display:flex;align-items:center;gap:8px;flex:1;min-width:0;cursor:pointer}
+.stew-b3-main input{accent-color:var(--green);width:15px;height:15px;flex:none}
+.stew-b3-title{font-size:13px;font-weight:500;color:var(--text-primary)}
+.stew-b3-pick{margin-top:8px}
+.stew-b3-pick select{width:100%;font-size:12px;padding:7px 10px}
+.stew-b3-hint{margin:10px 0 0;font-size:11px;color:var(--text-muted);font-style:italic}
+.stew-verse-text{margin:0 0 8px;font-size:16px;line-height:1.55;color:var(--text-primary);font-style:italic}
+.stew-verse-ref{font-size:12px;color:var(--gold-text);font-style:normal;font-weight:600}
+.stew-day-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+@media(max-width:1100px){.stew-day-grid{grid-template-columns:1fr}}
+.stew-rail{display:flex;flex-direction:column;gap:16px}
+@media(max-width:1100px) and (min-width:721px){.stew-rail{display:grid;grid-template-columns:1fr 1fr;align-items:start}}
+
+/* timeline */
+.stew-timeline{padding:14px 16px 18px}
+.stew-timeline-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.stew-seg-tabs{display:flex;background:var(--bg-card-2);border-radius:9px;padding:2px;gap:2px}
+.stew-seg-tab{border:none;background:transparent;padding:6px 12px;border-radius:7px;font-size:11px;font-weight:600;
+  cursor:pointer;color:var(--text-secondary);font-family:inherit}
+.stew-seg-tab.on{background:var(--bg-card);color:var(--text-primary);box-shadow:0 1px 3px var(--shadow-elevated)}
+.stew-allday{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.stew-allday-pill{border:none;border-radius:8px;padding:4px 10px;font-size:11px;font-family:inherit;cursor:pointer;
+  background:color-mix(in srgb,var(--cat) 14%,var(--bg-card));color:var(--text-primary);
+  border-left:3px solid var(--cat);text-align:left;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stew-block{display:grid;grid-template-columns:118px minmax(0,1fr) auto;gap:12px;align-items:center;
+  background:color-mix(in srgb,var(--cat) 9%,var(--bg-card));border-left:3px solid var(--cat);
+  border-radius:10px;padding:10px 14px;margin:5px 0;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease}
+.stew-block:hover{transform:translateY(-1px);box-shadow:0 3px 12px var(--shadow-elevated)}
+.stew-block.done{opacity:.66}
+.stew-block.done .stew-block-title{text-decoration:line-through}
+.stew-block.current{box-shadow:0 0 0 2px var(--gold-border),0 3px 12px var(--shadow-elevated)}
+.stew-block.legacy{border-left-style:dashed}
+.stew-block-time{font-size:11.5px;font-weight:600;color:var(--text-secondary);font-variant-numeric:tabular-nums}
+.stew-block-main{min-width:0;display:flex;flex-direction:column;gap:1px}
+.stew-block-title{font-size:13.5px;font-weight:600;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stew-block-sub{font-size:11px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stew-block-side{display:flex;align-items:center;gap:10px;flex:none}
+.stew-done-circle{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);background:var(--bg-card);
+  cursor:pointer;flex:none;display:grid;place-items:center;font-size:12px;color:transparent;
+  transition:background .15s,border-color .15s,color .15s;padding:0}
+.stew-done-circle:hover{border-color:var(--green)}
+.stew-done-circle.on{background:var(--green);border-color:var(--green);color:var(--text-on-green)}
+.stew-done-circle.sm{width:21px;height:21px;font-size:11px}
+.stew-hour-empty{display:flex;align-items:center;gap:10px;padding:5px 14px;min-height:26px;border-radius:8px;cursor:pointer}
+.stew-hour-empty:hover,.stew-hour-empty.drop-hover{background:var(--gold-fill-06)}
+.stew-hour-empty:hover .stew-hour-line::after{content:"+ add";font-size:10px;color:var(--gold-text)}
+.stew-hour-empty.now{background:var(--gold-fill-06)}
+.stew-hour-empty.now .stew-hour-label{color:var(--gold-text);font-weight:700}
+.stew-hour-label{font-size:10px;color:var(--text-muted);width:44px;flex:none;font-variant-numeric:tabular-nums}
+.stew-hour-line{flex:1;border-bottom:1px dashed color-mix(in srgb,var(--border) 70%,transparent);
+  display:flex;justify-content:center;line-height:0;padding-bottom:2px}
+.stew-timeline-empty{padding:20px 8px}
+.drop-hover{outline:2px dashed var(--gold-border);outline-offset:-2px}
+
+/* Faithfulness Ring */
+.stew-ring-wrap{display:flex;align-items:center;gap:16px}
+.stew-ring-svg{width:128px;height:128px;flex:none}
+.stew-ring-score{font-family:"Cormorant Garamond",serif;font-size:30px;font-weight:700;fill:var(--text-primary)}
+.stew-ring-caption{font-size:7.5px;letter-spacing:.14em;text-transform:uppercase;fill:var(--text-secondary)}
+.stew-ring-legend{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.stew-ring-row{display:flex;align-items:center;gap:7px;font-size:11.5px}
+.stew-ring-dot{width:8px;height:8px;border-radius:99px;flex:none}
+.dot-gold{background:var(--gold)} .dot-green{background:var(--green)}
+.dot-deep{background:#5b6ba8} .dot-rest{background:#6a9a94}
+.stew-ring-key{color:var(--text-secondary);flex:1}
+.stew-ring-val{color:var(--text-primary);font-weight:600;font-variant-numeric:tabular-nums}
+.stew-ring-word{margin:12px 0 0;font-size:12.5px;line-height:1.5;color:var(--text-secondary);font-style:italic;
+  border-top:1px solid color-mix(in srgb,var(--border) 55%,transparent);padding-top:10px}
+
+/* habits */
+.stew-habit-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid color-mix(in srgb,var(--border) 45%,transparent)}
+.stew-habit-row:last-of-type{border-bottom:none}
+.stew-habit-row.done .stew-habit-title{color:var(--text-secondary)}
+.stew-habit-icon{font-size:14px;flex:none;width:20px;text-align:center}
+.stew-habit-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.stew-habit-title{font-size:13px;font-weight:500;color:var(--text-primary)}
+.stew-habit-meta{font-size:10px;color:var(--text-muted)}
+.stew-h-hist{display:flex;gap:3px;flex:none}
+.stew-h-dot{width:6px;height:6px;border-radius:99px;background:var(--bar-track)}
+.stew-h-dot.hit{background:var(--green)}
+.stew-h-dot.miss{background:color-mix(in srgb,var(--red) 25%,transparent)}
+.stew-h-dot.na{background:transparent;border:1px solid var(--bar-track)}
+
+/* overflow inbox */
+.stew-of-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid color-mix(in srgb,var(--border) 45%,transparent)}
+.stew-of-row:last-of-type{border-bottom:none}
+.stew-of-grip{color:var(--text-muted);font-size:9px;cursor:grab;letter-spacing:-1px;flex:none}
+.stew-of-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.stew-of-title{font-size:12.5px;font-weight:500;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stew-of-meta{font-size:10px;color:var(--text-muted)}
+.stew-of-menu{position:relative;flex:none}
+.stew-of-menu summary{list-style:none;cursor:pointer;width:24px;height:24px;display:grid;place-items:center;
+  border-radius:6px;color:var(--text-secondary);border:1px solid transparent}
+.stew-of-menu summary::-webkit-details-marker{display:none}
+.stew-of-menu summary:hover{border-color:var(--border)}
+.stew-of-menu-list{position:absolute;right:0;top:26px;z-index:30;background:var(--bg-card);border:1px solid var(--border);
+  border-radius:10px;box-shadow:0 8px 24px var(--shadow-elevated);padding:4px;min-width:150px}
+.stew-of-menu-list button{display:block;width:100%;text-align:left;border:none;background:none;padding:7px 10px;
+  font-size:12px;color:var(--text-primary);cursor:pointer;font-family:inherit;border-radius:6px}
+.stew-of-menu-list button:hover{background:var(--bg-hover)}
+.stew-of-hint{margin:10px 0 0;font-size:10.5px;color:var(--text-muted);font-style:italic}
+
+/* reflection */
+.stew-refl-q{margin:0 0 8px;font-size:16px;color:var(--text-primary);font-style:italic}
+.stew-refl-input{width:100%;border:1px solid var(--border);border-radius:10px;background:var(--bg-card-2);
+  padding:10px 12px;font:13px/1.55 inherit;color:var(--text-primary);resize:vertical}
+.stew-refl-chips{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.stew-refl-chip{border:1px solid var(--border);background:var(--bg-card);border-radius:999px;padding:4px 11px;
+  font-size:11px;cursor:pointer;color:var(--text-secondary);font-family:inherit}
+.stew-refl-chip:hover{color:var(--gold-text);border-color:var(--gold-border-soft)}
+
+/* week view */
+.stew-week-card{padding:0;overflow:hidden}
+.stew-week-scroll{overflow-x:auto}
+.stew-week{min-width:760px}
+.stew-week-head{display:grid;grid-template-columns:52px repeat(7,1fr);border-bottom:1px solid var(--border)}
+.stew-wcol-head{padding:10px 6px;text-align:center;border-left:1px solid color-mix(in srgb,var(--border) 55%,transparent);
+  border-top:none;border-right:none;border-bottom:none;background:none;cursor:pointer;font-family:inherit}
+.stew-wcol-head:hover .stew-wdom{color:var(--gold-text)}
+.stew-wdow{display:block;font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em}
+.stew-wdom{display:block;font-family:"Cormorant Garamond",serif;font-size:19px;font-weight:600;margin-top:2px;color:var(--text-primary)}
+.stew-wcol-head.today .stew-wdom{background:var(--gold);color:var(--text-on-gold);border-radius:999px;
+  display:inline-flex;width:30px;height:30px;align-items:center;justify-content:center}
+.stew-week-allday{display:grid;grid-template-columns:52px repeat(7,1fr);border-bottom:1px solid var(--border);min-height:34px}
+.stew-wgutter-label{font-size:9px;color:var(--text-muted);padding:8px 6px;text-align:right}
+.stew-wallday-col{border-left:1px solid color-mix(in srgb,var(--border) 55%,transparent);padding:4px;display:flex;flex-wrap:wrap;gap:3px;align-content:flex-start}
+.stew-wallday-col .stew-allday-pill{font-size:10px;padding:2px 7px}
+.stew-week-body{display:grid;grid-template-columns:52px 1fr}
+.stew-wgutter{border-right:1px solid color-mix(in srgb,var(--border) 55%,transparent)}
+.stew-whour-label{font-size:9.5px;color:var(--text-muted);text-align:right;padding:0 6px;transform:translateY(-6px)}
+.stew-wcols{display:grid;grid-template-columns:repeat(7,1fr)}
+.stew-wday-col{position:relative;border-left:1px solid color-mix(in srgb,var(--border) 55%,transparent)}
+.stew-wslot{border-bottom:1px solid color-mix(in srgb,var(--border) 40%,transparent);cursor:pointer}
+.stew-wslot:hover,.stew-wslot.drop-hover{background:var(--gold-fill-06)}
+.stew-now-line{position:absolute;left:0;right:0;height:2px;background:var(--gold);z-index:2;pointer-events:none}
+.stew-now-line::before{content:"";position:absolute;left:-3px;top:-3px;width:8px;height:8px;border-radius:99px;background:var(--gold)}
+.stew-wevent{position:absolute;left:3px;right:3px;border:none;border-radius:7px;padding:4px 7px;text-align:left;
+  cursor:pointer;font-family:inherit;overflow:hidden;z-index:1;
+  background:color-mix(in srgb,var(--cat) 16%,var(--bg-card));border-left:3px solid var(--cat);
+  transition:box-shadow .12s}
+.stew-wevent:hover{box-shadow:0 2px 10px var(--shadow-elevated);z-index:3}
+.stew-wevent.done{opacity:.55}
+.stew-wevent.done .stew-wevent-title{text-decoration:line-through}
+.stew-wevent-title{display:block;font-size:11px;font-weight:600;line-height:1.25;color:var(--text-primary);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stew-wevent-time{display:block;font-size:9.5px;color:var(--text-secondary);margin-top:1px}
+
+/* month view */
+.stew-month{padding:14px}
+.stew-mhead{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
+.stew-mhead span{text-align:center;font-size:10.5px;color:var(--text-muted);padding:4px;text-transform:uppercase;letter-spacing:.05em}
+.stew-mgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.stew-mcell{border:1px solid color-mix(in srgb,var(--border) 70%,transparent);border-radius:10px;min-height:92px;
+  padding:6px;background:var(--bg-card);cursor:pointer;font-family:inherit;text-align:left;
+  display:flex;flex-direction:column;gap:2px;overflow:hidden;transition:border-color .15s}
+.stew-mcell:hover{border-color:var(--gold-border-soft)}
+.stew-mcell.empty{border:none;background:transparent;cursor:default}
+.stew-mcell.today{box-shadow:inset 0 0 0 2px var(--gold-border)}
+.stew-mnum{font-size:12px;font-weight:600;color:var(--text-primary);font-family:"Cormorant Garamond",serif}
+.stew-mevent{font-size:9px;line-height:1.3;padding:1px 5px;border-radius:4px;color:var(--text-primary);
+  background:color-mix(in srgb,var(--cat) 14%,transparent);border-left:2px solid var(--cat);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stew-mmore{font-size:9px;color:var(--text-muted)}
+
+/* agenda view */
+.stew-agenda{padding:8px 20px 20px}
+.stew-agenda-day{padding:14px 0;border-bottom:1px solid color-mix(in srgb,var(--border) 55%,transparent)}
+.stew-agenda-day:last-child{border-bottom:none}
+.stew-agenda-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:6px}
+.stew-agenda-date{border:none;background:none;padding:0;font-family:"Cormorant Garamond",serif;font-size:17px;
+  color:var(--text-primary);cursor:pointer;text-align:left}
+.stew-agenda-date:hover{color:var(--gold-text)}
+.stew-agenda-date strong{color:var(--gold-text)}
+.stew-agenda-row{display:flex;align-items:center;gap:12px;padding:7px 10px;border-radius:9px;cursor:pointer;
+  border-left:3px solid var(--cat);background:color-mix(in srgb,var(--cat) 6%,transparent);margin:4px 0}
+.stew-agenda-row:hover{background:color-mix(in srgb,var(--cat) 12%,transparent)}
+.stew-agenda-row.done{opacity:.6}
+.stew-agenda-row.done .stew-agenda-title{text-decoration:line-through}
+.stew-agenda-time{font-size:11px;font-weight:600;color:var(--text-secondary);width:70px;flex:none;font-variant-numeric:tabular-nums}
+.stew-agenda-title{flex:1;min-width:0;font-size:13px;font-weight:500;color:var(--text-primary);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* planning view */
+.stew-planning{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;align-items:start}
+@media(max-width:1000px){.stew-planning{grid-template-columns:1fr}}
+.stew-plan-col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.stew-plan-title{margin:0 0 -4px;font-size:20px;font-weight:600;color:var(--text-primary)}
+.stew-goal-title{margin:0;font-size:20px;font-weight:600;color:var(--text-primary);line-height:1.25}
+.stew-goal-why{margin:6px 0 0;font-size:12.5px;color:var(--text-secondary);line-height:1.5;font-style:italic}
+.stew-milestones{margin-top:10px;display:flex;flex-direction:column;gap:2px}
+.stew-project{margin-top:14px;border-left:2px solid var(--gold-border-soft);padding-left:12px}
+.stew-project-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px}
+.stew-project-title{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--gold-text)}
+.stew-ptask{display:flex;align-items:center;gap:8px;padding:6px 0;flex-wrap:wrap}
+.stew-ptask.done .stew-ptask-check span{text-decoration:line-through;color:var(--text-secondary)}
+.stew-ptask-check{display:flex;align-items:center;gap:8px;flex:1;min-width:160px;cursor:pointer;font-size:13px;color:var(--text-primary)}
+.stew-ptask-check input{accent-color:var(--green);width:15px;height:15px;flex:none}
+.stew-ptask-meta{display:flex;gap:4px;flex-wrap:wrap}
+.stew-ptask-actions{display:flex;gap:2px;flex:none}
+.stew-icon-act{border:none;background:none;width:24px;height:24px;border-radius:6px;cursor:pointer;
+  color:var(--text-muted);font-size:12px;padding:0;font-family:inherit}
+.stew-icon-act:hover{background:var(--bg-hover);color:var(--gold-text)}
+.stew-icon-act.on{color:var(--gold-text)}
+.stew-subtasks{display:flex;flex-direction:column;gap:1px;margin:0 0 4px 24px}
+.stew-subtask{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-secondary);cursor:pointer;padding:2px 0}
+.stew-subtask input{accent-color:var(--green);width:13px;height:13px;flex:none}
+.stew-subtask.done{text-decoration:line-through;color:var(--text-muted)}
+.stew-add-goal-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.stew-add-goal-row .stew-add-input{flex:2 1 200px;width:auto}
+.stew-add-goal-row select{flex:1 1 110px;width:auto;font-size:12px;padding:7px 10px}
+.stew-tpl-row{display:flex;align-items:center;gap:10px;padding:8px 0 8px 10px;border-left:3px solid var(--cat);
+  border-bottom:1px solid color-mix(in srgb,var(--border) 45%,transparent);margin:2px 0}
+.stew-tpl-row:last-of-type{border-bottom:none}
+.stew-tpl-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.stew-habit-manage{display:flex;align-items:center;gap:8px;padding:6px 0;flex-wrap:wrap}
+.stew-habit-manage .stew-add-input{flex:2 1 130px;width:auto}
+.stew-habit-manage select{font-size:11px;padding:5px 7px;width:auto}
+.stew-review-links{display:flex;flex-direction:column}
+.stew-review-link{display:flex;flex-direction:column;gap:2px;text-align:left;border:1px solid var(--border);
+  background:var(--bg-card-2);border-radius:10px;padding:12px 14px;margin-top:8px;cursor:pointer;font-family:inherit}
+.stew-review-link:hover{border-color:var(--gold-border-soft)}
+.stew-review-link strong{font-size:13px;color:var(--text-primary);font-family:"Cormorant Garamond",serif}
+.stew-review-link span{font-size:11px;color:var(--text-secondary)}
+
+/* drawer */
+.stew-drawer{position:fixed;top:0;right:0;width:min(460px,100vw);height:100vh;z-index:81;background:var(--bg-card);
+  border-left:1px solid var(--border);overflow-y:auto;box-shadow:-8px 0 40px var(--shadow-elevated);padding:0 22px 32px}
+.stew-drawer[hidden]{display:none}
+.stew-dr-accent{height:4px;margin:0 -22px;background:var(--cat,var(--gold))}
+.stew-dr-head{display:flex;align-items:center;justify-content:space-between;padding:14px 0 4px}
+.stew-dr-mode{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted)}
+.stew-dr-close{border:none;background:none;font-size:24px;color:var(--text-muted);cursor:pointer;line-height:1;padding:2px 6px}
+.stew-dr-title{width:100%;border:none;background:transparent;font-size:24px;font-weight:600;color:var(--text-primary);
+  padding:4px 0 10px;border-radius:0}
+.stew-dr-title:focus{outline:none;box-shadow:none}
+.stew-dr-note{margin:0 0 10px;font-size:11px;color:var(--text-muted);font-style:italic}
+.stew-dr-tpls{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.stew-dr-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;margin-bottom:6px}
+.stew-dr-grid label{display:flex;flex-direction:column;gap:4px;font-size:10.5px;font-weight:600;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--text-secondary)}
+.stew-dr-grid input,.stew-dr-grid select{font-size:13px;padding:7px 9px}
+.stew-dr-section{margin-top:18px;padding-top:14px;border-top:1px solid color-mix(in srgb,var(--border) 55%,transparent)}
+.stew-dr-section h4{margin:0 0 8px;font-family:"Cormorant Garamond",serif;font-size:15px;font-weight:600;color:var(--text-primary)}
+.stew-dr-section select{width:100%;font-size:12px;padding:7px 9px;margin-top:6px}
+.stew-dr-section textarea{width:100%;font-size:13px}
+.stew-dr-task{padding:5px 0;position:relative}
+.stew-dr-task>label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-primary);cursor:pointer;padding-right:26px}
+.stew-dr-task>label input{accent-color:var(--green);width:15px;height:15px;flex:none}
+.stew-dr-task>label span.done{text-decoration:line-through;color:var(--text-secondary)}
+.stew-dr-task>.stew-x{position:absolute;right:0;top:5px}
+.stew-dr-habit{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-primary);cursor:pointer;padding:4px 0}
+.stew-dr-habit input{accent-color:var(--green);width:15px;height:15px;flex:none}
+.stew-dr-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:22px;padding-top:14px;
+  border-top:1px solid var(--border)}
+.stew-dr-spacer{flex:1}
+.stew-dr-complete{border:1.5px solid var(--green);background:var(--green);color:var(--text-on-green);border-radius:9px;
+  padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.stew-dr-complete:hover{filter:brightness(1.06)}
+.stew-dr-complete.undone{background:transparent;color:var(--green)}
+.stew-dr-delete{color:var(--red);border-color:var(--red-border-soft)}
+.stew-dr-delete:hover{background:var(--red-bg);color:var(--red)}
+.stew-drawer-backdrop,.ncal-drawer-backdrop{position:fixed;inset:0;background:var(--overlay-backdrop);z-index:80}
+
+@media(max-width:720px){
+  .stew-date-label{min-width:0;font-size:15px}
+  .stew-block{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"time side" "main side"}
+  .stew-block-time{grid-area:time}
+  .stew-block-main{grid-area:main}
+  .stew-block-side{grid-area:side}
+  .stew-toolbar-tools{justify-content:stretch}
+  .stew-quick-add{max-width:none}
+  .stew-drawer{padding:0 16px 28px}
+}
 .cal-grid-wrap.full-width{border:1px solid var(--border-subtle);border-radius:14px;padding:12px;background:var(--bg-card)}
 .cal-grid{transition:grid-template-rows .25s ease}
 .cal-cell.expanded{grid-column:span 2;grid-row:span 2;min-height:280px;z-index:2;border-color:var(--gold);background:var(--bg-card-hover);transition:all .25s ease}
@@ -1615,55 +1854,10 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold-text)}
 </section>
 
 <section id="calendarPanel" hidden aria-label="Calendar">
-  <div class="ncal-shell">
-    <aside class="ncal-sidebar">
-      <div class="ncal-mini" id="ncalMini"></div>
-      <div class="ncal-sidebar-section">
-        <h4 class="ncal-sidebar-title">Calendars</h4>
-        <div class="ncal-filters" id="ncalFilters"></div>
-      </div>
-      <div class="ncal-sidebar-section">
-        <button type="button" class="ncal-text-btn" id="ncalMyWeekToggle">Edit recurring blocks</button>
-        <div class="ncal-my-week" id="ncalMyWeek" hidden></div>
-      </div>
-    </aside>
-    <div class="ncal-center">
-      <header class="ncal-toolbar">
-        <h1 class="ncal-title" id="ncalTitle"></h1>
-        <div class="ncal-toolbar-actions">
-          <select class="ncal-select" id="ncalViewSelect" aria-label="View">
-            <option value="week" selected>Week</option>
-            <option value="month">Month</option>
-          </select>
-          <button type="button" class="ncal-btn" id="ncalToday">Today</button>
-          <button type="button" class="ncal-icon-btn" id="ncalPrev" aria-label="Previous">‹</button>
-          <button type="button" class="ncal-icon-btn" id="ncalNext" aria-label="Next">›</button>
-          <button type="button" class="ncal-btn ncal-btn-primary" id="ncalNewEvent">+ New event</button>
-        </div>
-      </header>
-      <div class="ncal-grid-scroll" id="ncalGridScroll">
-        <div id="ncalGrid"></div>
-      </div>
-    </div>
-    <aside class="ncal-aside">
-      <div class="ncal-search-wrap">
-        <input type="search" class="ncal-search" id="ncalSearch" placeholder="Search events" aria-label="Search events">
-      </div>
-      <div class="ncal-aside-card">
-        <h4>Welcome to Calendar</h4>
-        <p class="ncal-muted">Click any hour to add an event. Click an event to edit.</p>
-      </div>
-      <div class="ncal-aside-card">
-        <h4>Useful shortcuts</h4>
-        <ul class="ncal-kbd-list">
-          <li><span>Today</span><kbd>T</kbd></li>
-          <li><span>Close panel</span><kbd>Esc</kbd></li>
-        </ul>
-      </div>
-    </aside>
-  </div>
-  <div class="ncal-drawer-backdrop" id="ncalDrawerBackdrop" hidden></div>
-  <aside class="ncal-drawer" id="ncalDrawer" hidden aria-label="Event details"></aside>
+  <div id="stewToolbar"></div>
+  <div id="stewBody" class="stew-body"><p class="stew-boot">Preparing your day…</p></div>
+  <div class="ncal-drawer-backdrop" id="stewDrawerBackdrop" hidden></div>
+  <aside class="stew-drawer" id="stewDrawer" hidden aria-label="Time block details"></aside>
 </section>
 
 <section id="tagLensPanel" hidden aria-label="Tagged items">
@@ -1881,11 +2075,12 @@ body.faithfulness-app #dailyBoard .ff-progress{color:var(--gold-text)}
 <script src="mentorship-ui.js?v=7"></script>
 <script src="tags-ui.js"></script>
 <script src="projects-ui.js"></script>
-<script src="journal-ui.js"></script>
-<script src="ideas-hub.js?v=5" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
-<script src="calendar-ui.js?v=1"></script>
+<script src="journal-ui.js?v=2"></script>
+<script src="ideas-hub.js?v=6" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
+<script src="stewardship-store.js?v=1"></script>
+<script src="calendar-ui.js?v=2"></script>
 <script src="daily-ui.js?v=1"></script>
-<script src="dashboard-ui.js"></script>
+<script src="dashboard-ui.js?v=2"></script>
 <script>
 
 if (!window.storage) {
@@ -1926,6 +2121,7 @@ let sb = null;
 let authUser = null;
 let cloudPushTimer = null;
 let cloudPushKeys = new Set();
+let cloudPushDeadline = 0;
 
 function initSupabaseClient(){
   if(!window.supabase?.createClient) return null;
@@ -1933,8 +2129,25 @@ function initSupabaseClient(){
   return sb;
 }
 function isSyncableKey(key){
+  if(key.startsWith('fs:ideas-attach:')) return false;   // large data-URLs stay on-device
   return key.startsWith('fs-day:') || key.startsWith('journal:') ||
-    key.startsWith('fs-week:') || key.startsWith('fs-month:') || key === 'fs-globals' || key === 'fs-core';
+    key.startsWith('fs-week:') || key.startsWith('fs-month:') ||
+    key === 'fs-globals' || key === 'fs-core' || key === 'fs-stewardship' ||
+    key === 'fs:ideas-hub' || key === 'fs:ideas-activity' || key === 'fs:ideas-focus-minutes' ||
+    key === 'fs:journal-custom-prompts' || key.startsWith('fs:dismissed:');
+}
+/* `fs:*` keys are written by modules straight to localStorage (no wsr: prefix);
+   everything else goes through window.storage. These two helpers give the sync
+   layer one way to read/write either kind. */
+function isRawLocalKey(key){ return key.startsWith('fs:'); }
+async function getLocalValue(key){
+  if(isRawLocalKey(key)){ try{ return localStorage.getItem(key); }catch{ return null; } }
+  const r = await window.storage.get(key);
+  return r?.value ?? null;
+}
+async function setLocalValue(key, value){
+  if(isRawLocalKey(key)){ try{ localStorage.setItem(key, value); return true; }catch{ return false; } }
+  return window.storage.set(key, value);
 }
 function syncMetaKey(storageKey){ return 'sync-at:'+storageKey; }
 function getLocalSyncAt(storageKey){
@@ -1979,41 +2192,19 @@ function syncKeysForView(){
   const keys = [];
   if(isPrayer()) keys.push('fs-globals');
   else keys.push(currentKey());
-  if(!keys.includes('fs-globals')) keys.push('fs-globals');
-  if(!keys.includes('fs-core')) keys.push('fs-core');
-  return keys.filter(isSyncableKey);
-}
-async function syncPullKey(storageKey){
-  if(!authUser || !sb) return false;
-  try{
-    const { data, error } = await sb.from('entries')
-      .select('data, updated_at')
-      .eq('user_id', authUser.id)
-      .eq('date', storageKey)
-      .maybeSingle();
-    if(error) throw error;
-    if(!data) return false;
-    const cloudAt = new Date(data.updated_at).getTime();
-    const localAt = getLocalSyncAt(storageKey);
-    if(cloudAt > localAt){
-      await window.storage.set(storageKey, JSON.stringify(data.data));
-      setLocalSyncAt(storageKey, cloudAt);
-      return true;
-    }
-    return false;
-  }catch(e){
-    console.warn('Sync pull failed:', storageKey, e);
-    return null;
-  }
+  keys.push('fs-globals', 'fs-core', 'fs-stewardship',
+    'fs:ideas-hub', 'fs:ideas-activity', 'fs:ideas-focus-minutes',
+    'fs:journal-custom-prompts', 'fs:dismissed:'+iso(dayOf(0)));
+  return [...new Set(keys)].filter(isSyncableKey);
 }
 async function syncPushKey(storageKey, dataObj){
   if(!authUser || !sb) return false;
   try{
-    const { error } = await sb.from('entries').upsert({
+    const { error } = await sb.from('app_data').upsert({
       user_id: authUser.id,
-      date: storageKey,
+      key: storageKey,
       data: dataObj
-    }, { onConflict: 'user_id,date' });
+    }, { onConflict: 'user_id,key' });
     if(error) throw error;
     setLocalSyncAt(storageKey, Date.now());
     return true;
@@ -2022,13 +2213,39 @@ async function syncPushKey(storageKey, dataObj){
     return false;
   }
 }
+/** Apply one pulled cloud row locally (newest-wins), then refresh the store it feeds. */
+async function applyPulledRow(key, dataObj, updatedAt){
+  const cloudAt = new Date(updatedAt).getTime();
+  if(cloudAt <= getLocalSyncAt(key)) return false;
+  await setLocalValue(key, JSON.stringify(dataObj));
+  setLocalSyncAt(key, cloudAt);
+  if(key === 'fs-core' && faithStore) await faithStore.load();
+  if(key === 'fs-stewardship' && window.StewStore) await window.StewStore.load();
+  if(key === 'fs:ideas-hub' && window.IdeasStore?.reload){
+    window.IdeasStore.reload();
+    if(isIdeas() && typeof loadIdeasHub === 'function') loadIdeasHub();
+  }
+  return true;
+}
 async function syncPullForView(){
-  if(!authUser) return;
+  if(!authUser || !sb) return;
+  const keys = syncKeysForView();
+  let rows;
+  try{
+    const { data, error } = await sb.from('app_data')
+      .select('key, data, updated_at')
+      .eq('user_id', authUser.id)
+      .in('key', keys);
+    if(error) throw error;
+    rows = data || [];
+  }catch(e){
+    console.warn('Sync pull failed:', e);
+    return;
+  }
   let globalsPulled = false;
-  for(const key of syncKeysForView()){
-    const r = await syncPullKey(key);
-    if(r && key === 'fs-globals') globalsPulled = true;
-    if(r && key === 'fs-core' && faithStore) await faithStore.load();
+  for(const row of rows){
+    const applied = await applyPulledRow(row.key, row.data, row.updated_at);
+    if(applied && row.key === 'fs-globals') globalsPulled = true;
   }
   if(globalsPulled){
     const g = await getJSON('fs-globals');
@@ -2047,20 +2264,26 @@ async function syncPullForView(){
 function scheduleCloudPush(keys){
   if(!authUser) return;
   keys.forEach(k=>{ if(isSyncableKey(k)) cloudPushKeys.add(k); });
+  if(!cloudPushKeys.size) return;
+  // Debounced 2s, but with a max-wait: continuous edits can delay the
+  // flush, never postpone it past 10s.
+  const now = Date.now();
+  if(!cloudPushDeadline) cloudPushDeadline = now + 10000;
   clearTimeout(cloudPushTimer);
-  cloudPushTimer = setTimeout(flushCloudPush, 2000);
+  cloudPushTimer = setTimeout(flushCloudPush, Math.min(2000, Math.max(100, cloudPushDeadline - now)));
 }
 async function flushCloudPush(){
+  cloudPushDeadline = 0;
   if(!authUser || !cloudPushKeys.size) return;
   const keys = [...cloudPushKeys];
   cloudPushKeys.clear();
   if(!dirty) updateSaveState('syncing');
   let allOk = true;
   for(const key of keys){
-    const raw = await window.storage.get(key);
-    if(!raw?.value) continue;
+    const raw = await getLocalValue(key);
+    if(raw == null || raw === '') continue;
     let data;
-    try{ data = JSON.parse(raw.value); }catch{ continue; }
+    try{ data = JSON.parse(raw); }catch{ continue; }
     if(!(await syncPushKey(key, data))) allOk = false;
   }
   if(!dirty){
@@ -2071,35 +2294,40 @@ async function flushCloudPush(){
     }
   }
 }
+/**
+ * One-time sweep after sign-in (re-runs once per user after the app_data
+ * upgrade, via the -v2 flag): every syncable key found locally — both the
+ * wsr:-wrapped keys and the raw fs:* module keys — is reconciled against
+ * app_data. Local-only data is uploaded; a newer cloud copy wins locally.
+ */
 async function migrateLocalToCloud(){
   if(!authUser || !sb) return;
-  const flag = 'wsr:migration-done';
+  const flag = 'wsr:migration-done-v2';
   if(localStorage.getItem(flag) === authUser.id) return;
-  const keys = [];
+  const keys = new Set();
   for(let i = 0; i < localStorage.length; i++){
     const full = localStorage.key(i);
-    if(!full?.startsWith('wsr:')) continue;
-    const key = full.slice(4);
-    if(isSyncableKey(key)) keys.push(key);
+    if(!full) continue;
+    const key = full.startsWith('wsr:') ? full.slice(4) : full;
+    if(isSyncableKey(key)) keys.add(key);
   }
   for(const key of keys){
-    const raw = localStorage.getItem('wsr:'+key);
-    if(!raw) continue;
+    const raw = await getLocalValue(key);
+    if(raw == null || raw === '') continue;
     let data;
     try{ data = JSON.parse(raw); }catch{ continue; }
     const localAt = getLocalSyncAt(key) || Date.now();
     try{
-      const { data: row, error } = await sb.from('entries')
+      const { data: row, error } = await sb.from('app_data')
         .select('data, updated_at')
         .eq('user_id', authUser.id)
-        .eq('date', key)
+        .eq('key', key)
         .maybeSingle();
       if(error) throw error;
       if(row){
         const cloudAt = new Date(row.updated_at).getTime();
         if(cloudAt >= localAt){
-          await window.storage.set(key, JSON.stringify(row.data));
-          setLocalSyncAt(key, cloudAt);
+          await applyPulledRow(key, row.data, row.updated_at);
           continue;
         }
       }
@@ -2495,7 +2723,6 @@ async function moveIdeaSchedule(ideaId,newDate){
         newDay.execute[field]=step;
         await saveDayDataByDate(newDate,newDay);
         IdeasStore.updateIdea(ideaId,{ schedule:{ ...idea.schedule, date:newDate } });
-        if(typeof globals !== 'undefined') globals.ideasHub=IdeasStore.getIdeas();
         markDirty(); window.renderCalendar?.();
         if(typeof loadIdeasHub==='function' && isIdeas()) loadIdeasHub();
       }
@@ -3016,7 +3243,10 @@ async function initFaithStore(){
     const seeded = MentorshipSeed.seedInitialMentorshipNotes(faithStore);
     if(seeded.created) await faithStore.save();
   }
-  faithStore.onChange(()=>{ dirty = true; updateSaveState('dirty'); scheduleSave(); });
+  // Ignore the echo emitted by faithStore.save() inside save() itself —
+  // otherwise every save marks dirty again and the app saves in a loop,
+  // perpetually resetting the cloud-push debounce.
+  faithStore.onChange(()=>{ if(saving) return; dirty = true; updateSaveState('dirty'); scheduleSave(); });
   return faithStore;
 }
 
@@ -3089,7 +3319,6 @@ async function save(){
   const savedKeys = ['fs-globals'];
   try{
     const S = window.storage;
-    if(typeof IdeasStore !== 'undefined') globals.ideasHub = IdeasStore.getIdeas();
     const ops = [S.set('view-mode', viewMode), S.set('fs-globals', JSON.stringify(globals))];
     if(isJournal()){ ops.push(S.set(journalKeyFor(dayOffset), JSON.stringify(journal))); savedKeys.push(journalKeyFor(dayOffset)); }
     else if(isDaily()){ ops.push(S.set(dayKeyFor(dayOffset), JSON.stringify(dayData))); savedKeys.push(dayKeyFor(dayOffset)); }
@@ -4481,6 +4710,7 @@ async function resetAll(){
   if(typeof IdeasStore !== 'undefined') IdeasStore.init(globals.ideasHub || globals.ideas);
   faithStoreInitPromise = initFaithStore();
   await faithStoreInitPromise;
+  await window.StewStore?.init().catch(e=>console.warn('[StewStore] init failed', e));
   await initAuth();
   if(new URLSearchParams(location.search).get('test')==='store' && typeof runFaithfulnessStoreTests === 'function'){
     const out = await runFaithfulnessStoreTests(()=> new FaithfulnessStore(createMemoryStorage()));
@@ -4492,7 +4722,6 @@ async function resetAll(){
   bindDashboardEvents?.();
   bindTagEvents?.();
   bindMentorshipEvents?.();
-  bindCalendarEvents?.();
   renderMentorshipNav?.();
   if(isMentorship()) loadMentorship?.();
   document.querySelectorAll('[data-nav]').forEach(btn=>{
