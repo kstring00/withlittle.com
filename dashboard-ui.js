@@ -334,6 +334,7 @@
 
     document.getElementById('dashGreeting').textContent = timeGreeting() + ', ' + USER_NAME;
     document.getElementById('dashSummary').textContent = buildSummaryLine(summary);
+    window.updateDashIntakeUI?.();
     document.getElementById('dashStatFraction').textContent = summary.tasksCompleted + ' / ' + summary.tasksTotal;
     document.getElementById('dashStatPct').textContent = pct + '%';
     document.getElementById('dashStatBar').style.width = pct + '%';
