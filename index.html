@@ -1955,6 +1955,7 @@ body.view-dashboard #settingsPanel,body.view-dashboard #mentorshipPanel,body.vie
 /* Off-canvas sidebar on small screens */
 .sidebar-toggle{display:none;font-size:16px;padding:6px 10px;line-height:1}
 .sidebar-backdrop{position:fixed;inset:0;background:var(--overlay-backdrop);z-index:49}
+.sidebar-backdrop[hidden],.ncal-drawer-backdrop[hidden],.ih-workspace-backdrop[hidden],.intake-overlay[hidden]{display:none!important;pointer-events:none!important}
 @media(max-width:720px){
   .app-sidebar{position:fixed;left:0;top:0;transform:translateX(-100%);box-shadow:none}
   body.sidebar-open .app-sidebar{transform:translateX(0);box-shadow:8px 0 32px var(--shadow-elevated)}
@@ -4928,8 +4929,52 @@ function updateFlowSteps(){
   });
 }
 
+function setMobileSidebar(open){
+  document.body.classList.toggle('sidebar-open', open);
+  const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+  if(sidebarBackdrop) sidebarBackdrop.hidden = !open;
+  document.getElementById('btnSidebarToggle')?.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function bindNavEvents(){
+  if(document.body.dataset.navBound) return;
+  document.body.dataset.navBound = '1';
+  document.getElementById('prevP')?.addEventListener('click', ()=> nav(-1));
+  document.getElementById('nextP')?.addEventListener('click', ()=> nav(1));
+  document.getElementById('btnSidebarToggle')?.addEventListener('click', ()=>
+    setMobileSidebar(!document.body.classList.contains('sidebar-open')));
+  document.getElementById('sidebarBackdrop')?.addEventListener('click', ()=> setMobileSidebar(false));
+  document.querySelector('.sidebar-nav')?.addEventListener('click', e=>{
+    const navBtn = e.target.closest('[data-nav]');
+    if(navBtn){
+      setMode(navBtn.dataset.nav);
+      setMobileSidebar(false);
+      return;
+    }
+    if(e.target.closest('#navRhythmsToggle')){
+      const sub = document.getElementById('navRhythmsSub');
+      const btn = document.getElementById('navRhythmsToggle');
+      const open = sub?.classList.toggle('open');
+      if(btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      return;
+    }
+    if(e.target.closest('#navMentorshipToggle')){
+      const sub = document.getElementById('navMentorshipSub');
+      const btn = document.getElementById('navMentorshipToggle');
+      sub?.classList.toggle('open');
+      if(btn) btn.setAttribute('aria-expanded', sub?.classList.contains('open') ? 'true' : 'false');
+      if(!isMentorship()) setMode('mentorship-threads');
+      return;
+    }
+  });
+  document.querySelectorAll('[data-nav]').forEach(btn=>{
+    if(btn.closest('.sidebar-nav')) return;
+    btn.addEventListener('click', ()=> setMode(btn.dataset.nav));
+  });
+}
+
 function bindEvents(){
   const app = document.getElementById('app');
+  if(!app){ console.warn('[bindEvents] #app missing'); return; }
   app.addEventListener('input', e=>{
     const el = e.target;
     if(el.id==='thoughtJournalText'){
@@ -5256,52 +5301,17 @@ function bindEvents(){
     document.getElementById('whyDrawer')?.classList.remove('open');
     document.getElementById('drawerBackdrop')?.classList.remove('open');
   }
-  document.getElementById('saveBtn').onclick = ()=>save();
+  document.getElementById('saveBtn')?.addEventListener('click', ()=> save());
   document.getElementById('authSendLink')?.addEventListener('click', sendMagicLink);
   document.getElementById('authEmail')?.addEventListener('keydown', e=>{
     if(e.key==='Enter'){ e.preventDefault(); sendMagicLink(); }
   });
   document.getElementById('authSignOut')?.addEventListener('click', signOut);
   bindIdeasPageEvents();
-  document.getElementById('prevP').onclick = ()=>nav(-1);
-  document.getElementById('nextP').onclick = ()=>nav(1);
-  const sidebarBackdrop = document.getElementById('sidebarBackdrop');
-  function setMobileSidebar(open){
-    document.body.classList.toggle('sidebar-open', open);
-    if(sidebarBackdrop) sidebarBackdrop.hidden = !open;
-    document.getElementById('btnSidebarToggle')?.setAttribute('aria-expanded', open ? 'true' : 'false');
-  }
-  document.getElementById('btnSidebarToggle')?.addEventListener('click', ()=>
-    setMobileSidebar(!document.body.classList.contains('sidebar-open')));
-  sidebarBackdrop?.addEventListener('click', ()=> setMobileSidebar(false));
-  document.querySelector('.sidebar-nav')?.addEventListener('click', e=>{
-    const navBtn = e.target.closest('[data-nav]');
-    if(navBtn && navBtn.closest('.sidebar-nav')){
-      setMode(navBtn.dataset.nav);
-      setMobileSidebar(false);
-      return;
-    }
-    if(e.target.closest('#navRhythmsToggle')){
-      const sub = document.getElementById('navRhythmsSub');
-      const btn = document.getElementById('navRhythmsToggle');
-      const open = sub?.classList.toggle('open');
-      if(btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      return;
-    }
-    if(e.target.closest('#navMentorshipToggle')){
-      const sub = document.getElementById('navMentorshipSub');
-      const btn = document.getElementById('navMentorshipToggle');
-      const willOpen = !sub?.classList.contains('open');
-      sub?.classList.toggle('open');
-      if(btn) btn.setAttribute('aria-expanded', sub?.classList.contains('open') ? 'true' : 'false');
-      if(willOpen || !isMentorship()) setMode('mentorship-threads');
-      return;
-    }
-  });
-  document.getElementById('clearPeriod').onclick = clearCurrent;
-  document.getElementById('clearJournal').onclick = clearJournalEntry;
-  document.getElementById('resetAll').onclick = resetAll;
-  document.getElementById('journalBody').addEventListener('input', e=>{
+  document.getElementById('clearPeriod')?.addEventListener('click', clearCurrent);
+  document.getElementById('clearJournal')?.addEventListener('click', clearJournalEntry);
+  document.getElementById('resetAll')?.addEventListener('click', resetAll);
+  document.getElementById('journalBody')?.addEventListener('input', e=>{
     if(typeof normalizeJournal === 'function' && !journal.gratitude) journal = normalizeJournal(journal);
     journal.body=e.target.value; journal.updated=Date.now();
     updateJournalMeta(); markDirty();
@@ -5551,7 +5561,9 @@ async function resetAll(){
 
 (async function init(){
   try{
-    renderDaily(); renderWeekly(); renderMonthly(); bindEvents(); bindFFAccordion(); bindDailyEvents?.(); bindReviewEvents?.();
+    renderDaily(); renderWeekly(); renderMonthly();
+    try{ bindEvents(); }catch(e){ console.warn('[bindEvents] failed — nav will still bind', e); }
+    bindFFAccordion(); bindDailyEvents?.(); bindReviewEvents?.();
     const vm = await window.storage.get('view-mode');
     if(vm?.value === 'calendar') viewMode = 'dashboard';
     else if(vm?.value && (['dashboard','daily','weekly','monthly','journal','ideas','prayer','projects','profile','privacy','guide','settings','tag'].includes(vm.value) || vm.value.startsWith('mentorship-'))) viewMode = vm.value;
@@ -5572,23 +5584,21 @@ async function resetAll(){
       console.log('[FaithfulnessStore tests]', out);
       alert(out.pass ? 'FaithfulnessStore tests passed ('+out.results.length+' checks)' : 'Store tests FAILED: '+out.error);
     }
-    document.getElementById('researchNotes').value = globals.researchNotes||'';
+    const rn = document.getElementById('researchNotes');
+    if(rn) rn.value = globals.researchNotes||'';
     bindProfileEvents?.();
     bindGuideEvents?.();
     bindTagEvents?.();
     bindMentorshipEvents?.();
     renderMentorshipNav?.();
     if(isMentorship()) loadMentorship?.();
-    document.querySelectorAll('[data-nav]').forEach(btn=>{
-      if(btn.closest('.sidebar-nav')) return;
-      btn.addEventListener('click', ()=> setMode(btn.dataset.nav));
-    });
     await loadGuide?.();
     await loadProfile?.();
     if(authUser) maybeGuideOnboarding?.();
   }catch(e){
     console.error('[init] startup error — loading local view anyway', e);
   }finally{
+    bindNavEvents();
     await loadCurrent().catch(e=> console.warn('[init] loadCurrent failed', e));
     loadThoughtJournal();
     if(authUser && !dirty) updateSaveState('synced');
