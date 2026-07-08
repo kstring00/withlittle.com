@@ -70,6 +70,54 @@
     return window.faithStore.getDailyAnchorConfig().filter(a=> a.enabled);
   }
 
+  function stew(){
+    return window.StewStore || null;
+  }
+
+  /** Unified habit list: faithStore anchors + dashboard habits not already linked */
+  function getHabitRows(){
+    const rows = [];
+    const anchors = getAnchors();
+    const linkedStew = new Set();
+    anchors.forEach(a=>{
+      if(a.stewHabitId) linkedStew.add(a.stewHabitId);
+      rows.push({ type:'anchor', anchor:a, id:a.id, title:a.title, stewHabitId:a.stewHabitId || null });
+    });
+    const S = stew();
+    if(S?.habitsForDate){
+      S.habitsForDate(dateStr()).forEach(h=>{
+        if(linkedStew.has(h.id)) return;
+        if(anchors.some(a=> a.title.trim().toLowerCase() === h.title.trim().toLowerCase())) return;
+        rows.push({ type:'stew', stewId:h.id, id:'stew-'+h.id, title:h.title, stewHabitId:h.id });
+      });
+    }
+    return rows;
+  }
+
+  function habitRowDone(row){
+    if(row.type === 'stew'){
+      return !!stew()?.habitDone?.(row.stewId, dateStr());
+    }
+    if(row.stewHabitId && stew()?.habitDone?.(row.stewHabitId, dateStr())) return true;
+    return anchorDone(row.id);
+  }
+
+  function habitRowStatus(row){
+    if(habitRowDone(row)) return 'Complete';
+    if(row.type === 'anchor'){
+      const sum = practiceSummary(row.id);
+      if(sum.count) return 'In progress';
+    }
+    return 'Not started';
+  }
+
+  function stewHabitCue(h){
+    if(!h) return '';
+    const freq = h.frequency === 'daily' ? 'Daily' : h.frequency === 'weekdays' ? 'Weekdays' : 'Weekly';
+    const time = h.targetTime && h.targetTime !== 'any' ? h.targetTime : '';
+    return [freq, time].filter(Boolean).join(' · ');
+  }
+
   function getCategories(){
     if(!window.faithStore) return [];
     return window.faithStore.getDailyCategoryConfig().filter(c=> c.enabled);
@@ -103,13 +151,6 @@
     return parts.join(' · ');
   }
 
-  function habitStatusLabel(anchorId){
-    if(anchorDone(anchorId)) return 'Complete';
-    const sum = practiceSummary(anchorId);
-    if(sum.count) return 'In progress';
-    return 'Not started';
-  }
-
   function filled(v){ return !!(v && String(v).trim()); }
 
   function sectionStatus(kind){
@@ -118,10 +159,10 @@
       return filled(dayData?.posture?.aim) ? 'done' : 'empty';
     }
     if(kind === 'habits'){
-      const a = getAnchors();
-      if(!a.length) return 'empty';
-      const done = a.filter(x=> anchorDone(x.id)).length;
-      if(done === a.length) return 'done';
+      const rows = getHabitRows();
+      if(!rows.length) return 'empty';
+      const done = rows.filter(habitRowDone).length;
+      if(done === rows.length) return 'done';
       if(done > 0) return 'partial';
       return 'empty';
     }
@@ -241,12 +282,24 @@
       '</section>';
   }
 
-  function renderHabitCard(anchor){
-    const done = anchorDone(anchor.id);
+  function renderHabitRow(row){
+    const done = habitRowDone(row);
+    const status = habitRowStatus(row);
+    if(row.type === 'stew'){
+      const h = stew()?.getHabit?.(row.stewId);
+      const cue = stewHabitCue(h);
+      return '<div class="dl-habit-card'+(done?' done':'')+'" data-dl-stew-habit="'+row.stewId+'">'+
+        '<input type="checkbox" data-dl-stew-check="'+row.stewId+'"'+(done?' checked':'')+' aria-label="Mark '+esc(row.title)+' kept">'+
+        '<div class="dl-habit-main">'+
+        '<span class="dl-habit-name">'+esc(row.title)+'</span>'+
+        (cue ? '<span class="dl-habit-meta">'+esc(cue)+'</span>' : '')+
+        '</div>'+
+        '<span class="dl-habit-status">'+esc(status)+'</span></div>';
+    }
+    const anchor = row.anchor;
     const kind = anchor.kind || window.faithStore?.getAnchorKind(anchor.id) || 'habit';
     const expanded = sessionExpandId === anchor.id;
     const cue = anchorCue(anchor);
-    const status = habitStatusLabel(anchor.id);
     return '<div class="dl-habit-card'+(done?' done':'')+(expanded?' expanded':'')+'" data-dl-ff="'+anchor.id+'">'+
       '<input type="checkbox" data-dl-habit-check="'+anchor.id+'"'+(done?' checked':'')+' aria-label="Mark '+esc(anchor.title)+' kept">'+
       '<div class="dl-habit-main">'+
@@ -260,9 +313,9 @@
   }
 
   function renderFirstFruits(){
-    const anchors = getAnchors();
+    const rows = getHabitRows();
     const st = sectionStatus('habits');
-    const cards = anchors.length ? anchors.map(renderHabitCard).join('')
+    const cards = rows.length ? rows.map(renderHabitRow).join('')
       : '<p class="dl-empty">These are the rhythms that protect your day. Add your own non-negotiables below.</p>';
     return '<section class="gr-card daily-section" data-phases="morning day evening" id="sec-first-fruits" data-dl-sec="habits">'+
       '<div class="gr-card-head">'+
@@ -634,13 +687,14 @@
     const nn = getNonNegItems();
     const done = nn.filter(it=> it.done && !it.released).length;
     const anchors = getAnchors();
-    const ffDone = anchors.filter(a=> anchorDone(a.id)).length;
+    const rows = getHabitRows();
+    const ffDone = rows.filter(habitRowDone).length;
     const practice = window.faithStore?.getPracticeSummaryForDate(dateStr());
-    let txt = ffDone + '/' + anchors.length + ' habits';
+    let txt = ffDone + '/' + rows.length + ' habits';
     if(practice?.totalSessions) txt += ' \u00b7 ' + practice.totalSessions + ' sessions';
     if(nn.length) txt += ' \u00b7 ' + done + '/' + nn.length + ' must-dos';
     el.textContent = txt;
-    el.classList.toggle('gold', anchors.length && ffDone === anchors.length && (!nn.length || done === nn.length));
+    el.classList.toggle('gold', rows.length && ffDone === rows.length && (!nn.length || done === nn.length));
   }
 
   async function logSession(anchorId, minutes, entries){
@@ -716,16 +770,63 @@
     markDirty?.();
   }
 
-  function addAnchor(text){
-    if(!text?.trim() || !window.faithStore) return;
-    const cfg = window.faithStore.getDailyAnchorConfig();
-    cfg.push({ id: uid(), title: text.trim(), durationMin: null, enabled: true, kind: 'habit' });
-    window.faithStore.setDailyAnchorConfig(cfg);
-    window.faithStore.ensureDailyAnchors?.(dateStr());
-    window.faithStore.save();
-    if(typeof renderAnchorSettings === 'function') renderAnchorSettings();
+  async function addAnchor(text){
+    const title = text?.trim();
+    if(!title) return;
+
+    const fs = window.faithStore || await window.ensureFaithStore?.().catch(()=> null);
+    let stewHabit = null;
+    const S = stew();
+    if(S?.createHabit){
+      stewHabit = S.createHabit({ title, icon: '\u25cb' });
+      await S.save?.();
+    }
+
+    if(fs){
+      const cfg = fs.getDailyAnchorConfig();
+      cfg.push({
+        id: uid(),
+        title,
+        durationMin: null,
+        enabled: true,
+        kind: 'habit',
+        stewHabitId: stewHabit?.id || null
+      });
+      fs.setDailyAnchorConfig(cfg);
+      fs.ensureDailyAnchors?.(dateStr());
+      if(dayData) fs.syncAnchorsToDay?.(dateStr(), dayData);
+      await fs.save();
+      if(typeof renderAnchorSettings === 'function') renderAnchorSettings();
+    } else if(!stewHabit){
+      return;
+    }
+
     refreshDailyUI();
+    if(typeof renderCalendar === 'function') renderCalendar();
     markDirty?.();
+  }
+
+  async function toggleStewHabit(stewId){
+    const S = stew();
+    if(!S?.toggleHabit) return;
+    S.toggleHabit(stewId, dateStr());
+    await S.save?.();
+    refreshDailyUI();
+    if(typeof renderCalendar === 'function') renderCalendar();
+    markDirty?.();
+  }
+
+  async function markAnchorKept(anchorId){
+    const anchor = getAnchors().find(a=> a.id === anchorId);
+    if(anchor?.stewHabitId && stew()?.habitDone && !stew().habitDone(anchor.stewHabitId, dateStr())){
+      stew().toggleHabit(anchor.stewHabitId, dateStr());
+      await stew().save?.();
+    }
+    if(!anchorDone(anchorId)){
+      await logSession(anchorId, 0, []);
+      sessionExpandId = anchorId;
+    }
+    refreshDailyUI();
   }
 
   function addNonNeg(text){
@@ -859,8 +960,15 @@
 
       if(e.target.closest('#dlAnchorAddBtn')){
         const inp = document.getElementById('dlAnchorAdd');
-        addAnchor(inp?.value);
+        await addAnchor(inp?.value);
         if(inp) inp.value = '';
+        return;
+      }
+
+      const stewCheck = e.target.closest('[data-dl-stew-check]');
+      if(stewCheck){
+        e.preventDefault();
+        await toggleStewHabit(stewCheck.dataset.dlStewCheck);
         return;
       }
 
@@ -879,9 +987,7 @@
         e.preventDefault();
         const anchorId = habitCheck.dataset.dlHabitCheck;
         if(!anchorDone(anchorId)){
-          await logSession(anchorId, 0, []);
-          sessionExpandId = anchorId;
-          refreshDailyUI();
+          await markAnchorKept(anchorId);
         } else {
           sessionExpandId = sessionExpandId === anchorId ? null : anchorId;
           refreshDailyUI();

@@ -2737,7 +2737,7 @@ body.intake-open{overflow:hidden}
 <script src="ideas-hub.js?v=6" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
 <script src="stewardship-store.js?v=1"></script>
 <script src="calendar-ui.js?v=4"></script>
-<script src="daily-ui.js?v=3"></script>
+<script src="daily-ui.js?v=4"></script>
 <script src="review-ui.js?v=2"></script>
 <script src="profile-ui.js?v=1"></script>
 <script src="guide-ui.js?v=2"></script>
@@ -3796,7 +3796,9 @@ async function saveAnchorSettingsFromDOM(){
     id: prev[i]?.id || uid(),
     title: row.querySelector('[data-anchor-title]')?.value.trim() || 'Anchor',
     durationMin: row.querySelector('[data-anchor-dur]')?.value ? Number(row.querySelector('[data-anchor-dur]').value) : null,
-    enabled: !!row.querySelector('[data-anchor-enabled]')?.checked
+    enabled: !!row.querySelector('[data-anchor-enabled]')?.checked,
+    kind: prev[i]?.kind || 'habit',
+    stewHabitId: prev[i]?.stewHabitId || null
   }));
   faithStore.setDailyAnchorConfig(cfg);
   await faithStore.save();
@@ -5167,6 +5169,14 @@ function bindEvents(){
     if(e.key==='Enter' && e.target.id==='qcText'){
       e.preventDefault();
       document.getElementById('qcAdd')?.click();
+    }
+    if(e.key==='Enter' && e.target.id==='dlAnchorAdd'){
+      e.preventDefault();
+      document.getElementById('dlAnchorAddBtn')?.click();
+    }
+    if(e.key==='Enter' && e.target.id==='dlNonNegAdd'){
+      e.preventDefault();
+      document.getElementById('dlNonNegAddBtn')?.click();
     }
     if(e.key==='Enter' && e.target.id==='pipeIdeaText' && !e.shiftKey){
       e.preventDefault();

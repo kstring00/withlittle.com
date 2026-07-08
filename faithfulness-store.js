@@ -59,13 +59,17 @@
 
   function normalizeDailyAnchor(raw){
     const a = raw || {};
-    const kind = a.kind === 'bible' ? 'bible' : (a.kind === 'prayer' ? 'prayer' : (a.id === 'bible' ? 'bible' : 'prayer'));
+    const kind = a.kind === 'bible' ? 'bible'
+      : (a.kind === 'prayer' ? 'prayer'
+      : (a.kind === 'habit' ? 'habit'
+      : (a.id === 'bible' ? 'bible' : 'prayer')));
     return {
       id: a.id || uid(),
       title: String(a.title || '').trim(),
       durationMin: typeof a.durationMin === 'number' ? a.durationMin : (a.durationMin == null ? null : Number(a.durationMin) || null),
       enabled: a.enabled !== false,
-      kind
+      kind,
+      stewHabitId: a.stewHabitId || null
     };
   }
 
