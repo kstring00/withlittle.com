@@ -4,7 +4,6 @@
 (function(root){
   'use strict';
 
-  let dailySubView = 'today';
   let stripHintDismissed = false;
   let sessionExpandId = null;
 
@@ -47,29 +46,6 @@
     let line = esc(anchor.title) + ' · ' + sum.count + ' session' + (sum.count === 1 ? '' : 's');
     if(sum.minutes) line += ' · ' + sum.minutes + ' min';
     return line;
-  }
-
-  function renderDayStrip(){
-    const anchors = getAnchors();
-    const chips = anchors.map(a=>{
-      const done = anchorDone(a.id);
-      const sum = practiceSummary(a.id);
-      const cnt = sum.count ? ' ×' + sum.count : '';
-      return '<button type="button" class="dl-chip'+(done?' done':'')+'" data-dl-strip-anchor="'+a.id+'" aria-pressed="'+(done?'true':'false')+'">'+
-        '<span class="dl-chip-check" aria-hidden="true">'+(done?'✓':'')+'</span>'+
-        '<span class="dl-chip-label">'+esc(a.title)+cnt+'</span></button>';
-    }).join('');
-    const nn = getNonNegItems();
-    const nnChips = nn.map(it=>{
-      const done = !!it.done && !it.released;
-      return '<button type="button" class="dl-chip'+(done?' done':'')+(it.released?' released':'')+'" data-dl-strip-nn="'+it.id+'" aria-pressed="'+(done?'true':'false')+'">'+
-        '<span class="dl-chip-check" aria-hidden="true">'+(done?'✓':(it.released?'—':''))+'</span>'+
-        '<span class="dl-chip-label">'+esc(it.text || 'Untitled')+'</span></button>';
-    }).join('');
-    const hint = stripHintDismissed ? '' :
-      '<p class="dl-strip-hint" id="dlStripHint">These follow you through the whole day.</p>';
-    return '<div class="dl-day-strip" id="dlDayStrip" role="region" aria-label="Today\'s commitments">'+
-      '<div class="dl-strip-row">'+chips+nnChips+'</div>'+hint+'</div>';
   }
 
   function renderSessionExpand(anchor, kind){
@@ -118,9 +94,15 @@
         (expanded ? renderSessionExpand(a, kind) : '')+
         '</div>';
     }).join('');
+    const empty = anchors.length ? '' :
+      '<p class="dl-empty">What matters most to you, every single day? Write it below — it will return each morning.</p>';
     return '<section class="dl-section daily-section" data-phases="morning day evening" id="sec-first-fruits">'+
-      '<h3 class="dl-section-head serif">First Fruits</h3>'+
-      '<div class="dl-list">'+rows+'</div></section>';
+      '<h3 class="dl-section-head serif">My Non-Negotiables'+(window.helpTip?.(1,'Start here. These are the personal commitments you return to every day — prayer, reading, movement, whatever matters most to you. Check one off when it\'s kept.')||'')+'</h3>'+
+      '<p class="dl-section-sub">Your daily rhythm — these return every morning until you change them.</p>'+
+      '<div class="dl-list">'+rows+'</div>'+empty+
+      '<div class="dl-add-row">'+
+      '<input type="text" class="dl-hairline" id="dlAnchorAdd" placeholder="Add a daily non-negotiable — e.g. Morning prayer">'+
+      '<button type="button" class="dl-add-btn" id="dlAnchorAddBtn" aria-label="Add non-negotiable">+</button></div></section>';
   }
 
   function renderNonNegItem(it){
@@ -139,9 +121,9 @@
   function renderNonNegotiables(){
     const items = getNonNegItems();
     const list = items.length ? items.map(renderNonNegItem).join('')
-      : '<p class="dl-empty">Add your non-negotiables for today.</p>';
+      : '<p class="dl-empty">Add what must happen today.</p>';
     return '<section class="dl-section daily-section" data-phases="morning day evening" id="sec-non-neg">'+
-      '<h3 class="dl-section-head serif">Non-Negotiables</h3>'+
+      '<h3 class="dl-section-head serif">Today\'s Must-Dos'+(window.helpTip?.(2,'One-time commitments for today only. Unfinished items can be carried to tomorrow (with a plan) or released in the Evening Review.')||'')+'</h3>'+
       '<div class="dl-list" id="dlNonNegList">'+list+'</div>'+
       '<div class="dl-add-row">'+
       '<input type="text" class="dl-hairline" id="dlNonNegAdd" placeholder="What must happen today?">'+
@@ -191,7 +173,7 @@
         '</div></details>';
     }).join('');
     return '<section class="dl-section daily-section" data-phases="morning day" id="sec-growth">'+
-      '<h3 class="dl-section-head serif">Growth Categories</h3>'+
+      '<h3 class="dl-section-head serif">Growth Categories'+(window.helpTip?.(3,'A small step in each area you\'re growing — body, order, leadership, skill. Open a category and add one thing for today.')||'')+'</h3>'+
       '<div class="dl-acc-grid">'+acc+'</div></section>';
   }
 
@@ -211,7 +193,7 @@
 
   function renderPlanOfAction(){
     return '<section class="dl-section daily-section" data-phases="morning day" id="sec-plan">'+
-      '<h3 class="dl-section-head serif">Plan of Action</h3>'+
+      '<h3 class="dl-section-head serif">Plan of Action'+(window.helpTip?.(4,'Sketch the shape of your day — what happens before work, during work, after work, and at evening shutdown.')||'')+'</h3>'+
       schedField('execute.beforeWork','Before Work')+
       schedField('execute.duringWork','During Work')+
       schedField('execute.afterWork','After Work')+
@@ -235,7 +217,7 @@
       '</div>'
     ).join('');
     return '<section class="dl-section daily-section" data-phases="evening" id="sec-evening-review">'+
-      '<h3 class="dl-section-head serif">Non-Negotiables Review</h3>'+
+      '<h3 class="dl-section-head serif">Evening Review'+(window.helpTip?.(5,'End the day in peace. Anything unfinished can be carried to tomorrow with a plan, or released with grace.')||'')+'</h3>'+
       rows+'</section>';
   }
 
@@ -245,60 +227,9 @@
       '<p class="dl-summary-line">'+s.kept+' kept · '+s.carried+' carried · '+s.released+' released</p></section>';
   }
 
-  function renderCarriedView(){
-    const items = collectCarriedItems();
-    const list = items.length ? items.map(it=>
-      '<div class="dl-carried-row">'+
-      '<span class="dl-carry-badge">↻'+it.carryCount+'</span>'+
-      '<div><div class="dl-carried-text">'+esc(it.text)+'</div>'+
-      (it.carryPlan ? '<div class="dl-carry-plan">'+esc(it.carryPlan)+'</div>' : '')+
-      '<div class="dl-carried-meta">From '+esc(it.carriedFrom || '—')+' · target '+esc(it.targetDate || '—')+'</div></div></div>'
-    ).join('') : '<p class="dl-empty">Nothing is riding the carry train.</p>';
-    return '<div class="dl-carried-panel" id="dlCarriedPanel"'+(dailySubView==='carried'?'':' hidden')+'>'+
-      '<h3 class="dl-section-head serif">Carried</h3>'+list+'</div>';
-  }
-
-  function collectCarriedItems(){
-    const out = [];
-    const today = dateStr();
-    for(let off = -14; off <= 14; off++){
-      const d = iso(dayOf((typeof dayOffset === 'number' ? dayOffset : 0) + off));
-      const data = off === 0 ? dayData : null;
-      if(off !== 0) continue;
-      getNonNegItems().forEach(it=>{
-        if(it.carryCount && !it.done && !it.released && d >= today)
-          out.push({ ...it, targetDate: d, carriedFrom: it.carriedFrom });
-      });
-    }
-    if(window._dlCarriedCache) return window._dlCarriedCache;
-    return out.sort((a,b)=> (a.carriedFrom||'').localeCompare(b.carriedFrom||''));
-  }
-
-  async function refreshCarriedCache(){
-    const out = [];
-    for(let off = -30; off <= 7; off++){
-      const d = iso(dayOf((typeof dayOffset === 'number' ? dayOffset : 0) + off));
-      if(d < dateStr() && off < 0) continue;
-      let data = off === 0 ? dayData : await getJSON('fs-day:'+d);
-      if(!data) continue;
-      data = typeof normalizeDaily === 'function' ? normalizeDaily(data) : data;
-      (data.faithfulFew?.mustDo?.items || []).filter(it=> !it.anchorId && it.carryCount && !it.done && !it.released).forEach(it=>{
-        out.push({ ...it, targetDate: d, carriedFrom: it.carriedFrom || d });
-      });
-    }
-    window._dlCarriedCache = out.sort((a,b)=> (a.carriedFrom||'').localeCompare(b.carriedFrom||''));
-    return window._dlCarriedCache;
-  }
-
   function renderDailySidebar(){
     return (typeof ThoughtJournalCard === 'function' ? ThoughtJournalCard() : '')+
-      '<div class="dl-rail-block"><h4 class="dl-rail-head serif">Today\'s Flow</h4>'+
-      '<div class="dl-flow-list">'+
-      ['Morning Setup','During the Day','Evening Review'].map((l,i)=>{
-        const ph = ['morning','day','evening'][i];
-        return '<button type="button" class="dl-flow-step" data-dl-goto-phase="'+ph+'">'+esc(l)+'</button>';
-      }).join('')+'</div></div>'+
-      '<div class="dl-rail-block"><h4 class="dl-rail-head serif">Scripture</h4>'+
+      '<div class="dl-rail-block dl-scripture-block"><h4 class="dl-rail-head serif">Scripture</h4>'+
       '<p class="dl-scripture">"Whatever you do, do it from the heart, as something done for the Lord and not for people."<cite>Colossians 3:23</cite></p></div>';
   }
 
@@ -314,36 +245,14 @@
       renderGrowthCategories()+
       renderPlanOfAction()+
       renderEveningNonNegReview()+
-      renderEveningSummary()+
-      renderCarriedView();
+      renderEveningSummary();
     if(sidebar) sidebar.innerHTML = renderDailySidebar();
-    const stripHost = document.getElementById('dlDayStripHost');
-    if(stripHost) stripHost.innerHTML = renderDayStrip();
     if(typeof loadThoughtJournal === 'function') loadThoughtJournal();
-    refreshCarriedCache().then(()=>{
-      const panel = document.getElementById('dlCarriedPanel');
-      if(panel && dailySubView === 'carried') renderCarriedPanelContent();
-    });
     return true;
-  }
-
-  function renderCarriedPanelContent(){
-    const panel = document.getElementById('dlCarriedPanel');
-    if(!panel) return;
-    const items = window._dlCarriedCache || [];
-    panel.innerHTML = '<h3 class="dl-section-head serif">Carried</h3>'+
-      (items.length ? items.map(it=>
-        '<div class="dl-carried-row"><span class="dl-carry-badge">↻'+it.carryCount+'</span><div>'+
-        '<div class="dl-carried-text">'+esc(it.text)+'</div>'+
-        (it.carryPlan ? '<div class="dl-carry-plan">'+esc(it.carryPlan)+'</div>' : '')+
-        '<div class="dl-carried-meta">From '+esc(it.carriedFrom||'—')+' · on '+esc(it.targetDate||'—')+'</div></div></div>'
-      ).join('') : '<p class="dl-empty">Nothing is riding the carry train.</p>');
   }
 
   function refreshDailyUI(){
     if(typeof isSaturdayRecovery === 'function' && isSaturdayRecovery()) return;
-    const stripHost = document.getElementById('dlDayStripHost');
-    if(stripHost) stripHost.innerHTML = renderDayStrip();
     const ff = document.getElementById('sec-first-fruits');
     if(ff){
       const sec = renderFirstFruits();
@@ -352,7 +261,7 @@
     const nnList = document.getElementById('dlNonNegList');
     if(nnList){
       const items = getNonNegItems();
-      nnList.innerHTML = items.length ? items.map(renderNonNegItem).join('') : '<p class="dl-empty">Add your non-negotiables for today.</p>';
+      nnList.innerHTML = items.length ? items.map(renderNonNegItem).join('') : '<p class="dl-empty">Add what must happen today.</p>';
     }
     const cats = getCategories();
     const growthSec = document.getElementById('sec-growth');
@@ -382,7 +291,7 @@
     const anchors = getAnchors();
     const ffDone = anchors.filter(a=> anchorDone(a.id)).length;
     const practice = window.faithStore?.getPracticeSummaryForDate(dateStr());
-    let txt = ffDone + '/' + anchors.length + ' first fruits';
+    let txt = ffDone + '/' + anchors.length + ' non-negotiables';
     if(practice?.totalSessions) txt += ' · ' + practice.totalSessions + ' sessions';
     if(nn.length) txt += ' · ' + done + '/' + nn.length + ' non-neg';
     el.textContent = txt;
@@ -455,7 +364,6 @@
       faithStore.syncMustDosFromDay(iso(dayOf(tomorrowOff)), tom);
       await faithStore.save();
     }
-    window._dlCarriedCache = null;
     refreshDailyUI();
     markDirty?.();
   }
@@ -466,6 +374,18 @@
     it.released = true;
     it.eveningAction = 'release';
     it.done = false;
+    refreshDailyUI();
+    markDirty?.();
+  }
+
+  function addAnchor(text){
+    if(!text?.trim() || !window.faithStore) return;
+    const cfg = window.faithStore.getDailyAnchorConfig();
+    cfg.push({ id: uid(), title: text.trim(), durationMin: null, enabled: true, kind: 'prayer' });
+    window.faithStore.setDailyAnchorConfig(cfg);
+    window.faithStore.ensureDailyAnchors?.(dateStr());
+    window.faithStore.save();
+    if(typeof renderAnchorSettings === 'function') renderAnchorSettings();
     refreshDailyUI();
     markDirty?.();
   }
@@ -524,23 +444,6 @@
     app.addEventListener('click', async e=>{
       if(!isDaily?.() || (typeof isSaturdayRecovery === 'function' && isSaturdayRecovery())) return;
 
-      const subTab = e.target.closest('[data-dl-sub]');
-      if(subTab){
-        dailySubView = subTab.dataset.dlSub;
-        document.querySelectorAll('[data-dl-sub]').forEach(b=> b.classList.toggle('on', b.dataset.dlSub === dailySubView));
-        document.querySelectorAll('#dailyMain .dl-section').forEach(s=>{
-          s.style.display = dailySubView === 'carried' ? 'none' : '';
-        });
-        const panel = document.getElementById('dlCarriedPanel');
-        if(panel){
-          if(dailySubView === 'carried'){
-            panel.removeAttribute('hidden');
-            refreshCarriedCache().then(renderCarriedPanelContent);
-          } else panel.setAttribute('hidden','');
-        }
-        return;
-      }
-
       const gotoPhase = e.target.closest('[data-dl-goto-phase]');
       if(gotoPhase?.dataset.dlGotoPhase){
         setDailyPhase?.(gotoPhase.dataset.dlGotoPhase);
@@ -552,6 +455,13 @@
         const inp = document.getElementById('dlNonNegAdd');
         if(inp) inp.value = '';
         dismissStripHint();
+        return;
+      }
+
+      if(e.target.closest('#dlAnchorAddBtn')){
+        const inp = document.getElementById('dlAnchorAdd');
+        addAnchor(inp?.value);
+        if(inp) inp.value = '';
         return;
       }
 
@@ -605,24 +515,6 @@
         let ent = entries;
         if(kind === 'bible') ent = [{ passage, takeaway }];
         await logSession(anchorId, +durPick.dataset.dlMins, ent);
-        dismissStripHint();
-        return;
-      }
-
-      const stripAnchor = e.target.closest('[data-dl-strip-anchor]');
-      if(stripAnchor){
-        const id = stripAnchor.dataset.dlStripAnchor;
-        const cb = document.querySelector('[data-dl-ff-check="'+id+'"]');
-        if(cb && !cb.checked){ cb.click(); }
-        else { sessionExpandId = id; refreshDailyUI(); }
-        dismissStripHint();
-        return;
-      }
-
-      const stripNn = e.target.closest('[data-dl-strip-nn]');
-      if(stripNn){
-        const cb = document.querySelector('[data-dl-nn-check="'+stripNn.dataset.dlStripNn+'"]');
-        if(cb && !cb.disabled) cb.click();
         dismissStripHint();
         return;
       }
@@ -726,6 +618,10 @@
         e.preventDefault();
         document.getElementById('dlNonNegAddBtn')?.click();
       }
+      if(e.key === 'Enter' && e.target.id === 'dlAnchorAdd'){
+        e.preventDefault();
+        document.getElementById('dlAnchorAddBtn')?.click();
+      }
     });
 
     document.getElementById('categoryAddBtn')?.addEventListener('click', ()=>{
@@ -761,7 +657,6 @@
     if(!document.getElementById('sec-first-fruits')) renderDailyLedger();
     populateFields?.(document.getElementById('dailyMain'), dayData);
     refreshDailyUI();
-    await refreshCarriedCache();
     return true;
   };
 

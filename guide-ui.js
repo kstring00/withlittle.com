@@ -20,8 +20,8 @@
         },
         {
           id: 'firstFruits',
-          title: 'Do your first First Fruits',
-          text: 'Bible and prayer before anything else. Open the Daily Ledger and complete at least one anchor.',
+          title: 'Keep your first non-negotiable',
+          text: 'Open the Daily Ledger, write in a daily non-negotiable that matters to you, and check it off.',
           link: { view: 'daily', hash: 'sec-first-fruits' }
         },
         {
@@ -64,7 +64,7 @@
         title: 'Rhythms',
         for: 'Daily, Weekly, and Monthly reviews — morning setup, honest carry-over, and zooming out.',
         bullets: [
-          'Daily Ledger: First Fruits first, then non-negotiables, growth, and your plan of action.',
+          'Daily Ledger: your non-negotiables first, then today\'s must-dos, growth, and your plan of action.',
           'Weekly review: adjust, experiment, triage ideas — a few honest minutes.',
           'Monthly review: celebrate fruit, realign, multiply what\'s working.',
           'Miss a day without guilt; carry what matters, release the rest.'
@@ -103,7 +103,7 @@
       },
       {
         id: 'prayer',
-        title: 'Dream Prayer Log',
+        title: 'Prayer Log',
         for: 'A simple log of what you\'re carrying and what God has answered.',
         bullets: [
           'Add requests as they come; mark answered when grace shows up.',
@@ -112,7 +112,7 @@
           'Prayer belongs beside your calendar, not buried in notes.'
         ],
         tryView: 'prayer',
-        tryLabel: 'Open Dream Prayer Log',
+        tryLabel: 'Open Prayer Log',
         hint: 'Carry requests and answered prayers in one quiet list.'
       },
       {
@@ -179,7 +179,7 @@
       asks: {
         heading: 'What it asks of you',
         bullets: [
-          '~5 minutes each morning: First Fruits and today\'s priorities.',
+          '~5 minutes each morning: your non-negotiables and today\'s priorities.',
           '~5 minutes each evening: a short reflection.',
           'One honest weekly review.',
           'Miss days without guilt — the system is built for starting again.'

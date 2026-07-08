@@ -46,10 +46,9 @@
     };
   }
 
-  const DEFAULT_DAILY_ANCHORS = [
-    { id: 'bible', title: 'Bible Reading', durationMin: 10, enabled: true, kind: 'bible' },
-    { id: 'prayer', title: 'Prayer', durationMin: null, enabled: true, kind: 'prayer' }
-  ];
+  // No hardcoded anchors — each user defines their own non-negotiables.
+  // Existing users keep whatever anchors are already stored in fs-core.
+  const DEFAULT_DAILY_ANCHORS = [];
 
   const DEFAULT_DAILY_CATEGORIES = [
     { id: 'body', icon: '♥', title: 'Body', hint: 'How am I stewarding my body today?', enabled: true, sortOrder: 0 },

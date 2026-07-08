@@ -44,7 +44,7 @@
       nowSub: 'A quiet 10 minutes, starting here',
       later: 'I’ll come back',
       laterSub: 'It stays open — no rush',
-      timerDone: 'Done — mark First Fruits kept',
+      timerDone: 'Done — time with God kept',
       timerHint: 'No hurry. This timer is a room, not a race.'
     },
     focus: {

@@ -224,7 +224,7 @@
 
   /* ── toolbar ───────────────────────────────────────────────── */
   function renderToolbar(){
-    const tabs = [['day','Day'],['week','Week'],['month','Month'],['agenda','Agenda'],['planning','Planning']];
+    const views = [['day','Day'],['week','Week'],['month','Month'],['agenda','Agenda'],['planning','Habit Library & Planning']];
     let label;
     if(view==='month'){
       label = new Date(anchor+'T12:00:00').toLocaleDateString('en-US',{month:'long',year:'numeric'});
@@ -234,28 +234,20 @@
     } else {
       label = (relDay(anchor) ? relDay(anchor)+' · ' : '')+fmtDateLong(anchor);
     }
-    const cats = S().CATEGORIES.map(c=>
-      '<button type="button" class="stew-filter-chip'+(catMatch(c.id)?' on':'')+'" data-act="filter-cat" data-id="'+c.id+'" style="--cat:'+c.color+'">'+
-      '<span class="stew-filter-dot"></span>'+esc(c.label)+'</button>').join('');
     return '<div class="stew-toolbar">'+
       '<div class="stew-toolbar-row">'+
-      '<div class="stew-view-tabs" role="tablist">'+tabs.map(t=>
-        '<button type="button" role="tab" class="stew-view-tab'+(view===t[0]?' on':'')+'" data-act="set-view" data-id="'+t[0]+'" aria-selected="'+(view===t[0])+'">'+t[1]+'</button>').join('')+'</div>'+
+      '<label class="stew-view-select-wrap"><span class="sr-only">View</span>'+
+      selectHtml('id="stewViewSelect" data-act-change="set-view-select" aria-label="Dashboard view"',
+        views, view)+'</label>'+
       '<div class="stew-date-nav">'+
       '<button type="button" class="stew-nav-btn" data-act="nav" data-id="-1" aria-label="Previous">‹</button>'+
       '<span class="stew-date-label">'+esc(label)+'</span>'+
       '<button type="button" class="stew-nav-btn" data-act="nav" data-id="1" aria-label="Next">›</button>'+
-      '<button type="button" class="stew-today-btn" data-act="go-today">Today</button>'+
       '</div>'+
       '<div class="stew-toolbar-tools">'+
-      '<input type="text" class="stew-quick-add" id="stewQuickAdd" '+
-        'placeholder="Quick add — try &quot;Workout tomorrow 5pm 45m #health !high&quot;" aria-label="Quick add">'+
       '<input type="search" class="stew-search" id="stewSearch" placeholder="Search" aria-label="Search events" value="'+esc(searchQuery)+'">'+
       '<button type="button" class="btn-gold stew-new-btn" data-act="new-event">+ New block</button>'+
-      '</div></div>'+
-      '<div class="stew-filter-row">'+cats+
-      (activeCats?'<button type="button" class="stew-filter-clear" data-act="filter-clear">Show all</button>':'')+
-      '</div></div>';
+      '</div></div></div>';
   }
 
   /* ── Faithfulness Ring ─────────────────────────────────────── */
@@ -302,7 +294,7 @@
 
   /* ── Day view ──────────────────────────────────────────────── */
   function renderMissionCard(dateStr, dm){
-    return '<div class="stew-card stew-mission">'+
+    return '<div class="stew-card stew-mission stew-mission-quiet">'+
       '<div class="stew-card-kicker">Today’s theme</div>'+
       '<input type="text" class="stew-theme-input serif" data-daymeta="theme" data-date="'+dateStr+'" '+
       'value="'+esc(dm.theme)+'" placeholder="Name the day — e.g. Faithful in the small things" aria-label="Today’s theme">'+
@@ -336,13 +328,14 @@
         [['','Choose a task to focus on…']].concat(cands.map(t=>[t.id, t.title+(t.priority==='high'?' · High':'')])), '')+'</div>' : '';
     const empty = !dm.bigThree.length && !cands.length ?
       '<p class="stew-empty">Add tasks in Planning, then crown up to three here.</p>' : '';
-    return '<div class="stew-card stew-b3"><div class="stew-card-kicker">✦ Today’s Big Three</div>'+
+    return '<div class="stew-card stew-b3"><div class="stew-card-kicker">✦ Today’s Big Three'+
+      (root.helpTip?.(3,'Choose up to three tasks that matter most today. Everything else waits in Still Entrusted.')||'')+'</div>'+
       (rows||'')+picker+empty+
       '<p class="stew-b3-hint">Only three. The rest can wait faithfully.</p></div>';
   }
   function renderScriptureCard(dateStr){
     const v = verseFor(dateStr);
-    return '<div class="stew-card stew-verse"><div class="stew-card-kicker">Today’s Scripture</div>'+
+    return '<div class="stew-card stew-verse stew-verse-sm"><div class="stew-card-kicker">Today’s Scripture</div>'+
       '<p class="stew-verse-text serif">“'+esc(v[0])+'”</p>'+
       '<cite class="stew-verse-ref">'+esc(v[1])+'</cite></div>';
   }
@@ -352,8 +345,7 @@
     return 'evening';
   }
   function renderTimeline(dateStr){
-    const events = allEventsForDay(dateStr).filter(e=>!e.allDay)
-      .filter(e=>segment==='all' || segmentOf(e.startMin)===segment);
+    const events = allEventsForDay(dateStr).filter(e=>!e.allDay);
     const allDay = allEventsForDay(dateStr).filter(e=>e.allDay);
     const now = new Date();
     const isToday = dateStr===iso(dayOf(0));
@@ -363,9 +355,8 @@
       rows += '<div class="stew-allday">'+allDay.map(e=>
         '<span class="stew-allday-pill" style="--cat:'+e.color+'">'+esc(e.title)+'</span>').join('')+'</div>';
     }
-    const segHours = { all:[HOUR_START,HOUR_END], morning:[HOUR_START,12], midday:[12,17], evening:[17,HOUR_END] }[segment];
     const covered = h => events.some(e=>e.startMin < (h+1)*60 && e.endMin > h*60);
-    for(let h=segHours[0]; h<=segHours[1]; h++){
+    for(let h=HOUR_START; h<=HOUR_END; h++){
       const starting = events.filter(e=>Math.floor(e.startMin/60)===h);
       starting.forEach(e=>{ rows += timelineRow(e); });
       if(!covered(h)){
@@ -376,13 +367,12 @@
       }
     }
     if(!events.length && !allDay.length){
-      rows += '<div class="stew-empty stew-timeline-empty">Nothing planned '+(segment==='all'?'yet':'for the '+segment)+
-        '. Click an hour, use quick add, or pull a task from Still Entrusted.</div>';
+      rows += '<div class="stew-empty stew-timeline-empty">Nothing planned yet. Click an hour or drag a task from Still Entrusted onto the timeline.</div>';
     }
     return '<div class="stew-card stew-timeline">'+
       '<div class="stew-timeline-head">'+
-      '<div class="stew-seg-tabs" role="tablist">'+SEGMENTS.map(s=>
-        '<button type="button" role="tab" class="stew-seg-tab'+(segment===s[0]?' on':'')+'" data-act="set-segment" data-id="'+s[0]+'" aria-selected="'+(segment===s[0])+'">'+s[1]+'</button>').join('')+'</div>'+
+      '<div class="stew-card-kicker">Today\u2019s schedule'+
+      (root.helpTip?.(4,'Plan your day in time blocks. Click an empty hour to add one, or drag a task from Still Entrusted onto the timeline.')||'')+'</div>'+
       '<button type="button" class="btn-ghost" data-act="new-event">+ Add time block</button>'+
       '</div><div class="stew-timeline-body" data-date="'+dateStr+'">'+rows+'</div></div>';
   }
@@ -414,10 +404,13 @@
         '<button type="button" class="stew-done-circle sm'+(isDone?' on':'')+'" data-act="toggle-habit" data-id="'+h.id+'" data-date="'+dateStr+'" '+
         'aria-pressed="'+isDone+'" aria-label="'+esc(h.title)+(isDone?' — done':'')+'">'+(isDone?'✓':'')+'</button></div>';
     }).join('');
-    return '<div class="stew-card"><div class="stew-card-head"><div class="stew-card-kicker">Habits</div>'+
+    const tip = root.helpTip?.(1,'Start here. Tap the circle to mark a habit kept today — the dots show your last seven days. Habits from your Habit Library appear here every day.')||'';
+    return '<div class="stew-card stew-habits-card"><div class="stew-card-head"><div class="stew-card-kicker">Today\u2019s Habits'+tip+'</div>'+
       '<span class="stew-card-meta">'+(total? done+' / '+total+' kept':'')+'</span></div>'+
-      (rows || '<p class="stew-empty">No habits for this day. Add them in Planning.</p>')+
-      '<button type="button" class="stew-text-link" data-act="set-view" data-id="planning">Manage habits →</button></div>';
+      '<p class="stew-habit-explain">Habits you create in the Habit Library appear here and in your daily rhythm so you can track them each day.</p>'+
+      (rows || '<p class="stew-empty">No habits yet. Add your first below — it will appear here every day so you can track it.</p>')+
+      '<div class="stew-add-row"><input type="text" class="stew-add-input" id="dashNewHabit" placeholder="+ New habit — Enter to save" aria-label="New habit"></div>'+
+      '<button type="button" class="stew-text-link" data-act="set-view" data-id="planning">Open Habit Library →</button></div>';
   }
   function renderOverflowCard(){
     const tasks = S().overflowTasks().slice(0,8);
@@ -434,7 +427,8 @@
         '<button type="button" data-act="schedule-task" data-id="'+t.id+'">Schedule today…</button>'+
         '</div></details></div>';
     }).join('');
-    return '<div class="stew-card"><div class="stew-card-head"><div class="stew-card-kicker">Still entrusted</div>'+
+    return '<div class="stew-card"><div class="stew-card-head"><div class="stew-card-kicker">Still entrusted'+
+      (root.helpTip?.(5,'Tasks waiting for their moment. Drag one onto the timeline, or use the arrow to move it to another day.')||'')+'</div>'+
       '<span class="stew-card-meta">'+(tasks.length? tasks.length+' waiting':'')+'</span></div>'+
       (rows || '<p class="stew-empty">Nothing waiting. Every task has its place.</p>')+
       '<p class="stew-of-hint">Drag onto the timeline, or use → to move gently.</p></div>';
@@ -442,20 +436,43 @@
   function renderReflectionCard(dateStr, dm){
     const chips = REFLECTION_CHIPS.map(c=>
       '<button type="button" class="stew-refl-chip" data-act="refl-chip" data-date="'+dateStr+'" data-text="'+esc(c[1])+'">'+c[0]+'</button>').join('');
-    return '<div class="stew-card stew-reflection"><div class="stew-card-kicker">Evening reflection</div>'+
+    return '<div class="stew-card stew-reflection"><div class="stew-card-kicker">Evening reflection'+
+      (root.helpTip?.(6,'End the day honestly. A line or two is enough — grace for what remains.')||'')+'</div>'+
       '<p class="stew-refl-q serif">How did I faithfully steward today?</p>'+
       '<textarea class="stew-refl-input" data-daymeta="reflection" data-date="'+dateStr+'" rows="4" '+
       'placeholder="Honest lines. Grace for what remains.">'+esc(dm.reflection)+'</textarea>'+
       '<div class="stew-refl-chips">'+chips+'</div></div>';
   }
+  function renderRhythmFlowCard(){
+    const phases = [
+      ['morning','Morning Setup','Non-negotiables and morning plan'],
+      ['day','During the Day','Must-dos, growth, and faithful work'],
+      ['evening','Evening Review','Reflect, carry forward, or release']
+    ];
+    const tip = root.helpTip?.(2,'Your day in three movements. Open the Daily Ledger to work through each phase in order.')||'';
+    return '<div class="stew-card stew-rhythm-flow"><div class="stew-card-kicker">Daily Rhythm'+tip+'</div>'+
+      '<div class="stew-rhythm-tabs" role="group" aria-label="Daily rhythm phases">'+
+      phases.map(p=>'<button type="button" class="stew-rhythm-tab" data-act="open-daily-phase" data-id="'+p[0]+'">'+
+        '<span class="stew-rhythm-tab-title">'+p[1]+'</span>'+
+        '<span class="stew-rhythm-tab-sub">'+p[2]+'</span></button>').join('')+'</div>'+
+      '<button type="button" class="stew-text-link" data-act="open-daily">Open Daily Ledger →</button></div>';
+  }
   function renderDayView(){
     const dm = S().getDayMeta(anchor);
     return '<div class="stew-day">'+
-      '<div class="stew-top-row">'+renderMissionCard(anchor,dm)+renderBigThreeCard(anchor,dm)+renderScriptureCard(anchor)+'</div>'+
+      '<div class="stew-habits-hero">'+renderHabitsCard(anchor)+'</div>'+
       '<div class="stew-day-grid">'+
-      '<div class="stew-day-main">'+renderTimeline(anchor)+'</div>'+
-      '<aside class="stew-rail">'+renderRingCard(anchor)+renderHabitsCard(anchor)+renderOverflowCard()+renderReflectionCard(anchor,dm)+'</aside>'+
-      '</div></div>';
+      '<div class="stew-day-main">'+
+      renderRhythmFlowCard()+
+      renderTimeline(anchor)+
+      renderScriptureCard(anchor)+
+      '</div>'+
+      '<aside class="stew-rail">'+
+      renderBigThreeCard(anchor,dm)+
+      renderOverflowCard()+
+      renderReflectionCard(anchor,dm)+
+      renderMissionCard(anchor,dm)+
+      '</aside></div></div>';
   }
 
   /* ── Week view ─────────────────────────────────────────────── */
@@ -662,7 +679,9 @@
       '<div class="stew-add-row"><input type="text" class="stew-add-input" data-add-task data-project="" data-goal="" placeholder="Quick task — Enter to save"></div></div>'+
       '<div class="stew-card"><div class="stew-card-kicker">Templates</div>'+
       (tplRows||'<p class="stew-empty">Open any block and choose “Save as template.”</p>')+'</div>'+
-      '<div class="stew-card"><div class="stew-card-kicker">Habits</div>'+habitRows+
+      '<div class="stew-card stew-habit-library"><div class="stew-card-kicker">Habit Library</div>'+
+      '<p class="stew-habit-explain">Habits you create here appear in your daily rhythm and on your dashboard, so you can track them each day.</p>'+
+      (habitRows||'<p class="stew-empty">No habits yet — add your first below.</p>')+
       '<div class="stew-add-row"><input type="text" class="stew-add-input" id="stewNewHabit" placeholder="New habit — Enter to save"></div></div>'+
       '<div class="stew-card stew-review-links"><div class="stew-card-kicker">Rhythms of review</div>'+
       '<button type="button" class="stew-review-link" data-act="open-weekly"><strong>Weekly review</strong><span>Review · adjust · experiment</span></button>'+
@@ -881,7 +900,7 @@
   function buildSummaryLine(summary){
     if(summary.practiceLine) return summary.practiceLine;
     if(summary.firstFruitsTotal > 0 && !summary.firstFruitsComplete)
-      return "Start with what's first — Bible reading & prayer.";
+      return "Start with what's first — your non-negotiables.";
     if(summary.firstFruitsComplete){
       const n = summary.prioritiesLeft || 0;
       return 'First things first — done. ' + n + ' priorit' + (n===1?'y':'ies') + ' remain.';
@@ -907,30 +926,9 @@
     el.innerHTML =
       '<div class="home-greeting"><h2 class="serif">'+esc(timeGreeting()+', '+homeDisplayName())+'</h2>'+
       '<p id="homeSummary">'+esc(summaryText)+'</p>'+
-      '<div id="dashFocus"></div></div>'+
-      '<div class="home-capture">'+
-      '<input type="text" id="homeQuickCapture" placeholder="Quick capture…" aria-label="Quick capture">'+
-      '<button type="button" class="home-capture-btn" data-home-act="task">→ Task</button>'+
-      '<button type="button" class="home-capture-btn" data-home-act="seed">→ Seed</button>'+
-      '</div>';
+      '<div id="dashFocus"></div></div>';
     root.renderProfileNudge?.();
     root.updateDashIntakeUI?.();
-  }
-  async function routeHomeCapture(kind){
-    const inp = document.getElementById('homeQuickCapture');
-    const text = inp?.value.trim();
-    if(!text || !root.faithStore) return;
-    const dateStr = anchor || iso(dayOf(0));
-    if(kind === 'task'){
-      root.faithStore.createTask({ title:text, date:dateStr, tag:'stewardship', timeSlot:'beforeWork' });
-    } else {
-      root.faithStore.createSeed({ title:text, lifeArea:'other', status:'active' });
-    }
-    await root.faithStore.save();
-    if(inp) inp.value = '';
-    root.markDirty?.();
-    toast(kind === 'task' ? 'Task added.' : 'Seed planted.');
-    renderCalendar();
   }
 
   /* ── render root ───────────────────────────────────────────── */
@@ -993,18 +991,14 @@
     const panel = document.getElementById('calendarPanel');
 
     panel.addEventListener('click', async e=>{
-      const homeAct = e.target.closest('[data-home-act]');
-      if(homeAct){
-        await routeHomeCapture(homeAct.dataset.homeAct);
-        return;
-      }
       const el = e.target.closest('[data-act]');
       if(!el) return;
       const act = el.dataset.act, id = el.dataset.id, date = el.dataset.date;
       if(el.closest('.stew-of-menu') && act!=='move-task' && act!=='schedule-task') return;
       switch(act){
         case 'set-view': view = id; try{ localStorage.setItem('stew:view', view); }catch(x){} renderCalendar(); break;
-        case 'set-segment': segment = id; renderCalendar(); break;
+        case 'open-daily': root.setMode?.('daily'); break;
+        case 'open-daily-phase': root.setMode?.('daily'); if(id) root.setDailyPhase?.(id); break;
         case 'nav': navStep(+id); break;
         case 'go-today': anchor = iso(dayOf(0)); renderCalendar(); break;
         case 'jump-day': anchor = date; view = 'day'; try{ localStorage.setItem('stew:view','day'); }catch(x){} renderCalendar(); break;
@@ -1125,6 +1119,7 @@
       const actEl = el.closest('[data-act-change]');
       if(actEl){
         const act = actEl.dataset.actChange;
+        if(act==='set-view-select' && el.value){ view = el.value; try{ localStorage.setItem('stew:view', view); }catch(x){} renderCalendar(); }
         if(act==='b3-add' && el.value){ S().toggleBigThree(actEl.dataset.date, el.value); renderCalendar(); }
         if(act==='dr-link-task' && el.value){
           const d = drawerDraft();
@@ -1178,14 +1173,8 @@
     });
 
     panel.addEventListener('keydown', e=>{
-      if(e.target.id === 'homeQuickCapture' && e.key === 'Enter'){
-        e.preventDefault();
-        routeHomeCapture('task');
-        return;
-      }
       if(e.key==='Enter'){
         const el = e.target;
-        if(el.id==='stewQuickAdd' && el.value.trim()){ handleQuickAdd(el.value.trim()); el.value=''; e.preventDefault(); return; }
         if(el.dataset.addTask !== undefined && el.value.trim()){
           S().createTask({ title:el.value.trim(), projectId:el.dataset.project||null, goalId:el.dataset.goal||null, urgency:'week' });
           el.value=''; renderCalendar(); e.preventDefault(); return;
@@ -1194,8 +1183,10 @@
           S().createProject({ title:el.value.trim(), goalId:el.dataset.goal });
           el.value=''; renderCalendar(); e.preventDefault(); return;
         }
-        if(el.id==='stewNewHabit' && el.value.trim()){
-          S().createHabit({ title:el.value.trim(), icon:'○' }); el.value=''; renderCalendar(); e.preventDefault(); return;
+        if((el.id==='stewNewHabit' || el.id==='dashNewHabit') && el.value.trim()){
+          S().createHabit({ title:el.value.trim(), icon:'○' }); el.value=''; renderCalendar();
+          toast('Habit added — it will appear here every day.');
+          e.preventDefault(); return;
         }
         if(el.dataset.drNewTask !== undefined && el.value.trim() && drawer){
           const d = drawerDraft();
@@ -1245,14 +1236,6 @@
 
     document.getElementById('stewDrawerBackdrop')?.addEventListener('click', closeDrawer);
 
-    const qa = document.getElementById('btnQuickAdd');
-    if(qa && !qa.dataset.homeQuick){
-      qa.dataset.homeQuick = '1';
-      qa.addEventListener('click', ()=>{
-        if(!root.isDashboard?.()) return;
-        document.getElementById('homeQuickCapture')?.focus();
-      });
-    }
   }
   let renderDebounce = null;
   function debounceRender(){ clearTimeout(renderDebounce); renderDebounce = setTimeout(renderCalendar, 200); }

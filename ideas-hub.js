@@ -1053,17 +1053,6 @@
       }
     });
 
-    const qa = document.getElementById('btnQuickAdd');
-    if(qa && !qa.dataset.ihQuick){
-      qa.dataset.ihQuick = '1';
-      qa.addEventListener('click', e=>{
-        if(typeof root.isIdeas === 'function' && root.isIdeas()){
-          e.stopImmediatePropagation();
-          openWorkspace(null);
-        }
-      }, true);
-    }
-
     document.addEventListener('keydown', e=>{
       if(e.key === 'Escape' && hub.draft && !document.getElementById('ihWorkspace')?.hidden){
         closeWorkspace();
