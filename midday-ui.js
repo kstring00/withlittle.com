@@ -158,16 +158,46 @@
       '<span class="dd-status'+(done?' complete':'')+'">'+esc(status)+'</span></div>';
   }
 
+  function renderMiddayIntro(){
+    return '<section class="gr-card dl-cc-card dd-intro-card">'+
+      '<div class="dl-phase-kicker">Midday Check-In</div>'+
+      '<h3 class="dl-cc-title serif">Reguide toward this morning\u2019s plan.</h3>'+
+      '<p class="dl-cc-hint">Pause, notice, adjust, and take the next faithful step.</p></section>';
+  }
+
+  function renderAlignmentCard(){
+    ensureDayCheckIn();
+    const aim = dayData?.posture?.aim?.trim();
+    const align = dayData.dayCheckIn.alignment || '';
+    const prominent = align === 'reset' || align === 'drifting';
+    const pills = [
+      ['onTrack','On track'],
+      ['drifting','Drifting'],
+      ['reset','Need to reset']
+    ].map(([id,label])=>
+      '<button type="button" class="dd-pill'+(align===id?' on':'')+'" data-dd-alignment="'+id+'">'+label+'</button>'
+    ).join('');
+    const copy = align && ALIGN_COPY[align]
+      ? '<p class="dd-microcopy">'+esc(ALIGN_COPY[align])+'</p>'
+      : '';
+    return '<section class="dd-card gr-card dl-cc-card'+(prominent?' dd-highlight':'')+'" id="dd-alignment">'+
+      '<h3 class="dl-cc-title serif">Alignment Check</h3>'+
+      '<p class="dd-question">Am I still living toward today\u2019s aim?</p>'+
+      (aim
+        ? '<div class="dd-aim-show"><span class="dd-aim-label">Today\u2019s Aim</span><span class="dd-aim-value">'+esc(aim)+'</span></div>'
+        : '<p class="dd-empty">No aim set yet — add one in quick setup or Morning Setup.</p>')+
+      '<div class="dd-pill-row" role="group" aria-label="Alignment">'+pills+'</div>'+copy+
+      '</section>';
+  }
+
   function renderHabitsCheck(){
     const rows = H().getHabitRows?.() || [];
     const kept = rows.filter(r=> H().habitRowDone?.(r)).length;
     const summary = rows.length ? kept+' of '+rows.length+' kept today' : 'No habits yet';
     const list = rows.length ? rows.map(renderDayHabitRow).join('')
       : '<p class="dd-empty">Add non-negotiables in Morning Setup.</p>';
-    return '<section class="dd-card gr-card" id="dd-habits">'+
-      '<p class="dd-card-kicker">Section 2</p>'+
-      '<h3 class="dd-card-title serif">Non-Negotiables Check</h3>'+
-      '<p class="dd-helper">These are the rhythms protecting your day.</p>'+
+    return '<section class="dd-card gr-card dl-cc-card" id="dd-habits">'+
+      '<h3 class="dl-cc-title serif">Non-Negotiables Check</h3>'+
       '<p class="dd-summary">'+esc(summary)+'</p>'+
       '<div class="dd-compact-list">'+list+'</div></section>';
   }
@@ -200,9 +230,8 @@
     const top = H().getTopMustDos?.() || [];
     const list = top.length ? top.map((it,i)=> renderDayMustDoRow(it, i+1)).join('')
       : '<p class="dd-empty">No must-dos yet — add one in quick setup or Morning Setup.</p>';
-    return '<section class="dd-card gr-card" id="dd-top3">'+
-      '<p class="dd-card-kicker">Section 3</p>'+
-      '<h3 class="dd-card-title serif">Top 3 Check</h3>'+
+    return '<section class="dd-card gr-card dl-cc-card" id="dd-top3">'+
+      '<h3 class="dl-cc-title serif">Top 3 Check</h3>'+
       '<p class="dd-question">What still matters most?</p>'+
       '<div class="dd-compact-list">'+list+'</div></section>';
   }
@@ -221,9 +250,8 @@
       '<span class="dd-option-sub">'+esc(o.sub)+'</span></button>'
     ).join('');
     const msg = a.adjustment ? AUDIBLE_OPTIONS.find(o=> o.id===a.adjustment)?.msg : '';
-    return '<section class="dd-card gr-card'+(prominent?' dd-prominent':'')+'" id="dd-audible">'+
-      '<p class="dd-card-kicker">Section 4</p>'+
-      '<h3 class="dd-card-title serif">Call an Audible</h3>'+
+    return '<section class="dd-card gr-card dl-cc-card'+(prominent?' dd-prominent':'')+'" id="dd-audible">'+
+      '<h3 class="dl-cc-title serif">Call an Audible</h3>'+
       '<p class="dd-helper">When the day changes, faithfulness may require adjustment.</p>'+
       '<p class="dd-question">What changed?</p>'+
       '<div class="dd-chip-row">'+chips+'</div>'+
@@ -237,9 +265,8 @@
     ensureDayCheckIn();
     const committed = dayData.dayCheckIn.nextStepCommitted;
     const step = dayData.dayCheckIn.nextStep || '';
-    return '<section class="dd-card gr-card dd-next-step" id="dd-next-step">'+
-      '<p class="dd-card-kicker">Section 5</p>'+
-      '<h3 class="dd-card-title serif">Next Faithful Step</h3>'+
+    return '<section class="dd-card gr-card dl-cc-card dd-next-step" id="dd-next-step">'+
+      '<h3 class="dl-cc-title serif">Next Faithful Step</h3>'+
       '<p class="dd-question">What is the next 10-minute action?</p>'+
       '<label class="dl-label">Right now, I will\u2026</label>'+
       '<input type="text" class="dl-hairline" id="ddNextStepInput" data-field="dayCheckIn.nextStep" value="'+esc(step)+'" placeholder="Put on gym clothes\u2026">'+
@@ -267,14 +294,20 @@
 
   function renderDuringDayDashboard(){
     ensureDayCheckIn();
-    return '<div class="dd-dashboard daily-section" data-phases="day" id="sec-day-dashboard">'+
-      renderDayHero()+
+    return '<div class="dd-dashboard dl-phase-view" id="sec-day-dashboard">'+
       renderQuickSetup()+
-      renderAlignment()+
+      '<div class="dl-grid-2 dd-top-grid">'+
+      renderMiddayIntro()+
+      renderAlignmentCard()+
+      '</div>'+
+      '<div class="dl-grid-2">'+
       renderHabitsCheck()+
       renderTop3Check()+
+      '</div>'+
+      '<div class="dl-grid-2">'+
       renderCallAudible()+
       renderNextStep()+
+      '</div>'+
       renderFrictionCheck()+
       '</div>';
   }
@@ -315,15 +348,11 @@
   }
 
   function refreshDuringDayUI(){
-    const dash = document.getElementById('sec-day-dashboard');
-    if(dash) dash.outerHTML = renderDuringDayDashboard();
-    const side = document.getElementById('dailySidebar');
-    if(side && typeof dailyPhase === 'string' && dailyPhase === 'day'){
-      side.innerHTML = renderDaySidebar();
-      root.loadThoughtJournal?.();
-    }
-    populateFields?.(document.getElementById('dailyMain'), dayData);
-    syncDayActionBar();
+    if(typeof dailyPhase !== 'string' || dailyPhase !== 'day') return;
+    const main = document.getElementById('dailyMain');
+    if(!main) return;
+    main.innerHTML = renderDuringDayDashboard();
+    populateFields?.(main, dayData);
   }
 
   function findHabitRow(key){

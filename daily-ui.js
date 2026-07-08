@@ -29,7 +29,7 @@
     { id:'mustdos', label:'Must-Dos', sec:'sec-non-neg', phases:['morning','evening'] },
     { id:'growth', label:'Growth', sec:'sec-growth', phases:['morning'] },
     { id:'plan', label:'Plan', sec:'sec-friction', phases:['morning'] },
-    { id:'reflect', label:'Reflect', sec:'sec-evening-review', phases:['evening'] }
+    { id:'reflect', label:'Reflect', sec:'ev-kept', phases:['evening'] }
   ];
 
   function dateStr(){
@@ -218,6 +218,109 @@
     return '<span class="gr-status empty">Not started</span>';
   }
 
+  function currentPhase(){
+    return typeof dailyPhase === 'string' ? dailyPhase : 'morning';
+  }
+
+  const HOW_BY_PHASE = {
+    morning: ['Name your aim','Choose top 3','Keep non-negotiables','Pick one growth rep','Prepare for friction','Map the day'],
+    day: ['Check your aim','Review habits and must-dos','Notice what changed','Call an audible if needed','Choose the next faithful step'],
+    evening: ['Notice what was kept','Learn from the day','Release what needs grace','Carry one adjustment forward','Close in peace']
+  };
+
+  function renderHowThisWorks(phase){
+    const steps = HOW_BY_PHASE[phase] || HOW_BY_PHASE.morning;
+    return '<div class="gr-how dl-rail-how"><h4 class="serif">How This Works</h4><ol>'+
+      steps.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol></div>';
+  }
+
+  function mustDoDisplay(it){
+    if(it?.reducedText?.trim()) return it.reducedText.trim();
+    return it?.text || '';
+  }
+
+  function phaseLabel(){
+    const p = currentPhase();
+    if(p === 'day') return 'During the Day';
+    if(p === 'evening') return 'Evening Review';
+    return 'Morning Setup';
+  }
+
+  function renderMorningStatRow(){
+    const aim = dayData?.posture?.aim?.trim() || '\u2014';
+    const rows = getHabitRows();
+    const kept = rows.filter(habitRowDone).length;
+    const top = getTopMustDos();
+    const done = top.filter(it=> it.done && !it.released).length;
+    return '<div class="dl-stat-row">'+
+      '<button type="button" class="dl-stat-card" data-dl-step="aim"><span class="dl-stat-k">Today\u2019s Aim</span><span class="dl-stat-v">'+esc(aim.length>28?aim.slice(0,28)+'\u2026':aim)+'</span></button>'+
+      '<button type="button" class="dl-stat-card" data-dl-step="habits"><span class="dl-stat-k">Habits</span><span class="dl-stat-v">'+kept+' / '+rows.length+'</span></button>'+
+      '<button type="button" class="dl-stat-card" data-dl-step="mustdos"><span class="dl-stat-k">Top 3</span><span class="dl-stat-v">'+done+' / '+top.length+'</span></button>'+
+      '<div class="dl-stat-card dl-stat-static"><span class="dl-stat-k">Phase</span><span class="dl-stat-v">'+esc(phaseLabel())+'</span></div>'+
+      '</div>';
+  }
+
+  function renderGrowthCompact(){
+    ensureGrowthRep();
+    const sel = dayData.growthRep.category || '';
+    const cats = GROWTH_REP_CATS.map(c=>
+      '<button type="button" class="dl-growth-cat'+(sel===c.id?' on':'')+'" data-dl-rep-cat="'+c.id+'">'+esc(c.label)+'</button>'
+    ).join('');
+    return '<section class="gr-card dl-cc-card" id="sec-growth" data-dl-sec="growth">'+
+      '<h3 class="dl-cc-title serif">1% Growth Rep</h3>'+
+      '<p class="dl-cc-q">What is today\u2019s rep?</p>'+
+      '<div class="dl-growth-cats">'+cats+'</div>'+
+      '<input type="text" class="dl-hairline" data-field="growthRep.text" placeholder="e.g. 30-min workout" aria-label="Growth rep">'+
+      '</section>';
+  }
+
+  function renderFrictionCompact(){
+    return '<section class="gr-card dl-cc-card" id="sec-friction" data-dl-sec="plan">'+
+      '<h3 class="dl-cc-title serif">Prepare for Friction</h3>'+
+      '<label class="dl-label">What could pull me off course?</label>'+
+      '<input type="text" class="dl-hairline" data-field="danger.danger" placeholder="If I feel bored after work\u2026">'+
+      '<label class="dl-label">If that happens, then I will\u2026</label>'+
+      '<input type="text" class="dl-hairline" data-field="danger.thenWill" placeholder="Go to the gym first"></section>';
+  }
+
+  function renderPlanCompact(){
+    return '<section class="gr-card dl-cc-card" id="sec-plan" data-dl-sec="plan-windows">'+
+      '<h3 class="dl-cc-title serif">Time Windows</h3>'+
+      '<div class="dl-window-row"><span class="dl-window-label">Morning</span><input type="text" class="dl-hairline" data-field="execute.beforeWork" placeholder="Quiet start\u2026"></div>'+
+      '<div class="dl-window-row"><span class="dl-window-label">Work</span><input type="text" class="dl-hairline" data-field="execute.duringWork" placeholder="Focus\u2026"></div>'+
+      '<div class="dl-window-row"><span class="dl-window-label">After</span><input type="text" class="dl-hairline" data-field="execute.afterWork" placeholder="Transition\u2026"></div>'+
+      '<div class="dl-window-row"><span class="dl-window-label">Evening</span><input type="text" class="dl-hairline" data-field="execute.eveningShutdown" placeholder="Shutdown\u2026"></div></section>';
+  }
+
+  function renderMorningDashboard(){
+    return '<div class="dl-phase-view" id="dl-phase-morning">'+
+      renderMorningStatRow()+
+      '<div class="dl-grid-2">'+renderTodayAimCompact()+renderTop3Compact()+'</div>'+
+      renderFirstFruitsCompact()+
+      '<div class="dl-grid-3">'+renderGrowthCompact()+renderFrictionCompact()+renderPlanCompact()+'</div>'+
+      '</div>';
+  }
+
+  function renderPhaseMain(){
+    const p = currentPhase();
+    if(p === 'morning') return renderMorningDashboard();
+    if(p === 'day') return root.renderDuringDayDashboard?.() || '';
+    if(p === 'evening') return root.renderEveningDashboard?.() || '';
+    return renderMorningDashboard();
+  }
+
+  function renderPhaseContent(){
+    const main = document.getElementById('dailyMain');
+    const sidebar = document.getElementById('dailySidebar');
+    if(!main) return;
+    main.innerHTML = renderPhaseMain();
+    populateFields?.(main, dayData);
+    if(sidebar) sidebar.innerHTML = renderDailySidebar();
+    if(typeof loadThoughtJournal === 'function') loadThoughtJournal();
+    refreshProgressChrome();
+    updateDailyScore();
+  }
+
   function renderProgressPills(){
     const phase = typeof dailyPhase === 'string' ? dailyPhase : 'morning';
     return '<div class="gr-progress" role="navigation" aria-label="Daily progress">'+
@@ -268,6 +371,45 @@
       '<input type="text" class="dl-hairline" data-dl-prayer-req="'+anchorId+'" data-dl-prayer-idx="'+idx+'" placeholder="What did I pray about?">'+
       '<input type="text" class="dl-hairline dl-secondary" data-dl-prayer-fruit="'+anchorId+'" data-dl-prayer-idx="'+idx+'" placeholder="How will this bear fruit? (optional)">'+
       '</div>';
+  }
+
+  function renderTodayAimCompact(){
+    return '<section class="gr-card dl-cc-card" id="sec-daily-aim" data-dl-sec="aim">'+
+      '<h3 class="dl-cc-title serif">Today\u2019s Aim</h3>'+
+      '<p class="dl-cc-q">Today, I want to be faithful in\u2026</p>'+
+      '<input type="text" class="dl-hairline" data-field="posture.aim" placeholder="patience, focus, courage, order, serving well\u2026" aria-label="Today\u2019s aim">'+
+      '<p class="dl-cc-hint">Name the direction before you name the tasks.</p></section>';
+  }
+
+  function renderTop3Compact(){
+    const top = getTopMustDos();
+    const more = getMoreMustDos();
+    const topList = top.length ? top.map((it,i)=> renderMustDoRow(it, i+1)).join('')
+      : '<p class="dl-empty">What three things would make today faithful?</p>';
+    const moreBlock = more.length
+      ? '<details class="dl-more-tasks"><summary>More tasks ('+more.length+')</summary>'+
+        '<div class="dl-list">'+more.map(it=> renderMustDoRow(it)).join('')+'</div></details>'
+      : '';
+    return '<section class="gr-card dl-cc-card" id="sec-non-neg" data-dl-sec="mustdos">'+
+      '<h3 class="dl-cc-title serif">Top 3 Must-Dos</h3>'+
+      '<p class="dl-cc-q">What three things would make today faithful?</p>'+
+      '<div class="dl-list" id="dlNonNegList">'+topList+'</div>'+moreBlock+
+      '<div class="dl-add-row">'+
+      '<input type="text" class="dl-hairline" id="dlNonNegAdd" placeholder="Add a must-do\u2026">'+
+      '<button type="button" class="dl-add-btn" id="dlNonNegAddBtn" aria-label="Add">+</button></div></section>';
+  }
+
+  function renderFirstFruitsCompact(){
+    const rows = getHabitRows();
+    const cards = rows.length ? rows.map(renderHabitRow).join('')
+      : '<p class="dl-empty">These are the rhythms that protect your day. Add your own non-negotiables below.</p>';
+    return '<section class="gr-card dl-cc-card dl-cc-full" id="sec-first-fruits" data-dl-sec="habits">'+
+      '<h3 class="dl-cc-title serif">Non-Negotiables / Habits</h3>'+
+      '<p class="dl-cc-q">These are the rhythms that protect your day.</p>'+
+      '<div class="dl-habit-list dl-habit-grid">'+cards+'</div>'+
+      '<div class="dl-add-row">'+
+      '<input type="text" class="dl-hairline" id="dlAnchorAdd" placeholder="Add a daily non-negotiable\u2026">'+
+      '<button type="button" class="dl-add-btn" id="dlAnchorAddBtn" aria-label="Add non-negotiable">+</button></div></section>';
   }
 
   function renderTodayAim(){
@@ -523,18 +665,7 @@
       '<p class="dl-summary-line">'+s.kept+' kept \u00b7 '+s.carried+' carried \u00b7 '+s.released+' released</p></section>';
   }
 
-  function renderHowThisWorks(){
-    return '<div class="gr-how"><h4 class="serif">How This Works</h4>'+
-      '<ol>'+
-      '<li><strong>Morning (~3 min):</strong> aim, habits, top 3, growth rep, friction plan, time windows</li>'+
-      '<li><strong>During the day:</strong> check habits and must-dos; use the midday card to reguide</li>'+
-      '<li><strong>Evening:</strong> review with grace — keep, learn, adjust</li>'+
-      '</ol></div>';
-  }
-
   function renderDailySidebar(){
-    const phase = typeof dailyPhase === 'string' ? dailyPhase : 'morning';
-    if(phase === 'day' && typeof root.renderDaySidebar === 'function') return root.renderDaySidebar();
     const tip = typeof helpTip === 'function' ? helpTip(8,'A calm margin for passing thoughts. Kept safe across days.') : '';
     return '<div class="dl-rail-journal" id="thoughtJournal" aria-label="Thought journal">'+
       '<h4 class="serif">Thought Journal'+tip+'</h4>'+
@@ -543,29 +674,31 @@
       '<div class="thought-journal-meta" id="thoughtJournalMeta"></div></div>'+
       '<div class="dl-rail-block dl-scripture-block"><h4 class="dl-rail-head serif">Today\u2019s Scripture</h4>'+
       '<p class="dl-scripture">"'+esc(SCRIPTURE.text)+'"<cite>'+esc(SCRIPTURE.ref)+'</cite></p></div>'+
-      renderHowThisWorks();
+      renderHowThisWorks(currentPhase());
   }
 
   function syncActionBar(){
-    if(typeof root.syncDayActionBar === 'function') root.syncDayActionBar();
-    else {
-      const bar = document.getElementById('dailyStickyBar');
-      if(!bar) return;
-      bar.hidden = false;
-      const phase = typeof dailyPhase === 'string' ? dailyPhase : 'morning';
-      const markBtn = bar.querySelector('[data-gr-act="mark-phase"]');
-      if(markBtn){
-        markBtn.textContent = phase === 'morning' ? 'Mark Morning Complete' : 'Mark Day Complete';
-      }
+    const bar = document.getElementById('dailyStickyBar');
+    if(!bar) return;
+    bar.hidden = false;
+    const phase = currentPhase();
+    const markBtn = bar.querySelector('[data-gr-act="mark-phase"]');
+    const commitBtn = bar.querySelector('[data-gr-act="commit-next-step"]');
+    if(phase === 'day'){
+      if(markBtn) markBtn.textContent = 'Mark Midday Check-In Complete';
+      if(commitBtn) commitBtn.hidden = false;
+    } else if(phase === 'evening'){
+      if(markBtn) markBtn.textContent = 'Mark Evening Complete';
+      if(commitBtn) commitBtn.hidden = true;
+    } else {
+      if(markBtn) markBtn.textContent = 'Mark Morning Complete';
+      if(commitBtn) commitBtn.hidden = true;
     }
   }
 
   function refreshProgressChrome(){
     const host = document.getElementById('dailyGuideChrome');
-    if(host){
-      const phase = typeof dailyPhase === 'string' ? dailyPhase : 'morning';
-      host.innerHTML = phase === 'day' ? '' : renderProgressPills();
-    }
+    if(host) host.innerHTML = renderProgressPills();
     syncActionBar();
   }
 
@@ -593,34 +726,10 @@
 
   function renderDailyLedger(){
     if(typeof isSaturdayRecovery === 'function' && isSaturdayRecovery()) return false;
-    const main = document.getElementById('dailyMain');
-    const sidebar = document.getElementById('dailySidebar');
-    if(!main) return false;
+    if(!document.getElementById('dailyMain')) return false;
     ensureGrowthRep();
-
-    let chrome = document.getElementById('dailyGuideChrome');
-    if(!chrome){
-      chrome = document.createElement('div');
-      chrome.id = 'dailyGuideChrome';
-      const layout = document.querySelector('#dailyBoard .daily-layout');
-      layout?.parentNode?.insertBefore(chrome, layout);
-    }
-    chrome.innerHTML = (typeof dailyPhase === 'string' && dailyPhase === 'day') ? '' : renderProgressPills();
-
-    main.innerHTML =
-      renderTodayAim()+
-      (typeof root.renderDuringDayDashboard === 'function' ? root.renderDuringDayDashboard() : '')+
-      renderFirstFruits()+
-      renderNonNegotiables()+
-      renderGrowthRep()+
-      renderFriction()+
-      renderPlanOfAction()+
-      renderEveningNonNegReview()+
-      renderEveningSummary();
-    if(sidebar) sidebar.innerHTML = renderDailySidebar();
-    if(typeof loadThoughtJournal === 'function') loadThoughtJournal();
-
-    syncActionBar();
+    root.ensureEveningReview?.();
+    renderPhaseContent();
     return true;
   }
 
@@ -650,47 +759,8 @@
   function refreshDailyUI(){
     if(typeof isSaturdayRecovery === 'function' && isSaturdayRecovery()) return;
     ensureGrowthRep();
-
-    const aim = document.getElementById('sec-daily-aim');
-    if(aim) aim.outerHTML = renderTodayAim();
-
-    const reguide = document.getElementById('sec-day-dashboard');
-    if(reguide && typeof root.refreshDuringDayUI === 'function') root.refreshDuringDayUI();
-    else if(reguide) reguide.outerHTML = root.renderDuringDayDashboard?.() || '';
-
-    const ff = document.getElementById('sec-first-fruits');
-    if(ff) ff.outerHTML = renderFirstFruits();
-
-    refreshMustDoList();
-    refreshSectionBadge('sec-non-neg', 'mustdos');
-
-    const growthSec = document.getElementById('sec-growth');
-    if(growthSec) growthSec.outerHTML = renderGrowthRep();
-
-    const friction = document.getElementById('sec-friction');
-    if(friction) friction.outerHTML = renderFriction();
-
-    refreshSectionBadge('sec-plan', 'plan');
-
-    const review = document.getElementById('sec-evening-review');
-    if(review) review.outerHTML = renderEveningNonNegReview();
-
-    const sum = document.getElementById('sec-day-summary');
-    if(sum) sum.outerHTML = renderEveningSummary();
-    else if(document.getElementById('sec-evening-review')){
-      const s = window.faithStore?.getNonNegotiableSummary(dateStr(), dayData) || { kept:0, carried:0, released:0 };
-      if(s.kept || s.carried || s.released){
-        document.getElementById('sec-evening-review')?.insertAdjacentHTML('afterend', renderEveningSummary());
-      }
-    }
-
-    refreshProgressChrome();
-    if(typeof dailyPhase === 'string' && dailyPhase === 'day'){
-      root.refreshDuringDayUI?.();
-    } else {
-      populateFields?.(document.getElementById('dailyMain'), dayData);
-    }
-    updateDailyScore();
+    root.ensureEveningReview?.();
+    renderPhaseContent();
   }
 
   function updateDailyScore(){
@@ -1256,27 +1326,15 @@
   root.__dailyHelpers = {
     getHabitRows, habitRowDone, habitRowStatus, getTopMustDos, getMoreMustDos, getNonNegItems,
     getAnchors, anchorDone, anchorCue, stewHabitCue, markAnchorKept, toggleStewHabit,
-    addNonNeg, addAnchor, filled, dateStr
+    addNonNeg, addAnchor, filled, dateStr, mustDoDisplay
   };
 
   root.hookDailyPhaseRefresh = function(){
-    refreshProgressChrome();
-    if(typeof dailyPhase === 'string' && dailyPhase === 'day'){
-      const side = document.getElementById('dailySidebar');
-      if(side && typeof root.renderDaySidebar === 'function'){
-        side.innerHTML = root.renderDaySidebar();
-        if(typeof loadThoughtJournal === 'function') loadThoughtJournal();
-      }
-    } else {
-      const side = document.getElementById('dailySidebar');
-      if(side && document.getElementById('sec-daily-aim')){
-        side.innerHTML = renderDailySidebar();
-        if(typeof loadThoughtJournal === 'function') loadThoughtJournal();
-      }
-    }
+    renderPhaseContent();
   };
 
   root.renderDailyLedger = renderDailyLedger;
+  root.renderPhaseContent = renderPhaseContent;
   root.refreshDailySummary = refreshProgressChrome;
   root.refreshDailyUI = refreshDailyUI;
   root.updateDailyScore = updateDailyScore;
@@ -1286,10 +1344,8 @@
   root.loadDailyLedger = async function(){
     if(typeof isSaturdayRecovery === 'function' && isSaturdayRecovery()) return false;
     ensureGrowthRep();
-    if(!document.getElementById('sec-daily-aim')) renderDailyLedger();
-    else renderDailyLedger();
-    populateFields?.(document.getElementById('dailyMain'), dayData);
-    refreshDailyUI();
+    root.ensureEveningReview?.();
+    renderPhaseContent();
     return true;
   };
 

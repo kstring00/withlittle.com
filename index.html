@@ -1049,8 +1049,8 @@ details.gr-card:not([open]) .gr-chevron{transform:rotate(-90deg)}
   .gr-sticky-bar{margin-left:-8px;margin-right:-8px;border-radius:0}
   .gr-btn-danger{margin-left:0;width:100%}
 }
-#dailyBoard .gr-progress,#dailyBoard .gr-summary{padding-left:24px;padding-right:24px;max-width:1400px;margin-left:auto;margin-right:auto}
-#dailyBoard .gr-sticky-bar{max-width:1400px;margin-left:auto;margin-right:auto}
+#dailyBoard .gr-progress,#dailyBoard .gr-summary{max-width:none;margin:0;padding:0}
+#dailyBoard .gr-sticky-bar{max-width:none;margin-left:0;margin-right:0}
 #dailyBoard:not(.saturday-recovery) .daily-toolbar{display:none}
 body.view-daily .site-foot,body.view-weekly .site-foot,body.view-monthly .site-foot{display:none!important}
 .weekly-board .page-head,.monthly-board .page-head{margin-bottom:8px}
@@ -1251,7 +1251,49 @@ body.view-daily #dailyBoard,body.view-weekly #weeklyBoard,body.view-monthly #mon
 .rv-btn-danger{background:transparent;border-color:var(--danger);color:var(--danger)}
 .rv-btn-danger:hover{background:color-mix(in srgb,var(--danger) 8%,transparent)}
 body.view-daily .site-foot,body.view-weekly .site-foot,body.view-monthly .site-foot{display:none!important}
-#dailyBoard.guided-daily .daily-layout{grid-template-columns:minmax(0,1fr) 280px;gap:24px;padding-bottom:88px}
+#dailyBoard.guided-daily .dl-command-shell{max-width:1680px;width:100%;margin:0 auto;padding:0 32px 24px;box-sizing:border-box}
+#dailyBoard.guided-daily .page-head,#dailyBoard.guided-daily .dl-phase-suggest-host,#dailyBoard.guided-daily .dl-guide-chrome{max-width:1680px;margin-left:auto;margin-right:auto;padding-left:32px;padding-right:32px;box-sizing:border-box}
+#dailyBoard.guided-daily .dl-body-grid,#dailyBoard.guided-daily .daily-layout{grid-template-columns:minmax(0,1fr) 340px;gap:24px;max-width:none;padding:0;margin:0}
+#dailyBoard.guided-daily .dl-main-stack{min-width:0;display:flex;flex-direction:column}
+#dailyBoard.guided-daily .dl-sticky-bar{position:sticky;bottom:0;margin:12px 0 0;max-width:none;border-radius:12px 12px 0 0;z-index:40}
+#dailyBoard.guided-daily #dailyMain{min-width:0;padding-bottom:4px}
+#dailyBoard.guided-daily #dailyGuideChrome{padding:0;margin:0 0 10px}
+#dailyBoard.guided-daily .gr-progress{margin:0;padding:2px 0 8px;max-width:none}
+#dailyBoard.guided-daily .dl-rail-how ol{margin:0;padding-left:18px;font-size:11px;color:var(--text-secondary);line-height:1.45}
+#dailyBoard.guided-daily .dl-rail-how li{margin-bottom:3px}
+@media(max-width:1100px){#dailyBoard.guided-daily .dl-body-grid,#dailyBoard.guided-daily .daily-layout{grid-template-columns:1fr}#dailyBoard.guided-daily .dl-rail-col{display:flex!important;flex-direction:column;gap:12px;margin-top:8px}}
+@media(max-width:720px){#dailyBoard.guided-daily .dl-command-shell,#dailyBoard.guided-daily .page-head,#dailyBoard.guided-daily .dl-phase-suggest-host{padding-left:16px;padding-right:16px}}
+.dl-phase-view{display:flex;flex-direction:column;gap:12px}
+.dl-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dl-grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media(max-width:900px){.dl-grid-3{grid-template-columns:1fr 1fr}}
+@media(max-width:720px){.dl-grid-2,.dl-grid-3{grid-template-columns:1fr}}
+.dl-cc-card{padding:12px 14px!important;margin-bottom:0!important}
+.dl-cc-title{font-family:"Cormorant Garamond",serif;font-size:17px;font-weight:600;margin:0 0 4px;color:var(--text-primary)}
+.dl-cc-q,.dl-cc-hint{margin:0 0 8px;font-size:12px;color:var(--text-secondary);line-height:1.4}
+.dl-cc-hint{font-size:11px;font-style:italic;color:var(--text-muted);margin-top:4px;margin-bottom:0}
+.dl-cc-full{grid-column:1/-1}
+.dl-stat-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media(max-width:720px){.dl-stat-row{grid-template-columns:1fr 1fr}}
+.dl-stat-card{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1px solid var(--border-subtle);border-radius:12px;background:var(--bg-card);box-shadow:0 1px 4px var(--shadow-elevated);cursor:pointer;font-family:inherit;text-align:left;transition:border-color .15s,background .15s}
+.dl-stat-card:hover:not(.dl-stat-static){border-color:var(--gold-border-soft)}
+.dl-stat-static{cursor:default}
+.dl-stat-k{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted)}
+.dl-stat-v{font-size:14px;font-weight:600;color:var(--text-primary)}
+.dl-habit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+@media(max-width:640px){.dl-habit-grid{grid-template-columns:1fr}}
+.dl-habit-grid .dl-habit-card{margin-bottom:0}
+.dl-phase-kicker{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-text);margin-bottom:4px}
+.dl-phase-hero{background:color-mix(in srgb,var(--gold) 8%,var(--bg-card));border:1px solid var(--gold-border-soft);border-radius:16px;padding:14px 16px;box-shadow:0 1px 5px var(--shadow-elevated)}
+.dl-phase-hero-title{font-family:"Cormorant Garamond",serif;font-size:20px;font-weight:600;margin:0 0 4px;color:var(--text-primary)}
+.dl-phase-hero-sub{margin:0;font-size:13px;color:var(--text-secondary);line-height:1.45}
+.dl-cc-check-list{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;max-height:140px;overflow-y:auto}
+.dl-cc-check-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-primary);padding:4px 0}
+.dl-cc-check-row.done .dl-cc-check{color:var(--green)}
+.dl-cc-check{font-weight:700;color:var(--green);flex:none}
+.dl-cc-empty{margin:0 0 8px;font-size:12px;color:var(--text-muted);font-style:italic}
+.dd-intro-card{background:color-mix(in srgb,var(--gold) 6%,var(--bg-card));border-color:var(--gold-border-soft)}
+#dailyBoard.guided-daily .daily-layout{grid-template-columns:minmax(0,1fr) 340px;gap:24px;padding-bottom:0}
 @media(max-width:1100px){#dailyBoard.guided-daily .daily-layout{grid-template-columns:1fr}.dl-rail-col{display:flex!important;flex-direction:column;gap:12px;margin-top:8px}}
 #dailyBoard.guided-daily .dl-section{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:16px;padding:14px 16px;margin-bottom:12px;box-shadow:0 1px 5px var(--shadow-elevated)}
 #dailyBoard.guided-daily .dl-section-head{font-size:18px;margin:0 0 4px}
@@ -1259,10 +1301,9 @@ body.view-daily .site-foot,body.view-weekly .site-foot,body.view-monthly .site-f
 #dailyBoard.guided-daily .dl-q{margin:0 0 8px;font-size:12px;font-style:italic;color:var(--text-secondary)}
 #dailyBoard.guided-daily #dailyTopSummary{display:block;margin-bottom:4px}
 #dailyBoard.guided-daily .daily-tagline{font-size:13px;color:var(--text-secondary);max-width:36em;margin:4px 0 0}
-#dailyBoard.guided-daily #dailyGuideChrome{padding:0 24px;max-width:1400px;margin:0 auto 8px}
 #dailyBoard.guided-daily .gr-btn-danger{background:transparent;border:1px solid color-mix(in srgb,var(--danger) 50%,var(--border));color:var(--danger);font-weight:600}
 #dailyBoard.guided-daily .gr-btn-danger:hover{background:color-mix(in srgb,var(--danger) 8%,transparent)}
-.dl-phase-suggest-host{max-width:1400px;margin:0 auto 8px;padding:0 24px}
+.dl-phase-suggest-host{max-width:1680px;margin:0 auto 8px;padding:0 32px;box-sizing:border-box}
 .dl-phase-suggest-host:empty{display:none}
 .dl-phase-suggest{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 14px;border-radius:12px;border:1px solid var(--gold-border-soft);background:color-mix(in srgb,var(--gold) 7%,var(--bg-card));font-size:12px;color:var(--text-secondary)}
 .dl-phase-suggest-text{flex:1;min-width:200px;line-height:1.45}
@@ -2517,15 +2558,20 @@ body.intake-open{overflow:hidden}
   <div class="daily-toolbar">
     <div class="phase-tabs sat-block-tabs" id="satBlockTabs" role="tablist" aria-label="Time blocks"></div>
   </div>
-  <div class="daily-layout">
-    <div class="main-col" id="dailyMain"></div>
-    <aside class="sidebar dl-rail-col" id="dailySidebar"></aside>
-  </div>
-  <div class="gr-sticky-bar" id="dailyStickyBar" hidden>
-    <button type="button" class="gr-btn-primary" data-gr-act="save-day">Save Day</button>
-    <button type="button" class="gr-btn-secondary" data-gr-act="commit-next-step" hidden>Commit Next Step</button>
-    <button type="button" class="gr-btn-secondary" data-gr-act="mark-phase">Mark Morning Complete</button>
-    <button type="button" class="gr-btn-danger" data-gr-act="clear-day">Clear Day</button>
+  <div class="dl-command-shell">
+    <div id="dailyGuideChrome" class="dl-guide-chrome" role="navigation" aria-label="Daily progress"></div>
+    <div class="dl-body-grid daily-layout">
+      <div class="dl-main-stack">
+        <div class="main-col" id="dailyMain"></div>
+        <div class="gr-sticky-bar dl-sticky-bar" id="dailyStickyBar" hidden>
+          <button type="button" class="gr-btn-primary" data-gr-act="save-day">Save Day</button>
+          <button type="button" class="gr-btn-secondary" data-gr-act="commit-next-step" hidden>Commit Next Step</button>
+          <button type="button" class="gr-btn-secondary" data-gr-act="mark-phase">Mark Morning Complete</button>
+          <button type="button" class="gr-btn-danger" data-gr-act="clear-day">Clear Day</button>
+        </div>
+      </div>
+      <aside class="sidebar dl-rail-col" id="dailySidebar"></aside>
+    </div>
   </div>
 </div>
 
@@ -2806,8 +2852,9 @@ body.intake-open{overflow:hidden}
 <script src="ideas-hub.js?v=6" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
 <script src="stewardship-store.js?v=1"></script>
 <script src="calendar-ui.js?v=4"></script>
-<script src="daily-ui.js?v=6"></script>
-<script src="midday-ui.js?v=1"></script>
+<script src="daily-ui.js?v=7"></script>
+<script src="midday-ui.js?v=2"></script>
+<script src="evening-ui.js?v=1"></script>
 <script src="review-ui.js?v=2"></script>
 <script src="profile-ui.js?v=1"></script>
 <script src="guide-ui.js?v=2"></script>
@@ -3918,7 +3965,8 @@ function blankDaily(){
       nextStepCommitted:false,
       friction:{pull:[],support:''},
       middayComplete:false
-    }
+    },
+    eveningReview:{release:'',releaseTags:[],carryTomorrow:'',gratitude:'',patterns:''}
   };
 }
 function blankSatRecovery(){
@@ -4089,6 +4137,8 @@ function normalizeDaily(s){
   if(s.dayCheckIn?.audible) d.dayCheckIn.audible = {...b.dayCheckIn.audible,...s.dayCheckIn.audible};
   if(s.dayCheckIn?.friction) d.dayCheckIn.friction = {...b.dayCheckIn.friction,...s.dayCheckIn.friction};
   if(s.dayCheckIn?.habits) d.dayCheckIn.habits = {...(s.dayCheckIn.habits||{})};
+  d.eveningReview = {...b.eveningReview,...(s.eveningReview||{})};
+  if(s.eveningReview?.releaseTags) d.eveningReview.releaseTags = [...s.eveningReview.releaseTags];
   d.satRecovery = normalizeSatRecovery(s.satRecovery);
   if(s.focus != null) d.focus = String(s.focus);
   if(s.soulCheck != null) d.soulCheck = s.soulCheck;
@@ -4969,8 +5019,8 @@ function setDailyPhase(phase){
   applyDailyPhase();
   if(phase === 'day' || phase === 'evening') dismissPhaseSuggest(phase);
   if(typeof refreshDailySummary === 'function') refreshDailySummary();
-  if(typeof hookDailyPhaseRefresh === 'function') hookDailyPhaseRefresh();
-  setTimeout(scrollDailyPhaseIntoView, 40);
+  if(typeof renderPhaseContent === 'function') renderPhaseContent();
+  else if(typeof hookDailyPhaseRefresh === 'function') hookDailyPhaseRefresh();
 }
 function bindDailyPhaseTabs(){
   if(document.body.dataset.dailyPhaseBound) return;
@@ -5179,6 +5229,7 @@ function bindPanelEvents(){
   try{ bindDailyEvents?.(); }catch(e){ console.warn('[bindPanelEvents] daily', e); }
   try{ bindDailyPhaseTabs(); }catch(e){ console.warn('[bindPanelEvents] daily phases', e); }
   try{ bindMiddayEvents?.(); }catch(e){ console.warn('[bindPanelEvents] midday', e); }
+  try{ bindEveningEvents?.(); }catch(e){ console.warn('[bindPanelEvents] evening', e); }
   try{ bindReviewEvents?.(); }catch(e){ console.warn('[bindPanelEvents] review', e); }
   try{ bindJournalEvents?.(); }catch(e){ console.warn('[bindPanelEvents] journal', e); }
   try{ bindIdeasPageEvents(); }catch(e){ console.warn('[bindPanelEvents] ideas page', e); }
@@ -5699,7 +5750,6 @@ async function loadDaily(){
     await faithStore.save();
   }
   if(!isSat && typeof loadDailyLedger === 'function'){
-    if(!document.getElementById('sec-daily-aim')) renderDailyLedger?.();
     await loadDailyLedger();
     applyDailyPhase();
     if(typeof updateDailyScore === 'function') updateDailyScore();
