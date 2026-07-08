@@ -147,7 +147,7 @@ html,body{margin:0;background:var(--bg-page);color:var(--ink);
 .page-head p{margin:0;font-size:13px;color:var(--mist)}
 /* Daily Ledger head — title left, rhythm tabs centered at the same height, actions right */
 .daily-head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}
-.daily-head .weekday-phase-tabs{justify-self:center}
+.daily-head .weekday-phase-tabs{justify-self:center;position:relative;z-index:5}
 .daily-head .page-head-actions{justify-self:end}
 @media(max-width:900px){
   .daily-head{grid-template-columns:1fr;justify-items:center;text-align:center;gap:10px}
@@ -1296,7 +1296,10 @@ body.view-daily .site-foot,body.view-weekly .site-foot,body.view-monthly .site-f
 .dl-rail-journal .dl-rail-q{margin:0 0 8px;font-size:12px;font-style:italic;color:var(--text-secondary)}
 .dl-rail-journal textarea{width:100%;min-height:72px;border:1px solid transparent;border-radius:10px;background:var(--bg-card-2);padding:8px 10px;font:13px/1.5 inherit;color:var(--text-primary);resize:vertical}
 .dl-rail-journal textarea:focus{outline:none;border-color:var(--gold-border-soft);background:var(--bg-card);min-height:96px}
-.dl-note{font-size:11px;color:var(--text-muted);line-height:1.45;margin:8px 0 0}
+.dl-reguide{background:color-mix(in srgb,var(--gold) 6%,var(--bg-card));border-color:var(--gold-border-soft)}
+.dl-reguide-aim{font-size:14px;font-weight:600;color:var(--text-primary);margin:0 0 6px}
+.dl-reguide-plan{font-size:12px;color:var(--text-secondary);margin:0 0 8px;line-height:1.45}
+.dl-reguide-hint{font-size:11px;color:var(--text-muted);margin:0;font-style:italic}
 .dl-nn-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
 .dl-how-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:14px;padding:14px 16px;box-shadow:0 1px 4px var(--shadow-elevated)}
 .dl-how-card h4{margin:0 0 8px;font-family:"Cormorant Garamond",serif;font-size:16px;font-weight:600}
@@ -2737,7 +2740,7 @@ body.intake-open{overflow:hidden}
 <script src="ideas-hub.js?v=6" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
 <script src="stewardship-store.js?v=1"></script>
 <script src="calendar-ui.js?v=4"></script>
-<script src="daily-ui.js?v=4"></script>
+<script src="daily-ui.js?v=5"></script>
 <script src="review-ui.js?v=2"></script>
 <script src="profile-ui.js?v=1"></script>
 <script src="guide-ui.js?v=2"></script>
@@ -4836,13 +4839,31 @@ function renderDaily(){
 }
 function applyDailyPhase(){
   const board = document.getElementById('dailyBoard');
+  if(!board) return;
   board.dataset.phase = dailyPhase;
   document.querySelectorAll('.weekday-phase-tabs .phase-tab').forEach(t=> t.classList.toggle('on', t.dataset.phase===dailyPhase));
+}
+function scrollDailyPhaseIntoView(){
+  const board = document.getElementById('dailyBoard');
+  if(!board) return;
+  const first = board.querySelector('.daily-section[data-phases~="'+dailyPhase+'"]');
+  first?.scrollIntoView({ behavior:'smooth', block:'start' });
 }
 function setDailyPhase(phase){
   dailyPhase = phase;
   applyDailyPhase();
   if(typeof refreshDailySummary === 'function') refreshDailySummary();
+  setTimeout(scrollDailyPhaseIntoView, 40);
+}
+function bindDailyPhaseTabs(){
+  if(document.body.dataset.dailyPhaseBound) return;
+  document.body.dataset.dailyPhaseBound = '1';
+  document.getElementById('dailyBoard')?.addEventListener('click', e=>{
+    const tab = e.target.closest('.weekday-phase-tabs .phase-tab[data-phase]');
+    if(!tab || !isDaily()) return;
+    e.preventDefault();
+    setDailyPhase(tab.dataset.phase);
+  });
 }
 
 function renderWeekly(){
@@ -5024,6 +5045,7 @@ function bindPanelEvents(){
   try{ bindTagEvents?.(); }catch(e){ console.warn('[bindPanelEvents] tags', e); }
   try{ bindMentorshipEvents?.(); }catch(e){ console.warn('[bindPanelEvents] mentorship', e); }
   try{ bindDailyEvents?.(); }catch(e){ console.warn('[bindPanelEvents] daily', e); }
+  try{ bindDailyPhaseTabs(); }catch(e){ console.warn('[bindPanelEvents] daily phases', e); }
   try{ bindReviewEvents?.(); }catch(e){ console.warn('[bindPanelEvents] review', e); }
   try{ bindJournalEvents?.(); }catch(e){ console.warn('[bindPanelEvents] journal', e); }
   try{ bindIdeasPageEvents(); }catch(e){ console.warn('[bindPanelEvents] ideas page', e); }

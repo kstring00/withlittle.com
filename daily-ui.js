@@ -24,11 +24,11 @@
     { id:'recovery', label:'Recovery', legacy:'body' }
   ];
   const DAILY_STEPS = [
-    { id:'aim', label:'Aim', sec:'sec-daily-aim', phases:['morning','day'] },
+    { id:'aim', label:'Aim', sec:'sec-daily-aim', phases:['morning'] },
     { id:'habits', label:'Habits', sec:'sec-first-fruits', phases:['morning','day','evening'] },
     { id:'mustdos', label:'Must-Dos', sec:'sec-non-neg', phases:['morning','day','evening'] },
-    { id:'growth', label:'Growth', sec:'sec-growth', phases:['morning','day'] },
-    { id:'plan', label:'Plan', sec:'sec-friction', phases:['morning','day'] },
+    { id:'growth', label:'Growth', sec:'sec-growth', phases:['morning'] },
+    { id:'plan', label:'Plan', sec:'sec-friction', phases:['morning'] },
     { id:'reflect', label:'Reflect', sec:'sec-evening-review', phases:['evening'] }
   ];
 
@@ -270,9 +270,32 @@
       '</div>';
   }
 
+  function renderDayReguide(){
+    ensureGrowthRep();
+    const aim = dayData?.posture?.aim?.trim();
+    const d = dayData?.danger || {};
+    const top = getTopMustDos();
+    const aimLine = aim ? 'Today\u2019s aim: '+esc(aim) : 'Set your aim in Morning Setup when you can.';
+    let planLine = '';
+    if(d.danger && d.thenWill){
+      planLine = 'If '+esc(d.danger)+', then '+esc(d.thenWill);
+    } else if(d.danger || d.thenWill){
+      planLine = 'Finish your friction plan in Morning Setup.';
+    }
+    const todoHint = top.length
+      ? 'Check off habits and your top '+Math.min(top.length, 3)+' as you go.'
+      : 'Add up to three must-dos in Morning Setup, then check them off here.';
+    return '<section class="gr-card daily-section dl-reguide" data-phases="day" id="sec-day-reguide" data-dl-sec="reguide">'+
+      '<div class="gr-card-head"><div><div class="gr-card-kicker">Midday check-in</div>'+
+      '<h3 class="gr-card-title serif">Reguide toward this morning\u2019s plan</h3></div></div>'+
+      '<p class="dl-reguide-aim">'+aimLine+'</p>'+
+      (planLine ? '<p class="dl-reguide-plan">'+planLine+'</p>' : '')+
+      '<p class="dl-reguide-hint">'+todoHint+'</p></section>';
+  }
+
   function renderTodayAim(){
     const st = sectionStatus('aim');
-    return '<section class="gr-card daily-section" data-phases="morning day" id="sec-daily-aim" data-dl-sec="aim">'+
+    return '<section class="gr-card daily-section" data-phases="morning" id="sec-daily-aim" data-dl-sec="aim">'+
       '<div class="gr-card-head">'+
       '<div><div class="gr-card-kicker">Step 1</div>'+
       '<h3 class="gr-card-title serif">Today\u2019s Aim'+(window.helpTip?.(1,'Name the virtue or posture you want to carry today — before tasks take over.')||'')+'</h3>'+
@@ -399,7 +422,7 @@
       '<button type="button" class="dl-growth-cat'+(sel===c.id?' on':'')+'" data-dl-rep-cat="'+c.id+'">'+esc(c.label)+'</button>'
     ).join('');
     const legacy = renderLegacyGrowthAreas();
-    return '<section class="gr-card daily-section" data-phases="morning day" id="sec-growth" data-dl-sec="growth">'+
+    return '<section class="gr-card daily-section" data-phases="morning" id="sec-growth" data-dl-sec="growth">'+
       '<div class="gr-card-head">'+
       '<div><div class="gr-card-kicker">Step 4</div>'+
       '<h3 class="gr-card-title serif">1% Growth Rep'+(window.helpTip?.(4,'One small action that develops what God has entrusted to you.')||'')+'</h3>'+
@@ -454,7 +477,7 @@
 
   function renderFriction(){
     const st = sectionStatus('plan');
-    return '<section class="gr-card daily-section" data-phases="morning day" id="sec-friction" data-dl-sec="plan">'+
+    return '<section class="gr-card daily-section" data-phases="morning" id="sec-friction" data-dl-sec="plan">'+
       '<div class="gr-card-head">'+
       '<div><div class="gr-card-kicker">Step 5</div>'+
       '<h3 class="gr-card-title serif">Prepare for Friction'+(window.helpTip?.(5,'Goals need a plan for obstacles, not just good intentions.')||'')+'</h3>'+
@@ -469,7 +492,7 @@
   }
 
   function renderPlanOfAction(){
-    return '<section class="gr-card daily-section" data-phases="morning day" id="sec-plan" data-dl-sec="plan-windows">'+
+    return '<section class="gr-card daily-section" data-phases="morning" id="sec-plan" data-dl-sec="plan-windows">'+
       '<div class="gr-card-head">'+
       '<div><div class="gr-card-kicker">Step 6</div>'+
       '<h3 class="gr-card-title serif">Time Windows'+(window.helpTip?.(6,'Map faithfulness across the day \u2014 one line per window.')||'')+'</h3>'+
@@ -526,13 +549,9 @@
   function renderHowThisWorks(){
     return '<div class="gr-how"><h4 class="serif">How This Works</h4>'+
       '<ol>'+
-      '<li>Name your aim</li>'+
-      '<li>Keep your non-negotiables</li>'+
-      '<li>Choose your top 3</li>'+
-      '<li>Pick one growth rep</li>'+
-      '<li>Prepare for friction</li>'+
-      '<li>Map your windows</li>'+
-      '<li>Review with grace</li>'+
+      '<li><strong>Morning (~3 min):</strong> aim, habits, top 3, growth rep, friction plan, time windows</li>'+
+      '<li><strong>During the day:</strong> check habits and must-dos; use the midday card to reguide</li>'+
+      '<li><strong>Evening:</strong> review with grace — keep, learn, adjust</li>'+
       '</ol></div>';
   }
 
@@ -605,6 +624,7 @@
 
     main.innerHTML =
       renderTodayAim()+
+      renderDayReguide()+
       renderFirstFruits()+
       renderNonNegotiables()+
       renderGrowthRep()+
@@ -648,6 +668,9 @@
 
     const aim = document.getElementById('sec-daily-aim');
     if(aim) aim.outerHTML = renderTodayAim();
+
+    const reguide = document.getElementById('sec-day-reguide');
+    if(reguide) reguide.outerHTML = renderDayReguide();
 
     const ff = document.getElementById('sec-first-fruits');
     if(ff) ff.outerHTML = renderFirstFruits();
@@ -1127,7 +1150,15 @@
             if(task) window.faithStore.updateTask(task.id, { completed: !!it.done, completedAt: it.done ? new Date().toISOString() : null });
             window.faithStore.save();
           }
-          refreshDailyUI();
+          const row = nn.closest('.dl-must-row');
+          if(row){
+            row.classList.toggle('done', it.done);
+            const text = row.querySelector('.dl-must-text');
+            if(text) text.classList.toggle('done', it.done);
+          }
+          refreshSectionBadge('sec-non-neg', 'mustdos');
+          refreshProgressChrome();
+          updateDailyScore();
           markDirty?.();
         }
         return;
