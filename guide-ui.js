@@ -489,7 +489,11 @@
       if(dismiss){ dismissHint(dismiss.dataset.hintDismiss); return; }
 
       const help = e.target.closest('#btnGuideHelp');
-      if(help && help.dataset.guideCard){ openGuideCard(help.dataset.guideCard); }
+      if(help){
+        const areaId = help.dataset.guideCard || hintAreaForView();
+        if(areaId) openGuideCard(areaId);
+        return;
+      }
     });
 
     document.addEventListener('input', e => {

@@ -1420,7 +1420,9 @@ body.faithfulness-app #periodLabel{color:var(--text-primary);font-weight:500;min
   border:5px solid transparent;border-bottom-color:var(--navy,#2b2b26);
   opacity:0;visibility:hidden;transition:opacity .15s ease;z-index:80}
 .help-tip:hover::after,.help-tip:focus-visible::after,
-.help-tip:hover::before,.help-tip:focus-visible::before{opacity:1;visibility:visible;transform:translateY(0)}
+.help-tip:hover::before,.help-tip:focus-visible::before,
+.help-tip.on::after,.help-tip.on::before{opacity:1;visibility:visible;transform:translateY(0)}
+.help-tip.on::before{transform:none}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .dash-task{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;font-size:13px}
 .dash-task:last-child{border-bottom:none}
@@ -2699,7 +2701,7 @@ body.intake-open{overflow:hidden}
 <script src="daily-ui.js?v=2"></script>
 <script src="review-ui.js?v=2"></script>
 <script src="profile-ui.js?v=1"></script>
-<script src="guide-ui.js?v=1"></script>
+<script src="guide-ui.js?v=2"></script>
 <script src="intake-ui.js?v=1"></script>
 <script>
 
@@ -4751,6 +4753,8 @@ function injectSatRhythmSidebar(){
   updateSatRhythm();
 }
 function bindFFAccordion(){
+  if(document.body.dataset.ffAccBound) return;
+  document.body.dataset.ffAccBound = '1';
   document.getElementById('app')?.addEventListener('toggle', e=>{
     const d = e.target;
     if(!d.classList?.contains('ff-accordion') || !d.open) return;
@@ -4970,6 +4974,32 @@ function bindNavEvents(){
     if(btn.closest('.sidebar-nav')) return;
     btn.addEventListener('click', ()=> setMode(btn.dataset.nav));
   });
+}
+function bindPanelEvents(){
+  try{ bindProfileEvents?.(); }catch(e){ console.warn('[bindPanelEvents] profile', e); }
+  try{ bindGuideEvents?.(); }catch(e){ console.warn('[bindPanelEvents] guide', e); }
+  try{ bindTagEvents?.(); }catch(e){ console.warn('[bindPanelEvents] tags', e); }
+  try{ bindMentorshipEvents?.(); }catch(e){ console.warn('[bindPanelEvents] mentorship', e); }
+  try{ bindDailyEvents?.(); }catch(e){ console.warn('[bindPanelEvents] daily', e); }
+  try{ bindReviewEvents?.(); }catch(e){ console.warn('[bindPanelEvents] review', e); }
+  try{ bindJournalEvents?.(); }catch(e){ console.warn('[bindPanelEvents] journal', e); }
+  try{ bindIdeasPageEvents(); }catch(e){ console.warn('[bindPanelEvents] ideas page', e); }
+  try{ bindFFAccordion(); }catch(e){ console.warn('[bindPanelEvents] ff accordion', e); }
+  if(!document.body.dataset.helpTipBound){
+    document.body.dataset.helpTipBound = '1';
+    document.getElementById('app')?.addEventListener('click', e=>{
+      const tip = e.target.closest('.help-tip');
+      if(tip){
+        if(tip.classList.contains('on')) tip.classList.remove('on');
+        else{
+          document.querySelectorAll('.help-tip.on').forEach(t=> t.classList.remove('on'));
+          tip.classList.add('on');
+        }
+        return;
+      }
+      document.querySelectorAll('.help-tip.on').forEach(t=> t.classList.remove('on'));
+    });
+  }
 }
 
 function bindEvents(){
@@ -5307,7 +5337,6 @@ function bindEvents(){
     if(e.key==='Enter'){ e.preventDefault(); sendMagicLink(); }
   });
   document.getElementById('authSignOut')?.addEventListener('click', signOut);
-  bindIdeasPageEvents();
   document.getElementById('clearPeriod')?.addEventListener('click', clearCurrent);
   document.getElementById('clearJournal')?.addEventListener('click', clearJournalEntry);
   document.getElementById('resetAll')?.addEventListener('click', resetAll);
@@ -5317,7 +5346,6 @@ function bindEvents(){
     updateJournalMeta(); markDirty();
     if(typeof scheduleSnapshotRefresh === 'function') scheduleSnapshotRefresh();
   });
-  if(typeof bindJournalEvents === 'function') bindJournalEvents();
   window.addEventListener('beforeunload', e=>{ if(dirty){ save(); e.preventDefault(); }});
   document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden' && dirty) save(); });
   window.addEventListener('online', ()=>{ if(authUser && cloudPushKeys.size) flushCloudPush(); });
@@ -5563,7 +5591,6 @@ async function resetAll(){
   try{
     renderDaily(); renderWeekly(); renderMonthly();
     try{ bindEvents(); }catch(e){ console.warn('[bindEvents] failed — nav will still bind', e); }
-    bindFFAccordion(); bindDailyEvents?.(); bindReviewEvents?.();
     const vm = await window.storage.get('view-mode');
     if(vm?.value === 'calendar') viewMode = 'dashboard';
     else if(vm?.value && (['dashboard','daily','weekly','monthly','journal','ideas','prayer','projects','profile','privacy','guide','settings','tag'].includes(vm.value) || vm.value.startsWith('mentorship-'))) viewMode = vm.value;
@@ -5586,10 +5613,6 @@ async function resetAll(){
     }
     const rn = document.getElementById('researchNotes');
     if(rn) rn.value = globals.researchNotes||'';
-    bindProfileEvents?.();
-    bindGuideEvents?.();
-    bindTagEvents?.();
-    bindMentorshipEvents?.();
     renderMentorshipNav?.();
     if(isMentorship()) loadMentorship?.();
     await loadGuide?.();
@@ -5599,6 +5622,7 @@ async function resetAll(){
     console.error('[init] startup error — loading local view anyway', e);
   }finally{
     bindNavEvents();
+    bindPanelEvents();
     await loadCurrent().catch(e=> console.warn('[init] loadCurrent failed', e));
     loadThoughtJournal();
     if(authUser && !dirty) updateSaveState('synced');
