@@ -8,7 +8,7 @@
 'use strict';
 
 const { createClient } = require('@supabase/supabase-js');
-const { buildMentorSystemPrompt } = require('../mentor-system-prompt.js');
+const { MENTOR_SYSTEM_PROMPT, buildMentorDynamicBlock } = require('../mentor-system-prompt.js');
 
 const DAILY_ALLOWANCE = 20;
 const RATE_LIMIT_PER_MIN = 5;
@@ -20,10 +20,13 @@ const ERR_UNAVAILABLE = "I can't reach you right now. What's the one thing you a
 const ERR_SIGNED_OUT = 'The Stewardship Mentor needs you to be signed in — your rhythm and your data stay yours that way.';
 const ERR_ZERO_BALANCE = "We've talked a lot today. Sit with what you have. I'll be here in the morning.";
 
-/** Today's date in UTC — used only for the prompt's date line. Never derived
+/** Today's date for the prompt's date line, in the app's canonical zone
+ *  (America/Chicago — same source of truth as the meter reset). Never derived
  *  from the request body, so it can't be gamed to refill the meter. */
-function utcDateStr(){
-  return new Date().toISOString().slice(0, 10);
+function displayDateStr(){
+  return new Date().toLocaleDateString('en-US', {
+    timeZone: 'America/Chicago', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
 }
 
 function trimHistory(history){
@@ -119,16 +122,20 @@ module.exports = async function handler(req, res){
   const source = String(body.source || 'general').slice(0, 64);
   const userName = String(body.userName || '').slice(0, 80);
 
-  // System prompt built exactly as before — interpolation untouched (mentor-system-prompt.js).
-  const systemPrompt = buildMentorSystemPrompt(userName, utcDateStr());
-
-  const contextBlock = context
-    ? '\n\n---\nAPP CONTEXT (' + source + '):\n' + context
-    : '';
+  // ── Two system blocks so prompt caching can actually engage ──
+  // [0] the STATIC voice/policy prompt, byte-identical every call → cached.
+  // [1] the per-call identity + app context → NOT cached (it changes every call).
+  // Interpolating name/date/context into a single block (the old shape) meant
+  // the "cached" prefix was never repeated, so it could never cache.
+  const dynamicContext = context ? ('APP CONTEXT (' + source + '):\n' + context) : '';
+  const system = [
+    { type: 'text', text: MENTOR_SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } },
+    { type: 'text', text: buildMentorDynamicBlock(userName, displayDateStr(), dynamicContext) }
+  ];
 
   const messages = [
     ...history,
-    { role: 'user', content: message + contextBlock }
+    { role: 'user', content: message }
   ];
 
   let anthropicRes;
@@ -144,11 +151,7 @@ module.exports = async function handler(req, res){
         model: MODEL,
         max_tokens: MAX_TOKENS,
         stream: true,
-        system: [{
-          type: 'text',
-          text: systemPrompt,
-          cache_control: { type: 'ephemeral' }
-        }],
+        system,
         messages
       })
     });
@@ -217,9 +220,12 @@ module.exports = async function handler(req, res){
     }
 
     // Cache visibility: a nonzero cache_read on the 2nd+ message in a
-    // conversation means the system block is caching. If it stays 0, the
-    // prefix is under the model's minimum (2048 tokens for Sonnet 4.6) and
-    // the placeholder prompt simply won't cache — report, don't hide.
+    // conversation means the static system block is caching. The static block
+    // is now byte-stable (dynamic data lives in the 2nd, uncached block), so
+    // it CAN cache — but only once it exceeds the model minimum: 2048 tokens
+    // for Sonnet 4.6 (per Anthropic's prompt-caching table; the 1024 tier is
+    // Sonnet 4.5 and older). The current placeholder prompt is ~500 tokens, so
+    // it still won't cache until the real, longer prompt lands — report, don't hide.
     console.log('[mentor] usage', JSON.stringify({
       source,
       input_tokens: inputTokens,

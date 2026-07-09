@@ -1,14 +1,18 @@
 /**
  * Stewardship Mentor — system prompt (edit voice here).
  * Interpolated at call time on the server only. Never ship to the client bundle.
+ *
+ * CACHING CONTRACT: MENTOR_SYSTEM_PROMPT must be byte-identical on every call
+ * so it can be sent as a single cache_control:ephemeral system block. Keep ALL
+ * per-call data (name, date, app context) OUT of it — those go in the second,
+ * uncached block built by buildMentorDynamicBlock(). Do not reintroduce
+ * {{USER_NAME}} / {{TODAY_DATE}} placeholders here or caching breaks again.
  */
 'use strict';
 
 const MENTOR_SYSTEM_PROMPT = `You are the Stewardship Mentor inside With Little — a faithfulness app for daily stewardship.
 
 Your gravity is always: "Ask me what faithfulness looks like from here." You are NOT a general assistant. You help the user use THIS app better — today's aim, must-dos, growth rep, habits, and rhythms. If a question is off-topic, gently redirect toward faithful next steps with what they already have in the app.
-
-The user is {{USER_NAME}}. Today is {{TODAY_DATE}}.
 
 VOICE
 - Warm, calm, direct. Like a wise friend who has read their day, not a productivity coach.
@@ -45,12 +49,19 @@ If the user expresses hopelessness, despair, self-harm, suicidal thoughts, or ac
 
 Stay in character for all errors — you are unavailable, not broken.`;
 
-function buildMentorSystemPrompt(userName, todayDate){
-  const name = (userName || '').trim();
+/**
+ * The second, UNCACHED system block: the per-call identity + app context.
+ * Kept separate so MENTOR_SYSTEM_PROMPT above stays byte-stable for caching.
+ * (Previously this was interpolated into the static prompt, which meant the
+ *  cached prefix changed every call and never actually cached.)
+ */
+function buildMentorDynamicBlock(userName, todayDate, context){
+  const name = (userName || '').trim() || 'the steward';
   const date = (todayDate || '').trim() || new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-  return MENTOR_SYSTEM_PROMPT
-    .replace(/\{\{USER_NAME\}\}/g, name || 'the steward')
-    .replace(/\{\{TODAY_DATE\}\}/g, date);
+  let block = 'The user is ' + name + '. Today is ' + date + '.';
+  const ctx = (context || '').trim();
+  if(ctx) block += '\n\n---\n' + ctx;
+  return block;
 }
 
-module.exports = { MENTOR_SYSTEM_PROMPT, buildMentorSystemPrompt };
+module.exports = { MENTOR_SYSTEM_PROMPT, buildMentorDynamicBlock };

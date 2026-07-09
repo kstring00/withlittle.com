@@ -5,15 +5,22 @@
 -- The meter must NOT live in app_data: app_data is writable by the
 -- user under RLS (the server previously used the anon key and acted
 -- AS the user), so a user could set their own balance from the
--- browser console. This table is writable ONLY by the service role,
--- and the daily reset is computed in UTC on the server — never from a
--- client-supplied timezone.
+-- browser console. This table is writable ONLY by the service role.
+--
+-- The daily reset flips at 4am America/Central, DST-safe. We use the
+-- NAMED zone (not a fixed hour offset) because Central is UTC-6 in
+-- winter and UTC-5 in summer — a fixed offset would break twice a year.
+-- Central is the single source of truth for ALL users; we do NOT read a
+-- timezone from the request body. A future per-user timezone would swap
+-- only the reset expression below (the ((now() AT TIME ZONE ...)) line)
+-- for a per-row zone; nothing else changes.
 -- ============================================================
 
 create table if not exists public.mentor_meter (
   user_id      uuid primary key references auth.users on delete cascade,
   balance      integer     not null default 20,
-  reset_date   date        not null default (now() at time zone 'utc')::date,
+  -- "today" = the 4am-Central stewardship day (see header note)
+  reset_date   date        not null default ((now() at time zone 'America/Chicago') - interval '4 hours')::date,
   window_start timestamptz,
   window_count integer     not null default 0,
   updated_at   timestamptz not null default now()
@@ -25,13 +32,21 @@ alter table public.mentor_meter enable row level security;
 drop policy if exists "mentor_meter select own" on public.mentor_meter;
 create policy "mentor_meter select own" on public.mentor_meter
   for select using (auth.uid() = user_id);
--- No insert / update / delete policies → denied for anon & authenticated.
--- The service role bypasses RLS, so the serverless function can write.
+-- No insert / update / delete policies → those are denied for anon &
+-- authenticated even with a table grant. The service role bypasses RLS.
+
+-- ── Explicit grant lock-down (Supabase auto-grants anon/authenticated on
+--    public tables, so strip them and hand back only read to authenticated;
+--    RLS still limits that read to the user's own row). ──
+revoke all on table public.mentor_meter from anon, authenticated;
+grant select on table public.mentor_meter to authenticated;
 
 -- ── Atomic reserve: rate-limit check + balance decrement in one statement ──
 -- Returns exactly one row. `allowed` false with balance 0 = out of messages;
 -- `rate_limited` true = too many in the last minute (balance untouched).
--- reset_date/window are recomputed from UTC now() — client cannot influence.
+-- reset_date/window are recomputed from server time — client cannot influence.
+-- A brand-new user is upserted with a FULL balance, so their first call
+-- decrements to allowance-1 and is allowed (never born at zero).
 create or replace function public.mentor_reserve(
   p_user_id   uuid,
   p_allowance integer,
@@ -43,12 +58,15 @@ security definer
 set search_path = ''
 as $$
 declare
-  v_today date := (now() at time zone 'utc')::date;
+  -- The 4am-Central stewardship day. DST-safe named zone; NOT a fixed offset.
+  -- (Future per-user tz: replace 'America/Chicago' with the user's zone.)
+  v_today date := ((now() at time zone 'America/Chicago') - interval '4 hours')::date;
   v_bal   integer;
   v_reset date;
   v_wstart timestamptz;
   v_wcount integer;
 begin
+  -- Upsert a fresh full-balance row for a user who has never had one.
   insert into public.mentor_meter as m (user_id, balance, reset_date, window_start, window_count)
     values (p_user_id, p_allowance, v_today, now(), 0)
     on conflict (user_id) do nothing;
@@ -59,7 +77,7 @@ begin
     where m.user_id = p_user_id
     for update;
 
-  -- Daily reset (fixed UTC midnight)
+  -- Daily reset (4am Central, DST-safe)
   if v_reset is distinct from v_today then
     v_bal := p_allowance;
     v_reset := v_today;
@@ -119,7 +137,9 @@ begin
 end;
 $$;
 
--- Lock the RPCs down to the service role (the serverless function).
+-- Lock the RPCs down to the service role (the serverless function) only.
+-- Supabase's default execute-grant to anon/authenticated is revoked explicitly
+-- so production matches the locked-down intent, not just the local shim.
 revoke all on function public.mentor_reserve(uuid, integer, integer) from public, anon, authenticated;
 revoke all on function public.mentor_refund(uuid) from public, anon, authenticated;
 grant execute on function public.mentor_reserve(uuid, integer, integer) to service_role;
