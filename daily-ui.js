@@ -483,7 +483,7 @@
     const top = getTopMustDos();
     const more = getMoreMustDos();
     const topList = top.length ? top.map((it,i)=> renderMustDoRow(it, i+1)).join('')
-      : '<p class="dl-empty">'+(tomorrow ? 'What three things would make tomorrow faithful?' : 'What three things would make today faithful?')+'</p>';
+      : '<p class="dl-empty">'+(tomorrow ? 'This is where tomorrow begins.' : 'What three things would make today faithful?')+'</p>';
     const moreBlock = more.length
       ? '<details class="dl-more-tasks"><summary>More tasks ('+more.length+')</summary>'+
         '<div class="dl-list">'+more.map(it=> renderMustDoRow(it)).join('')+'</div></details>'
@@ -500,7 +500,7 @@
   function renderFirstFruitsCompact(){
     const rows = getHabitRows();
     const cards = rows.length ? rows.map(renderHabitRow).join('')
-      : '<p class="dl-empty">These are the rhythms that protect your day. Add your own non-negotiables below.</p>';
+      : '<p class="dl-empty">These are the rhythms that keep a day faithful.</p>';
     return '<section class="gr-card dl-cc-card dl-cc-full" id="sec-first-fruits" data-dl-sec="habits">'+
       '<h3 class="dl-cc-title serif">Non-Negotiables / Habits</h3>'+
       '<p class="dl-cc-q">These are the rhythms that protect your day.</p>'+
@@ -626,7 +626,7 @@
     const rows = getHabitRows();
     const st = sectionStatus('habits');
     const cards = rows.length ? rows.map(renderHabitRow).join('')
-      : '<p class="dl-empty">These are the rhythms that protect your day. Add your own non-negotiables below.</p>';
+      : '<p class="dl-empty">These are the rhythms that keep a day faithful.</p>';
     return '<section class="gr-card daily-section" data-phases="morning evening" id="sec-first-fruits" data-dl-sec="habits">'+
       '<div class="gr-card-head">'+
       '<div><div class="gr-card-kicker">Step 2</div>'+
@@ -657,11 +657,12 @@
   }
 
   function renderNonNegotiables(){
+    const tomorrow = isPlanningTomorrow();
     const top = getTopMustDos();
     const more = getMoreMustDos();
     const st = sectionStatus('mustdos');
     const topList = top.length ? top.map((it,i)=> renderMustDoRow(it, i+1)).join('')
-      : '<p class="dl-empty">What three things would make today faithful?</p>';
+      : '<p class="dl-empty">'+(tomorrow ? 'This is where tomorrow begins.' : 'What three things would make today faithful?')+'</p>';
     const moreBlock = more.length
       ? '<details class="dl-more-tasks"><summary>More tasks ('+more.length+')</summary>'+
         '<div class="dl-list">'+more.map(it=> renderMustDoRow(it)).join('')+'</div></details>'
@@ -744,7 +745,7 @@
         renderMentorBorrow(c.id)+
         '<ul class="dl-growth-items" data-dl-growth-list="'+c.id+'">'+
         (items.length ? items.map(it=> renderGrowthItem(it, c.id)).join('')
-          : '<li class="dl-empty-li">Nothing yet \u2014 add below.</li>')+
+          : '<li class="dl-empty-li">Name the smallest faithful step here.</li>')+
         '</ul>'+
         '<div class="dl-add-row">'+
         '<input type="text" class="dl-hairline" data-dl-growth-add="'+c.id+'" placeholder="Add item\u2026">'+
@@ -906,9 +907,10 @@
   function refreshMustDoList(){
     const nnList = document.getElementById('dlNonNegList');
     if(!nnList) return;
+    const tomorrow = isPlanningTomorrow();
     const top = getTopMustDos();
     nnList.innerHTML = top.length ? top.map((it,i)=> renderMustDoRow(it, i+1)).join('')
-      : '<p class="dl-empty">What three things would make today faithful?</p>';
+      : '<p class="dl-empty">'+(tomorrow ? 'This is where tomorrow begins.' : 'What three things would make today faithful?')+'</p>';
     const sec = document.getElementById('sec-non-neg');
     const moreDetails = sec?.querySelector('.dl-more-tasks');
     const more = getMoreMustDos();

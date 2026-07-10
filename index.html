@@ -1039,7 +1039,8 @@ body.view-ideas .app-content{padding-top:8px}
 .stones-panel{max-width:760px;margin:0 auto;padding:0 8px 64px}
 .stones-hero{padding:36px 4px 20px;text-align:center}
 .stones-hero-title{font-size:30px;color:var(--text-primary);margin:0 0 8px;letter-spacing:.2px}
-.stones-hero-sub{color:var(--text-secondary);font-size:14px;max-width:440px;margin:0 auto;line-height:1.6}
+.stones-purpose{color:var(--text-secondary);font-size:15px;max-width:500px;margin:0 auto 10px;line-height:1.65}
+.stones-origin{color:var(--text-muted);font-size:13px;max-width:460px;margin:0 auto;line-height:1.55;font-style:italic}
 .stones-body{margin-top:8px}
 .stones-top{display:flex;justify-content:center;margin-bottom:8px}
 .stone-setdown-btn{border:1px solid var(--gold-border);background:var(--gold-fill-06);color:var(--gold-text);
@@ -2821,7 +2822,8 @@ body.intake-open{overflow:hidden}
   <header class="stones-hero" role="banner">
     <div class="stones-hero-inner">
       <h2 class="stones-hero-title serif">Stones</h2>
-      <p class="stones-hero-sub">What you believe. What you've survived. Kept where you can reach it.</p>
+      <p class="stones-purpose">These are principles you've proven true through your own experience. When emotions lie, when motivation disappears, when life gets chaotic — return here.</p>
+      <p class="stones-origin">David defeated Goliath with five smooth stones from the brook. Every stone you set down is a truth you've tested in real life.</p>
     </div>
   </header>
   <div class="stones-body" id="stonesBody"></div>
@@ -3078,21 +3080,21 @@ body.intake-open{overflow:hidden}
 </div><!-- /.app-shell -->
 
 <script src="faithfulness-store.js"></script>
-<script src="mentorship-ui.js?v=7"></script>
-<script src="tags-ui.js"></script>
-<script src="projects-ui.js"></script>
-<script src="journal-ui.js?v=2"></script>
-<script src="stones-ui.js?v=1"></script>
-<script src="ideas-hub.js?v=6" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
+<script src="mentorship-ui.js?v=8"></script>
+<script src="tags-ui.js?v=2"></script>
+<script src="projects-ui.js?v=2"></script>
+<script src="journal-ui.js?v=3"></script>
+<script src="stones-ui.js?v=2"></script>
+<script src="ideas-hub.js?v=7" onerror="(function(){var p=document.getElementById('ihPipeline');if(p)p.innerHTML='<p class=&quot;ih-load-error&quot;>Failed to load ideas-hub.js — hard-refresh the page.</p>';})()"></script>
 <script src="stewardship-store.js?v=1"></script>
-<script src="calendar-ui.js?v=4"></script>
-<script src="daily-ui.js?v=9"></script>
-<script src="midday-ui.js?v=2"></script>
-<script src="evening-ui.js?v=1"></script>
-<script src="review-ui.js?v=2"></script>
+<script src="calendar-ui.js?v=5"></script>
+<script src="daily-ui.js?v=10"></script>
+<script src="midday-ui.js?v=3"></script>
+<script src="evening-ui.js?v=2"></script>
+<script src="review-ui.js?v=3"></script>
 <script src="profile-ui.js?v=1"></script>
 <script src="guide-ui.js?v=2"></script>
-<script src="intake-ui.js?v=2"></script>
+<script src="intake-ui.js?v=3"></script>
 <script src="mentor-context.js?v=1"></script>
 <script src="mentor-ui.js?v=1"></script>
 <script>
@@ -3881,7 +3883,7 @@ function renderSeedbed(){
   if(viewBtn) viewBtn.hidden = items.length <= 12;
   const shown=items.slice(0,12);
   if(!shown.length){
-    shelf.innerHTML='<span class="seed-empty">No seeds waiting. Capture one above.</span>';
+    shelf.innerHTML='<span class="seed-empty">Seeds are rough captures — jot one before it fades.</span>';
   } else {
     shelf.innerHTML=shown.map(i=>{
       const dot=i.status==='growing'?'gold':(i.status==='harvested'?'harvest':(i.status==='resting'?'':''));
@@ -3890,7 +3892,7 @@ function renderSeedbed(){
   }
   if(list && seedbedListOpen){
     list.classList.add('open');
-    list.innerHTML=items.map(i=>'<div class="seed-list-row"><span>'+esc(i.text)+'</span><button type="button" class="pipe-text-btn" data-seed="'+i.id+'">Load</button></div>').join('')||'<div class="seed-empty">Nothing in the shelf.</div>';
+    list.innerHTML=items.map(i=>'<div class="seed-list-row"><span>'+esc(i.text)+'</span><button type="button" class="pipe-text-btn" data-seed="'+i.id+'">Load</button></div>').join('')||'<div class="seed-empty">Your shelf holds ideas in waiting.</div>';
   } else if(list) list.classList.remove('open');
 }
 function ideaCalMonthDate(){
@@ -3985,7 +3987,7 @@ function renderIdeaTriage(){
   if(!zone) return;
   const items=getUntouchedIdeas(3);
   if(!items.length){
-    zone.innerHTML='<section class="zone"><div class="zonehead compact"><div class="num">Idea Triage</div><h2>Inbox is clear</h2><p>Well stewarded.</p></div></section>';
+    zone.innerHTML='<section class="zone"><div class="zonehead compact"><div class="num">Idea Triage</div><h2 style="font-size:14px;font-weight:400;font-style:italic;color:var(--text-secondary)">A clear inbox means ideas aren\'t piling up untended.</h2></div></section>';
     return;
   }
   zone.innerHTML='<section class="zone"><div class="zonehead compact"><div class="num">Idea Triage</div><h2>Oldest captures</h2><p>Open Ideas Hub to clarify and plant.</p></div>'+
@@ -4727,12 +4729,12 @@ function renderFFLists(){
           if(rest.length) html+='<li class="ff-pri-divider"></li>';
         }
         html+=rest.length ? rest.map(it=> renderFFItem(it, f.key)).join('')
-          : (!anchors.length ? '<li class="hint" style="list-style:none;padding:2px 0">No items yet — add below.</li>' : '');
+          : (!anchors.length ? '<li class="hint" style="list-style:none;padding:2px 0">What one thing here would make today more faithful?</li>' : '');
         list.innerHTML=html;
       } else {
         list.innerHTML = items.length
           ? items.map(it=> renderFFItem(it, f.key)).join('')
-          : '<li class="hint" style="list-style:none;padding:2px 0">No items yet — add below.</li>';
+          : '<li class="hint" style="list-style:none;padding:2px 0">What one thing here would make today more faithful?</li>';
       }
     }
     const card = document.querySelector('.ff-card[data-ff="'+f.key+'"]');
@@ -4909,8 +4911,8 @@ function renderPrayerList(){
   if(filterBtn) filterBtn.classList.toggle('on', !!prayerCategoryFilter);
   if(!items.length){
     list.innerHTML = '<div class="dpl-empty">'+(prayerFilter==='all' && !prayerSearchQuery && !prayerCategoryFilter
-      ? 'No prayers yet — add one in the card beside you.'
-      : 'Nothing in this view yet.')+'</div>';
+      ? 'Name what\'s on your heart before God.'
+      : 'No prayers match this view — try another filter or add anew.')+'</div>';
     return;
   }
   const shown = prayerShowAll ? items : items.slice(0, 4);
@@ -5424,7 +5426,7 @@ function updateDangerReminder(){
   if(!el || !dayData) return;
   const d = dayData.danger;
   if(!d?.danger){
-    el.innerHTML = '<span class="hint">Set your plan in Morning Setup.</span>';
+    el.innerHTML = '<span class="hint">Name the obstacle before it names your day.</span>';
     return;
   }
   el.innerHTML = '<div><strong>'+esc(d.danger)+'</strong></div>'+
@@ -5441,7 +5443,7 @@ function renderQuickCaptureList(){
     '<div class="cap-row"><span class="cat">'+esc(it.cat)+'</span><span class="txt">'+esc(it.text)+'</span>'+
     (it.process?'<span class="proc">'+esc(it.process)+'</span>':'')+
     '<button type="button" class="xbtn cap-rm" data-lane="'+it.lane+'" data-id="'+it.id+'">×</button></div>'
-  ).join('') : '<p class="hint">Nothing captured yet.</p>';
+  ).join('') : '<p class="hint">What\'s in front of you right now? Capture it before it slips.</p>';
 }
 function renderCaptureItems(){ renderQuickCaptureList(); }
 function renderFruitGrid(){

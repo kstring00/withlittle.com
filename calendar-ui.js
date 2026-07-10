@@ -327,7 +327,7 @@
       '<div class="stew-b3-pick">'+selectHtml('data-act-change="b3-add" data-date="'+dateStr+'" aria-label="Choose a Big Three task"',
         [['','Choose a task to focus on…']].concat(cands.map(t=>[t.id, t.title+(t.priority==='high'?' · High':'')])), '')+'</div>' : '';
     const empty = !dm.bigThree.length && !cands.length ?
-      '<p class="stew-empty">Add tasks in Planning, then crown up to three here.</p>' : '';
+      '<p class="stew-empty">Choose up to three tasks that matter most today.</p>' : '';
     return '<div class="stew-card stew-b3"><div class="stew-card-kicker">✦ Today’s Big Three'+
       (root.helpTip?.(3,'Choose up to three tasks that matter most today. Everything else waits in Still Entrusted.')||'')+'</div>'+
       (rows||'')+picker+empty+
@@ -367,7 +367,7 @@
       }
     }
     if(!events.length && !allDay.length){
-      rows += '<div class="stew-empty stew-timeline-empty">Nothing planned yet. Click an hour or drag a task from Still Entrusted onto the timeline.</div>';
+      rows += '<div class="stew-empty stew-timeline-empty">Unscheduled hours are room for rest and faithful work.</div>';
     }
     return '<div class="stew-card stew-timeline">'+
       '<div class="stew-timeline-head">'+
@@ -408,7 +408,7 @@
     return '<div class="stew-card stew-habits-card"><div class="stew-card-head"><div class="stew-card-kicker">Today\u2019s Habits'+tip+'</div>'+
       '<span class="stew-card-meta">'+(total? done+' / '+total+' kept':'')+'</span></div>'+
       '<p class="stew-habit-explain">Habits you create in the Habit Library appear here and in your daily rhythm so you can track them each day.</p>'+
-      (rows || '<p class="stew-empty">No habits yet. Add your first below — it will appear here every day so you can track it.</p>')+
+      (rows || '<p class="stew-empty">One habit tracked daily compounds into a life.</p>')+
       '<div class="stew-add-row"><input type="text" class="stew-add-input" id="dashNewHabit" placeholder="+ New habit — Enter to save" aria-label="New habit"></div>'+
       '<button type="button" class="stew-text-link" data-act="set-view" data-id="planning">Open Habit Library →</button></div>';
   }
@@ -430,7 +430,7 @@
     return '<div class="stew-card"><div class="stew-card-head"><div class="stew-card-kicker">Still entrusted'+
       (root.helpTip?.(5,'Tasks waiting for their moment. Drag one onto the timeline, or use the arrow to move it to another day.')||'')+'</div>'+
       '<span class="stew-card-meta">'+(tasks.length? tasks.length+' waiting':'')+'</span></div>'+
-      (rows || '<p class="stew-empty">Nothing waiting. Every task has its place.</p>')+
+      (rows || '<p class="stew-empty">When everything has a place, your mind can rest.</p>')+
       '<p class="stew-of-hint">Drag onto the timeline, or use → to move gently.</p></div>';
   }
   function renderReflectionCard(dateStr, dm){
@@ -675,13 +675,13 @@
       '<div class="stew-plan-col">'+
       '<div class="stew-card"><div class="stew-card-head"><div class="stew-card-kicker">Still entrusted — task inbox</div>'+
       '<span class="stew-card-meta">'+overflow.length+' unscheduled</span></div>'+
-      (ofRows||'<p class="stew-empty">Every task has a home.</p>')+
+      (ofRows||'<p class="stew-empty">When every task has a home, your mind can rest.</p>')+
       '<div class="stew-add-row"><input type="text" class="stew-add-input" data-add-task data-project="" data-goal="" placeholder="Quick task — Enter to save"></div></div>'+
       '<div class="stew-card"><div class="stew-card-kicker">Templates</div>'+
-      (tplRows||'<p class="stew-empty">Open any block and choose “Save as template.”</p>')+'</div>'+
+      (tplRows||'<p class="stew-empty">Save a repeating block as a template — use it again tomorrow.</p>')+'</div>'+
       '<div class="stew-card stew-habit-library"><div class="stew-card-kicker">Habit Library</div>'+
       '<p class="stew-habit-explain">Habits you create here appear in your daily rhythm and on your dashboard, so you can track them each day.</p>'+
-      (habitRows||'<p class="stew-empty">No habits yet — add your first below.</p>')+
+      (habitRows||'<p class="stew-empty">Build habits here; they follow you into every day.</p>')+
       '<div class="stew-add-row"><input type="text" class="stew-add-input" id="stewNewHabit" placeholder="New habit — Enter to save"></div></div>'+
       '<div class="stew-card stew-review-links"><div class="stew-card-kicker">Rhythms of review</div>'+
       '<button type="button" class="stew-review-link" data-act="open-weekly"><strong>Weekly review</strong><span>Review · adjust · experiment</span></button>'+
@@ -741,7 +741,7 @@
         '<button type="button" class="stew-x" data-act="dr-unlink-task" data-id="'+t.id+'" aria-label="Unlink">×</button>'+
         (t.subtasks.length?'<div class="stew-subtasks">'+t.subtasks.map(s=>
           '<label class="stew-subtask'+(s.done?' done':'')+'"><input type="checkbox" data-act="subtask-toggle" data-id="'+t.id+'" data-sub="'+s.id+'"'+(s.done?' checked':'')+'>'+esc(s.text)+'</label>').join('')+'</div>':'')+
-        '</div>').join('') || '<p class="stew-empty">No tasks linked yet.</p>')+
+        '</div>').join('') || '<p class="stew-empty">Link a task to give this block a clear outcome.</p>')+
       (linkable.length?selectHtml('data-act-change="dr-link-task" aria-label="Link an existing task"',
         [['','Link an existing task…']].concat(linkable.map(t=>[t.id,t.title])), ''):'')+
       '<input type="text" class="stew-add-input" data-dr-new-task placeholder="New task for this block — Enter to add">'+
@@ -749,7 +749,7 @@
       '<div class="stew-dr-section"><h4>Habits in this block</h4>'+
       (habits.length ? habits.map(h=>
         '<label class="stew-dr-habit"><input type="checkbox" data-act="dr-habit-link" data-id="'+h.id+'"'+(d.habitIds.includes(h.id)?' checked':'')+'>'+
-        esc(h.icon)+' '+esc(h.title)+'</label>').join('') : '<p class="stew-empty">No habits yet.</p>')+
+        esc(h.icon)+' '+esc(h.title)+'</label>').join('') : '<p class="stew-empty">Attach a habit to weave rhythm into this hour.</p>')+
       '</div>'+
       '<div class="stew-dr-section"><h4>Notes</h4>'+
       '<textarea data-dr="notes" rows="3" placeholder="Context, links, anything that serves the block…">'+esc(d.notes)+'</textarea></div>'+

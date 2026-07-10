@@ -47,7 +47,7 @@
       top.map(it=> renderCheckedRow(H().mustDoDisplay?.(it) || it.text)).join('');
     return '<section class="gr-card dl-cc-card" id="ev-kept">'+
       '<h3 class="dl-cc-title serif">What did I keep?</h3>'+
-      '<div class="dl-cc-check-list">'+(list || '<p class="dl-cc-empty">Grace for the day — note what was faithful below.</p>')+'</div>'+
+      '<div class="dl-cc-check-list">'+(list || '<p class="dl-cc-empty">Even an imperfect day holds something worth naming.</p>')+'</div>'+
       '<label class="dl-label">Where did faithfulness show up today?</label>'+
       '<input type="text" class="dl-hairline" data-field="track.handledWell" placeholder="Moments, rhythms, choices\u2026"></section>';
   }

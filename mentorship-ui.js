@@ -99,7 +99,7 @@
 
   function renderApplicationTimeline(principleId){
     const apps = window.faithStore.getApplicationsByPrinciple(principleId);
-    if(!apps.length) return '<p class="ms-muted">No applications yet.</p>';
+    if(!apps.length) return '<p class="ms-muted">A principle becomes real when you put it to work.</p>';
     return '<div class="ms-app-timeline">'+apps.map(a=>
       '<div class="ms-app-row"><span class="ms-app-date">'+esc(a.date)+'</span><span class="ms-app-note">'+esc(a.note || '(no note)')+'</span></div>'
     ).join('')+'</div>';
@@ -151,7 +151,7 @@
     const groups = window.faithStore.getPrinciplesGroupedByQuestion(mentorId);
     const keys = Object.keys(groups);
     if(!keys.length){
-      return '<p class="dash-empty">No principles yet — mark a queued question as asked or import your notes.</p>';
+      return '<p class="dash-empty">Wisdom from real conversations begins with one question.</p>';
     }
     return keys.map(q=>
       '<section class="ms-question-group" id="ms-q-'+hashStr(q)+'">'+
@@ -175,7 +175,7 @@
       (asked.length ? '<ul class="ms-plain-list">'+asked.map(q=>{
         const gid = hashStr(q.text);
         return '<li><button type="button" class="ms-link" data-ms-scroll-q="'+gid+'">'+esc(q.text)+'</button></li>';
-      }).join('')+'</ul>' : '<p class="ms-muted">Nothing asked yet.</p>')+
+      }).join('')+'</ul>' : '<p class="ms-muted">Questions brought to a mentor become wisdom you can return to.</p>')+
       '</div>'+
       '<div class="ms-vault-block"><span class="ms-label">Queued for next session</span>'+
       '<ul class="ms-queue-list" data-ms-queue="'+mentorId+'">'+
@@ -209,7 +209,7 @@
       (prepView ? '<div class="ms-prep"><pre class="ms-prep-text" id="msPrepText">'+esc(prep)+'</pre>'+
       '<button type="button" class="ms-text-btn" data-ms-copy-prep="'+mentorId+'">Copy prep</button></div>' : '')+
       (sessions.length ? '<ul class="ms-session-list">'+sessions.map(s=>'<li>'+renderSessionCard(s)+'</li>').join('')+'</ul>' :
-        '<p class="ms-muted">No sessions logged yet.</p>')+
+        '<p class="ms-muted">Each conversation is worth remembering.</p>')+
       '</div>';
   }
 
@@ -255,7 +255,7 @@
   function renderThreadsView(){
     const threads = window.faithStore.getThreadsGrouped().filter(g=> g.tag !== 'untagged' || g.principles.length);
     if(!threads.length){
-      return '<p class="dash-empty">No themed principles yet — tags appear as you import or add principles.</p>';
+      return '<p class="dash-empty">Themes emerge as you capture principles over time.</p>';
     }
     return '<div class="ms-threads">'+
       threads.map(g=>
@@ -304,7 +304,7 @@
       }
       const view = parseMentorshipView(getViewMode());
       if(!view){
-        panel.innerHTML = '<p class="dash-empty">Select a mentor.</p>';
+        panel.innerHTML = '<p class="dash-empty">Choose a mentor to see their wisdom gathered here.</p>';
         return;
       }
       if(view.type === 'threads'){

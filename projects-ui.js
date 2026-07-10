@@ -24,7 +24,7 @@
       });
     }
     if(!projects.length && !selectedProjectId){
-      el.innerHTML = '<p class="dash-empty">No projects yet — create one above.</p>';
+      el.innerHTML = '<p class="dash-empty">Turn intention into work you can finish.</p>';
       return;
     }
     el.innerHTML = projects.map(p=> renderProjectCard(p)).join('');
@@ -61,9 +61,9 @@
       '<button type="button" class="btn-ghost" id="projArchiveBtn">Archive</button></div>'+
       '<div class="proj-meta">'+pc+'% · '+done.length+' done · '+open.length+' open</div>'+
       '<div class="proj-task-group"><h5>Open</h5>'+
-      (open.length ? open.map(t=> projTaskRow(t)).join('') : '<p class="dash-empty">No open tasks.</p>')+'</div>'+
+      (open.length ? open.map(t=> projTaskRow(t)).join('') : '<p class="dash-empty">Break the project into one next task.</p>')+'</div>'+
       '<div class="proj-task-group"><h5>Done</h5>'+
-      (done.length ? done.map(t=> projTaskRow(t)).join('') : '<p class="dash-empty">Nothing completed yet.</p>')+'</div>'+
+      (done.length ? done.map(t=> projTaskRow(t)).join('') : '<p class="dash-empty">Completion is built one task at a time.</p>')+'</div>'+
       '<div class="dash-add-row"><input type="text" id="projAddTaskInp" placeholder="Add task to project…">'+
       '<input type="date" id="projAddTaskDate" title="Optional calendar date">'+
       '<button type="button" id="projAddTaskBtn">+ Add</button></div></div>';

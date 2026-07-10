@@ -66,7 +66,7 @@
     body.innerHTML = sections.map(([label, rows, fn])=>{
       if(!rows.length) return '';
       return '<div class="tag-lens-group"><h4>'+label+'</h4>'+rows.map(fn).join('')+'</div>';
-    }).join('') || '<p class="dash-empty">Nothing carries this tag yet.</p>';
+    }).join('') || '<p class="dash-empty">Tags connect what matters across your whole life.</p>';
   }
 
   function openTagLens(tag){

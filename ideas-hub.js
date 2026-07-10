@@ -495,7 +495,7 @@
     const tabs = [{id:'all',label:'All'}, ...statuses.map(s=>({id:s,label:STATUS_LABELS[s]}))];
     const ideas = filteredIdeas();
     const list = ideas.length ? ideas.map(ideaRow).join('') :
-      '<div class="ih-empty">No ideas here yet. Capture something from the inbox.</div>';
+      '<div class="ih-empty">Capture the ideas worth remembering.</div>';
     return '<div class="ih-card ih-vault">'+
       '<h3 class="ih-card-title ih-vault-title">Ideas Vault</h3>'+
       '<div class="ih-vault-head">'+
@@ -532,7 +532,7 @@
     if(!pinned){
       return '<div class="ih-card ih-focus">'+
         '<div class="ih-focus-head"><span class="ih-crown">👑</span><h3 class="ih-card-title">Idea Focus</h3></div>'+
-        '<p class="ih-focus-empty">Choose an idea to focus.</p></div>';
+        '<p class="ih-focus-empty">Pin the one idea that deserves your attention now.</p></div>';
     }
     return '<div class="ih-card ih-focus">'+
       '<div class="ih-focus-head"><span class="ih-crown">👑</span><h3 class="ih-card-title">Idea Focus</h3></div>'+
@@ -624,7 +624,7 @@
     panel.hidden = false; backdrop.hidden = false;
     const log = (d.activityLog||[]).slice().reverse().map(e=>
       '<div class="ih-log-item"><span class="ih-log-time">'+formatIdeaTime(e.createdAt)+'</span> '+esc(e.message)+'</div>'
-    ).join('') || '<p class="ih-empty">No activity yet.</p>';
+    ).join('') || '<p class="ih-empty">Every step you take here will show up in this log.</p>';
 
     panel.innerHTML =
       '<div class="ih-ws-head">'+
@@ -989,7 +989,7 @@
         if(list){
           const ideas = filteredIdeas();
           list.innerHTML = ideas.length ? ideas.map(ideaRow).join('') :
-            '<div class="ih-empty">No matching ideas.</div>';
+            '<div class="ih-empty">Try different words — or capture a fresh idea.</div>';
         }
       }
     });

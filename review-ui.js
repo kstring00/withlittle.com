@@ -163,7 +163,7 @@
       '<p class="gr-rail-line" style="font-style:italic">"Teach us to number our days, that we may gain a heart of wisdom."</p>'+
       '<p class="gr-rail-line" style="color:var(--gold-text)">Psalm 90:12</p></div>'+
       '<div class="gr-rail-card"><h4 class="serif">Next Week Focus</h4>'+
-      '<p class="gr-rail-line">'+(filled(w?.nextWeekFocus)?esc(w.nextWeekFocus):'Not set yet — choose one priority below.')+'</p></div>'+
+      '<p class="gr-rail-line">'+(filled(w?.nextWeekFocus)?esc(w.nextWeekFocus):'One priority for next week beats a long list of intentions.')+'</p></div>'+
       howWorks('How This Works',[
         'Review what happened',
         'Notice patterns',
@@ -316,9 +316,9 @@
       '<div class="gr-rail-card"><h4 class="serif">Fruit Snapshot</h4>'+
       '<p class="gr-rail-line">'+rated+'/9 fruits rated'+(top ? ' · strongest: '+esc(top.name) : '')+'</p></div>'+
       '<div class="gr-rail-card"><h4 class="serif">Next Month Theme</h4>'+
-      '<p class="gr-rail-line">'+(filled(m?.theme)?esc(m.theme):'Not chosen yet')+'</p></div>'+
+      '<p class="gr-rail-line">'+(filled(m?.theme)?esc(m.theme):'Name one theme — it gives the month a direction.')+'</p></div>'+
       '<div class="gr-rail-card"><h4 class="serif">Keystone System</h4>'+
-      '<p class="gr-rail-line">'+(filled(m?.keystone)?esc(m.keystone):'Not set yet')+'</p></div>'+
+      '<p class="gr-rail-line">'+(filled(m?.keystone)?esc(m.keystone):'One keystone system unlocks faithfulness for the month.')+'</p></div>'+
       howWorks('How This Works',[
         'Name what was entrusted',
         'Notice what multiplied',

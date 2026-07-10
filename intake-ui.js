@@ -558,7 +558,7 @@
       showIdeasLink+
       '</div>'+
       '<div class="intake-agenda" id="intakeAgenda"><p class="intake-hint" style="margin-top:0">Today</p>'+
-      (pickRows || '<p class="intake-empty">Your three will land here.</p>')+
+      (pickRows || '<p class="intake-empty">Your three will take shape here.</p>')+
       '</div></div>'+
       '<button type="button" class="intake-btn-primary" data-in="b3-done">'+COPY.bigThree.cont+'</button>'+
       '</div>';

@@ -262,7 +262,7 @@
     ul.innerHTML = keys.map(k=>{
       const d = k.slice(8);
       return '<li><button type="button" class="'+(d === cur ? 'on' : '')+'" data-jdate="'+d+'">'+esc(formatJournalListDate(d))+'</button></li>';
-    }).join('') || '<li class="hint">No past entries</li>';
+    }).join('') || '<li class="hint">Your first page starts today — one honest line is enough.</li>';
   }
 
   function insertAtCursor(ta, before, after){

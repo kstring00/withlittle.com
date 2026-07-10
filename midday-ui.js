@@ -126,7 +126,7 @@
       '<p class="dd-question">Am I still living toward today\u2019s aim?</p>'+
       (aim
         ? '<div class="dd-aim-show"><span class="dd-aim-label">Today\u2019s Aim</span><span class="dd-aim-value">'+esc(aim)+'</span></div>'
-        : '<p class="dd-empty">No aim set yet — add one above or in Morning Setup.</p>')+
+        : '<p class="dd-empty">Without an aim, the day chooses for you.</p>')+
       '<div class="dd-pill-row" role="group" aria-label="Alignment">'+pills+'</div>'+copy+
       '</section>';
   }
@@ -185,7 +185,7 @@
       '<p class="dd-question">Am I still living toward today\u2019s aim?</p>'+
       (aim
         ? '<div class="dd-aim-show"><span class="dd-aim-label">Today\u2019s Aim</span><span class="dd-aim-value">'+esc(aim)+'</span></div>'
-        : '<p class="dd-empty">No aim set yet — add one in quick setup or Morning Setup.</p>')+
+        : '<p class="dd-empty">Without an aim, the day chooses for you.</p>')+
       '<div class="dd-pill-row" role="group" aria-label="Alignment">'+pills+'</div>'+copy+
       '</section>';
   }
@@ -195,7 +195,7 @@
     const kept = rows.filter(r=> H().habitRowDone?.(r)).length;
     const summary = rows.length ? kept+' of '+rows.length+' kept today' : 'No habits yet';
     const list = rows.length ? rows.map(renderDayHabitRow).join('')
-      : '<p class="dd-empty">Add non-negotiables in Morning Setup.</p>';
+      : '<p class="dd-empty">Habits are the rhythms that keep you steady.</p>';
     return '<section class="dd-card gr-card dl-cc-card" id="dd-habits">'+
       '<h3 class="dl-cc-title serif">Non-Negotiables Check</h3>'+
       '<p class="dd-summary">'+esc(summary)+'</p>'+
@@ -229,7 +229,7 @@
   function renderTop3Check(){
     const top = H().getTopMustDos?.() || [];
     const list = top.length ? top.map((it,i)=> renderDayMustDoRow(it, i+1)).join('')
-      : '<p class="dd-empty">No must-dos yet — add one in quick setup or Morning Setup.</p>';
+      : '<p class="dd-empty">Even one clear must-do gives the afternoon a center.</p>';
     return '<section class="dd-card gr-card dl-cc-card" id="dd-top3">'+
       '<h3 class="dl-cc-title serif">Top 3 Check</h3>'+
       '<p class="dd-question">What still matters most?</p>'+
