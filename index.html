@@ -1458,6 +1458,16 @@ body.view-daily .site-foot,body.view-weekly .site-foot,body.view-monthly .site-f
 .dl-habit-meta{font-size:10px;color:var(--text-muted);margin-top:2px}
 .dl-habit-status{font-size:10px;font-weight:600;color:var(--gold-text);flex:none}
 .dl-habit-card.done .dl-habit-status{color:var(--green)}
+/* editable title in place */
+.dl-habit-name[contenteditable]{cursor:text;border-radius:4px;padding:1px 3px;margin:-1px -3px;outline:none}
+.dl-habit-name[contenteditable]:hover{background:color-mix(in srgb,var(--gold) 8%,transparent)}
+.dl-habit-name[contenteditable]:focus{background:var(--bg-card);box-shadow:0 0 0 2px var(--focus-ring)}
+/* quiet remove control — hover on desktop, always on touch */
+.dl-habit-remove{flex:none;width:22px;height:22px;border:none;background:transparent;color:var(--text-muted);
+  font-size:17px;line-height:1;border-radius:50%;cursor:pointer;opacity:0;transition:opacity .12s,background .12s,color .12s}
+.dl-habit-card:hover .dl-habit-remove,.dl-habit-remove:focus-visible{opacity:1}
+.dl-habit-remove:hover{background:var(--red-bg);color:var(--red)}
+@media(hover:none){.dl-habit-remove{opacity:.65}}
 .dl-priority{width:20px;height:20px;border-radius:50%;background:var(--gold-dim);color:var(--gold-text);font-size:10px;font-weight:700;display:grid;place-items:center;flex:none}
 .dl-must-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid color-mix(in srgb,var(--border) 55%,transparent)}
 .dl-must-row:last-child{border-bottom:none}
