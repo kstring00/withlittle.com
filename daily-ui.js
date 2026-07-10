@@ -429,6 +429,17 @@
       '</section>';
   }
 
+  // Editable title + quiet remove control, identical for every row shape.
+  function habitTitleEl(kind, id, title){
+    return '<span class="dl-habit-name" contenteditable="true" spellcheck="false" role="textbox" '+
+      'aria-label="Habit name — edit and press Enter" data-dl-habit-title="1" data-row-kind="'+kind+'" data-row-id="'+esc(id)+'">'+
+      esc(title)+'</span>';
+  }
+  function habitRemoveEl(kind, id, title){
+    return '<button type="button" class="dl-habit-remove" data-dl-habit-remove="1" data-row-kind="'+kind+'" data-row-id="'+esc(id)+'" '+
+      'aria-label="Remove '+esc(title)+'" title="Remove">×</button>';
+  }
+
   function renderHabitRow(row){
     const done = habitRowDone(row);
     const status = habitRowStatus(row);
@@ -438,10 +449,11 @@
       return '<div class="dl-habit-card'+(done?' done':'')+'" data-dl-stew-habit="'+row.stewId+'">'+
         '<input type="checkbox" data-dl-stew-check="'+row.stewId+'"'+(done?' checked':'')+' aria-label="Mark '+esc(row.title)+' kept">'+
         '<div class="dl-habit-main">'+
-        '<span class="dl-habit-name">'+esc(row.title)+'</span>'+
+        habitTitleEl('stew', row.stewId, row.title)+
         (cue ? '<span class="dl-habit-meta">'+esc(cue)+'</span>' : '')+
         '</div>'+
-        '<span class="dl-habit-status">'+esc(status)+'</span></div>';
+        '<span class="dl-habit-status">'+esc(status)+'</span>'+
+        habitRemoveEl('stew', row.stewId, row.title)+'</div>';
     }
     const anchor = row.anchor;
     const kind = anchor.kind || window.faithStore?.getAnchorKind(anchor.id) || 'habit';
@@ -450,13 +462,71 @@
     return '<div class="dl-habit-card'+(done?' done':'')+(expanded?' expanded':'')+'" data-dl-ff="'+anchor.id+'">'+
       '<input type="checkbox" data-dl-habit-check="'+anchor.id+'"'+(done?' checked':'')+' aria-label="Mark '+esc(anchor.title)+' kept">'+
       '<div class="dl-habit-main">'+
-      '<span class="dl-habit-name">'+esc(anchor.title)+'</span>'+
+      habitTitleEl('anchor', anchor.id, anchor.title)+
       (cue ? '<span class="dl-habit-meta">'+esc(cue)+'</span>' : '')+
       '</div>'+
       '<span class="dl-habit-status">'+esc(status)+'</span>'+
+      habitRemoveEl('anchor', anchor.id, anchor.title)+
       (done ? '<button type="button" class="dl-text-action" data-dl-log-another="'+anchor.id+'">+ log</button>' : '')+
       (expanded ? renderSessionExpand(anchor, kind) : '')+
       '</div>';
+  }
+
+  /* ── remove / edit, writing back to whichever store the row came from ── */
+  async function removeHabitRow(kind, id){
+    const S = stew();
+    if(kind === 'stew'){
+      S?.deleteHabit?.(id);
+      await S?.save?.();
+    } else if(kind === 'anchor'){
+      const fs = window.faithStore;
+      if(fs){
+        const cfg = fs.getDailyAnchorConfig();
+        const entry = cfg.find(a=> a.id === id);
+        const linkedStew = entry?.stewHabitId || null;
+        fs.setDailyAnchorConfig(cfg.filter(a=> a.id !== id));
+        await fs.save();
+        // A ledger-added anchor is a linked pair — remove its stew twin too, or
+        // it would resurface as an unlinked stew row.
+        if(linkedStew && S?.deleteHabit){ S.deleteHabit(linkedStew); await S.save?.(); }
+      }
+    }
+    refreshDailyUI();
+    if(typeof renderCalendar === 'function' && typeof isDashboard === 'function' && isDashboard()) renderCalendar();
+    markDirty?.();
+  }
+
+  function currentHabitTitle(kind, id){
+    if(kind === 'stew') return stew()?.getHabit?.(id)?.title || '';
+    return window.faithStore?.getDailyAnchorConfig().find(a=> a.id === id)?.title || '';
+  }
+
+  async function commitHabitTitle(kind, id, raw){
+    // Preserve case exactly as typed; only tidy contenteditable whitespace.
+    const title = String(raw || '').replace(/\s+/g, ' ').trim();  // JS \s covers nbsp
+    const old = currentHabitTitle(kind, id);
+    if(!title){ refreshDailyUI(); return; }   // emptied → revert to the stored title
+    if(title === old) return;                 // unchanged → leave the row alone (no churn while tabbing)
+    const S = stew();
+    if(kind === 'stew'){
+      S?.updateHabit?.(id, { title });
+      await S?.save?.();
+    } else if(kind === 'anchor'){
+      const fs = window.faithStore;
+      if(fs){
+        const cfg = fs.getDailyAnchorConfig();
+        const entry = cfg.find(a=> a.id === id);
+        if(entry){
+          entry.title = title;
+          fs.setDailyAnchorConfig(cfg);
+          await fs.save();
+          if(entry.stewHabitId && S?.updateHabit){ S.updateHabit(entry.stewHabitId, { title }); await S.save?.(); }
+        }
+      }
+    }
+    refreshDailyUI();
+    if(typeof renderCalendar === 'function' && typeof isDashboard === 'function' && isDashboard()) renderCalendar();
+    markDirty?.();
   }
 
   function renderFirstFruits(){
@@ -1062,6 +1132,21 @@
         return;
       }
 
+      const habitRemove = e.target.closest('[data-dl-habit-remove]');
+      if(habitRemove){
+        e.preventDefault();
+        const kind = habitRemove.dataset.rowKind;
+        const id = habitRemove.dataset.rowId;
+        const title = currentHabitTitle(kind, id) || 'this habit';
+        if(confirm('Remove “'+title+'”? You can always add it again.')){
+          await removeHabitRow(kind, id);
+        }
+        return;
+      }
+
+      const habitTitle = e.target.closest('[data-dl-habit-title]');
+      if(habitTitle){ return; }   // clicking a title just places the caret to edit
+
       const repCat = e.target.closest('[data-dl-rep-cat]');
       if(repCat){
         ensureGrowthRep();
@@ -1302,6 +1387,26 @@
         e.preventDefault();
         document.getElementById('dlAnchorAddBtn')?.click();
       }
+      // Inline habit-title edit: Enter or Tab commits.
+      const titleEl = e.target.closest?.('[data-dl-habit-title]');
+      if(titleEl && (e.key === 'Enter' || e.key === 'Tab')){
+        if(e.key === 'Enter') e.preventDefault();   // don't insert a newline
+        titleEl.dataset.committing = '1';
+        commitHabitTitle(titleEl.dataset.rowKind, titleEl.dataset.rowId, titleEl.textContent);
+      }
+      if(titleEl && e.key === 'Escape'){
+        e.preventDefault();
+        titleEl.dataset.committing = '1';   // cancel = re-render restores the stored title
+        refreshDailyUI();
+      }
+    });
+
+    // Commit on blur too (clicking away), unless a key already committed.
+    app.addEventListener('focusout', e=>{
+      const titleEl = e.target.closest?.('[data-dl-habit-title]');
+      if(!titleEl) return;
+      if(titleEl.dataset.committing){ delete titleEl.dataset.committing; return; }
+      commitHabitTitle(titleEl.dataset.rowKind, titleEl.dataset.rowId, titleEl.textContent);
     });
 
     document.getElementById('categoryAddBtn')?.addEventListener('click', ()=>{
