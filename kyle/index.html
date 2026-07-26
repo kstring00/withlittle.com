@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#02050a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Kyle OS">
+  <meta name="description" content="Kyle OS — a Christ-centered personal operating system for faithfulness, stewardship, capacity, and service.">
+  <title>Kyle OS</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-lockup">
+        <div class="brand-mark">K</div>
+        <div><p class="eyebrow">PERSONAL OPERATING SYSTEM</p><h1>Kyle OS</h1></div>
+      </div>
+
+      <nav class="nav-stack" aria-label="Kyle OS environments">
+        <button class="nav-item active" data-view="command"><span>01</span>Command Center</button>
+        <button class="nav-item" data-view="garage"><span>02</span>The Garage</button>
+        <button class="nav-item" data-view="gym"><span>03</span>The Gym</button>
+        <button class="nav-item" data-view="workshop"><span>04</span>The Workshop</button>
+        <button class="nav-item" data-view="field"><span>05</span>The Field</button>
+        <button class="nav-item" data-view="sanctuary"><span>06</span>The Sanctuary</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <p class="eyebrow">FOUNDATIONAL ORDER</p>
+        <p>Identity → Rest → Faithfulness → Stewardship → Service</p>
+      </div>
+    </aside>
+
+    <main class="main-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow" id="dayLabel">TODAY</p>
+          <h2 id="greeting">Build what lasts.</h2>
+        </div>
+        <div class="top-actions">
+          <span class="sync-pill" id="syncState">Local</span>
+          <button class="ghost-btn" id="installBtn" hidden>Install</button>
+          <button class="primary-btn" id="openWithLittle">Open With Little</button>
+        </div>
+      </header>
+
+      <section id="authCard" class="auth-card panel">
+        <div><p class="eyebrow">CLOUD CONNECTION</p><h3>Use the same life system everywhere.</h3><p class="muted">Sign in with the email already connected to With Little.</p></div>
+        <div class="auth-controls">
+          <input id="emailInput" type="email" placeholder="you@example.com" autocomplete="email">
+          <button class="primary-btn" id="signInBtn">Send sign-in link</button>
+          <button class="ghost-btn" id="signOutBtn" hidden>Sign out</button>
+        </div>
+        <p class="muted" id="authMessage"></p>
+      </section>
+
+      <section class="view active" id="commandView">
+        <section class="hero-grid">
+          <article class="hero-card panel">
+            <div>
+              <p class="eyebrow">THE AIM</p>
+              <h3>Faithfulness that compounds into capacity to serve.</h3>
+              <p class="muted">The car, career, body, systems, influence, and resources remain subordinate ends. The ultimate end is the glory of God.</p>
+            </div>
+            <div class="trajectory">
+              <span>WHY</span><i></i><span>PRINCIPLES</span><i></i><span>SYSTEMS</span><i></i><span>REPS</span><i></i><span>SERVICE</span>
+            </div>
+          </article>
+
+          <article class="score-card panel">
+            <p class="eyebrow">TODAY'S TRAJECTORY</p>
+            <div class="score-ring" id="scoreRing"><strong id="habitPercent">0%</strong><span>kept</span></div>
+            <p id="habitScoreText">0 of 0 scheduled habits complete</p>
+          </article>
+        </section>
+
+        <section class="metrics-grid">
+          <article class="metric panel"><p class="eyebrow">STEWARDSHIP CREDITS</p><strong id="creditBalance">0</strong><span>Phase 2 foundation ready</span></article>
+          <article class="metric panel"><p class="eyebrow">FAITHFUL FEW</p><strong id="priorityMetric">0 / 0</strong><span>daily non-negotiables</span></article>
+          <article class="metric panel"><p class="eyebrow">NEXT FAITHFUL ACTION</p><strong class="action-text" id="nextAction">Open the day and choose the next rep.</strong></article>
+        </section>
+
+        <section class="content-grid">
+          <article class="panel section-card">
+            <div class="section-head"><div><p class="eyebrow">HABIT MOMENTUM</p><h3>Scheduled today</h3></div><span class="status-dot"></span></div>
+            <div id="habitList" class="habit-list"><p class="empty">Sign in to load your habits.</p></div>
+          </article>
+
+          <article class="panel section-card vision-panel">
+            <div class="section-head"><div><p class="eyebrow">THE WORLD BEING BUILT</p><h3>One integrated life</h3></div></div>
+            <div class="vision-track">
+              <div><span>GARAGE</span><strong>Systems and projects become operational.</strong></div>
+              <div><span>GYM</span><strong>Capacity grows through training and recovery.</strong></div>
+              <div><span>FIELD</span><strong>Clinical competence becomes service to families.</strong></div>
+              <div><span>SANCTUARY</span><strong>Identity and rest remain upstream of performance.</strong></div>
+            </div>
+          </article>
+        </section>
+      </section>
+
+      <section class="view" id="garageView"><article class="environment panel"><p class="eyebrow">THE GARAGE</p><h3>Build systems that can carry weight.</h3><p>Projects will move through Blueprint → Building → Testing → Operational → Multiplying.</p><div class="coming">Phase 1 establishes the environment. Project pipelines arrive next.</div></article></section>
+      <section class="view" id="gymView"><article class="environment panel"><p class="eyebrow">THE GYM</p><h3>Develop capacity, not appearance alone.</h3><p>Training, nutrition, recovery, sleep, and weight trajectory will live in one system.</p><div class="coming">Habit data is already connected. Deeper body metrics arrive in a later phase.</div></article></section>
+      <section class="view" id="workshopView"><article class="environment panel"><p class="eyebrow">THE WORKSHOP</p><h3>Turn experience into reusable wisdom.</h3><p>Why, principles, systems, mentoring lessons, and Pain to Wisdom will become a searchable operating library.</p><div class="coming">This shell is prepared for Stones, principles, and systems maps.</div></article></section>
+      <section class="view" id="fieldView"><article class="environment panel"><p class="eyebrow">THE FIELD</p><h3>Become capable of developing others.</h3><p>RBT debriefs, BCBA study, supervisor questions, clinical patterns, and leadership reps converge here.</p><div class="coming">Daily habit signals are connected now; clinical development workflows follow.</div></article></section>
+      <section class="view" id="sanctuaryView"><article class="environment panel"><p class="eyebrow">THE SANCTUARY</p><h3>Formation before performance.</h3><p>Scripture, prayer, identity, rest, motive checks, and alignment remain the source—not another productivity demand.</p><blockquote>God's glory → Identity in Christ → Rest → Faithfulness → Stewardship → Service</blockquote></article></section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
