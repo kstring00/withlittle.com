@@ -150,6 +150,12 @@
       createdAt: e.createdAt || nowIso(), updatedAt: e.updatedAt || null
     };
   }
+  // Optional per-habit credit override: null means "use the global default".
+  function normCredits(v){
+    if(v == null || v === '') return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? Math.max(0, Math.round(n)) : null;
+  }
   function normHabit(h){
     return {
       id: h.id || uid(), title: h.title || '', icon: h.icon || '○',
@@ -158,6 +164,14 @@
       targetTime: ['morning','midday','evening','any'].includes(h.targetTime) ? h.targetTime : 'any',
       goalId: h.goalId || null, notes: h.notes || '',
       log: h.log && typeof h.log === 'object' ? h.log : {},
+      // reps: date → { tier, completedAt, credits } — written by the credit
+      // layer; must survive normalization or duplicate-award prevention breaks.
+      reps: h.reps && typeof h.reps === 'object' ? h.reps : {},
+      domains: Array.isArray(h.domains) ? [...new Set(h.domains.map(String))] : [],
+      trajectoryStageIds: Array.isArray(h.trajectoryStageIds) ? [...new Set(h.trajectoryStageIds.map(String))] : [],
+      fullRepCredits: normCredits(h.fullRepCredits),
+      minimumRepCredits: normCredits(h.minimumRepCredits),
+      recoveryRepCredits: normCredits(h.recoveryRepCredits),
       createdAt: h.createdAt || nowIso()
     };
   }
