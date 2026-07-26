@@ -94,8 +94,20 @@
     'coffee':'Food', 'gaming':'Recovery', 'meal':'Food',
     'fishing-gear':'Gear', 'gym':'Fitness', 'fishing-day':'Experience'
   };
+  const STARTER_REWARDS = [
+    { id:'coffee', name:'Specialty coffee', category:'Food', creditCost:25, description:'Use only from the existing food/reward budget.' },
+    { id:'gaming', name:'One guilt-free gaming hour', category:'Recovery', creditCost:40, description:'Time reward; no cash value.' },
+    { id:'meal', name:'Restaurant meal', category:'Food', creditCost:60, description:'Use only from the existing dining budget.' },
+    { id:'fishing-gear', name:'Fishing purchase', category:'Gear', creditCost:80, description:'Use only from the pre-budgeted recreation amount.' },
+    { id:'gym', name:'New gym clothing', category:'Fitness', creditCost:120, description:'Use only from the clothing budget.' },
+    { id:'fishing-day', name:'Fishing day', category:'Experience', creditCost:175, description:'Planned experience; credits create permission, not money.' }
+  ];
   function runEditableRewardsV1(){
     if(data.meta.migrations.editableRewardsV1) return false;
+    // Brand-new document: plant the classic starter garage, fully editable.
+    if(!data.rewards.length && !data.ledger.length){
+      data.rewards = STARTER_REWARDS.map((r,i)=>normReward(Object.assign({ sortOrder:i }, r)));
+    }
     let upgraded = 0;
     data.rewards = data.rewards.map((r, i)=>{
       // Legacy preset shape: { id, title, cost, budgetNote }. normReward has
