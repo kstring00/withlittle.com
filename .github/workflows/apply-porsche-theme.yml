@@ -1,11 +1,13 @@
-name: Apply Porsche theme
+name: Apply With Little Phase 2 and 3
 
 on:
   push:
     branches:
-      - feature/withlittle-porsche-redesign
+      - feature/withlittle-phases-2-3
     paths:
-      - scripts/apply-porsche-theme.mjs
+      - scripts/apply-phase23.mjs
+      - porsche-phase23.css
+      - stewardship-credits.js
       - .github/workflows/apply-porsche-theme.yml
   workflow_dispatch:
 
@@ -13,27 +15,27 @@ permissions:
   contents: write
 
 jobs:
-  apply-theme:
+  apply-phase23:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: feature/withlittle-porsche-redesign
+          ref: feature/withlittle-phases-2-3
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Apply visual system without changing functionality
-        run: node scripts/apply-porsche-theme.mjs
+      - name: Inject lighter cockpit and stewardship modules
+        run: node scripts/apply-phase23.mjs
       - name: Commit transformed With Little
         run: |
           if git diff --quiet; then
-            echo "Theme already applied"
+            echo "Phase 2/3 already applied"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "Redesign existing With Little with GT3 RS visual system"
+          git commit -m "Apply lighter GT3 cockpit and stewardship credits"
           git push
