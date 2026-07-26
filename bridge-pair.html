@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pair With Little Bridge</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{--bg:#f6f1e9;--card:#fffcf7;--ink:#3d362c;--muted:#6f6558;--gold:#b8892a;--green:#427a52;--line:#d5cabb}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,Segoe UI,sans-serif;padding:20px}.card{width:min(560px,100%);background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px;box-shadow:0 18px 50px rgba(61,54,44,.08)}h1{margin:0 0 8px;font:700 34px/1.05 Georgia,serif}.eyebrow{font-size:11px;font-weight:800;letter-spacing:.14em;color:var(--gold);margin:0 0 10px}.muted{color:var(--muted)}.row{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}input,button{font:inherit;border-radius:9px;padding:11px 13px;border:1px solid var(--line)}input{flex:1;min-width:220px;background:white;color:var(--ink)}button{background:var(--ink);color:white;cursor:pointer;font-weight:650}.status{margin-top:18px;padding:12px;border-radius:10px;background:#f3ece2}.ok{color:var(--green);font-weight:700}.hidden{display:none}</style>
+</head>
+<body>
+<main class="card">
+<p class="eyebrow">WITH LITTLE WINDOWS BRIDGE</p>
+<h1>Pair this computer</h1>
+<p class="muted">Sign in to With Little, then this page securely passes a temporary Supabase session to the bridge running only on this Windows computer. Your password is never sent to the bridge.</p>
+<div id="signedOut">
+  <div class="row"><input id="email" type="email" autocomplete="email" placeholder="you@example.com"><button id="send">Send sign-in link</button></div>
+</div>
+<div id="signedIn" class="hidden"><p class="ok">Signed in. Pairing with Windows…</p></div>
+<div id="status" class="status">Checking your session…</div>
+</main>
+<script>
+const SUPABASE_URL='https://lfgukrnfuradrgofzxsz.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_VwhWvbGrfWR7jkJY5QKwyw_Ka14_Y-m';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,detectSessionInUrl:true,autoRefreshToken:true}});
+const statusEl=document.getElementById('status');
+const signedOut=document.getElementById('signedOut');
+const signedIn=document.getElementById('signedIn');
+async function pair(session){
+  if(!session)return;
+  signedOut.classList.add('hidden'); signedIn.classList.remove('hidden');
+  statusEl.textContent='Connecting to the local bridge…';
+  try{
+    const response=await fetch('http://127.0.0.1:8765/pair',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({access_token:session.access_token,refresh_token:session.refresh_token,expires_at:session.expires_at,user:{id:session.user?.id,email:session.user?.email}})});
+    if(!response.ok) throw new Error(await response.text());
+    statusEl.innerHTML='<span class="ok">Paired successfully.</span> You may close this tab. Your Rainmeter widgets will update automatically.';
+  }catch(error){
+    statusEl.textContent='The local bridge was not reachable. Leave this page open, start the bridge installer, then refresh. Details: '+error.message;
+  }
+}
+async function check(){const {data}=await sb.auth.getSession(); if(data.session) pair(data.session); else statusEl.textContent='Sign in to pair this Windows computer.'}
+document.getElementById('send').onclick=async()=>{const email=document.getElementById('email').value.trim(); if(!email)return; statusEl.textContent='Sending sign-in link…'; const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.href}}); statusEl.textContent=error?error.message:'Check your email and open the sign-in link on this computer.'};
+sb.auth.onAuthStateChange((_event,session)=>{if(session)pair(session)}); check();
+</script>
+</body>
+</html>
