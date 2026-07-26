@@ -1,0 +1,39 @@
+name: Apply Porsche theme
+
+on:
+  push:
+    branches:
+      - feature/withlittle-porsche-redesign
+    paths:
+      - scripts/apply-porsche-theme.mjs
+      - .github/workflows/apply-porsche-theme.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply-theme:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feature/withlittle-porsche-redesign
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Apply visual system without changing functionality
+        run: node scripts/apply-porsche-theme.mjs
+      - name: Commit transformed With Little
+        run: |
+          if git diff --quiet; then
+            echo "Theme already applied"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Redesign existing With Little with GT3 RS visual system"
+          git push
