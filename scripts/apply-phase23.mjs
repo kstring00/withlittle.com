@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+const file='index.html';
+let html=fs.readFileSync(file,'utf8');
+const css='<link rel="stylesheet" href="porsche-phase23.css">';
+const js='<script src="stewardship-credits.js" defer></script>';
+if(!html.includes('porsche-phase23.css')) html=html.replace('</head>',`${css}\n</head>`);
+if(!html.includes('stewardship-credits.js')) html=html.replace('</body>',`${js}\n</body>`);
+html=html.replace(/<meta name="theme-color"[^>]*>/g,'');
+html=html.replace('</head>','<meta name="theme-color" content="#07101b">\n</head>');
+fs.writeFileSync(file,html);
+console.log('Applied lighter cockpit and Phase 2/3 modules.');
